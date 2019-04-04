@@ -53,7 +53,10 @@ before_install:
 
 install:
   # - yarn --ignore-engines
-  - yarn
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn --ignore-engines; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn --ignore-engines; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then npm install -g cnpm --registry=https://registry.npm.taobao.org; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cnpm i; fi
   # On Linux, initialize "virtual display". See before_script
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -77,6 +80,7 @@ before_script:
 script:
   # - yarn
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release:linux; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn release:win; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release:mac; fi
   # - yarn flow
