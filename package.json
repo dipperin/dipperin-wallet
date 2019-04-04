@@ -223,8 +223,6 @@
     "publish": [
       {
         "provider": "github",
-        "token": "c88408b40f6572833f6fd3c5a868ada9c9cee7f6",
-        "private": true,
         "vPrefixedTagName": true,
         "publishAutoUpdate": false
       }
