@@ -1,0 +1,8 @@
+@import './fonts/index.css';
+@import '~rc-pagination/dist/rc-pagination.min.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
