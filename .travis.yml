@@ -82,6 +82,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release:linux; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn release:win; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then echo "======================================="; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then dir; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release:mac; fi
   # - yarn flow
