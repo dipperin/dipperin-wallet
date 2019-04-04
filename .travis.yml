@@ -2,31 +2,31 @@ matrix:
   allow_failures:
     - os: windows
   include:
-    - os: osx
-      language: node_js
-      node_js:
-        - node
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+    # - os: osx
+    #   language: node_js
+    #   node_js:
+    #     - node
+    #   env:
+    #     - ELECTRON_CACHE=$HOME/.cache/electron
+    #     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
-    - os: linux
-      language: node_js
-      node_js:
-        - node
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-multilib
-            - g++-8
-            - g++-multilib
-            - icnsutils
-            - graphicsmagick
-            - xz-utils
-            - xorriso
-            - rpm
+    # - os: linux
+    #   language: node_js
+    #   node_js:
+    #     - node
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - gcc-multilib
+    #         - g++-8
+    #         - g++-multilib
+    #         - icnsutils
+    #         - graphicsmagick
+    #         - xz-utils
+    #         - xorriso
+    #         - rpm
 
     - os: windows
       language: node_js
@@ -82,6 +82,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release:linux; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn release:win; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then dir; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release:mac; fi
   # - yarn flow
   # # HACK: Temporarily ignore `yarn test` on linux
