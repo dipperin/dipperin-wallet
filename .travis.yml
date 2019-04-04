@@ -52,7 +52,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX="g++-8"; fi
 
 install:
-  - yarn --ignore-engines
+  # - yarn --ignore-engines
+  - yarn
   # On Linux, initialize "virtual display". See before_script
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -74,7 +75,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
-  - yarn
+  # - yarn
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release:linux; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn release:win; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release:mac; fi
