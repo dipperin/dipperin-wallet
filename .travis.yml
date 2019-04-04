@@ -74,8 +74,10 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
-  - ./script.sh "yarn"
-  - ./script.sh  "yarn release:all"
+  - yarn
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yarn release:linux; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then yarn release:win; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn release:mac; fi
   # - yarn flow
   # # HACK: Temporarily ignore `yarn test` on linux
   # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn test; fi
