@@ -817,10 +817,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@dipperin/dipperin.js@^0.4.39":
-  version "0.4.39"
-  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.39.tgz#6b2edeafabdbe6658bc71c3ebfae38d6668eb926"
-  integrity sha512-Kbbo+lwkBQ03uEK/tYnU+w5ae2RJGfcNxogLH5jxYNSlt5rt7PLc+nAp8IqcdLG5Sohf8LsRxp5Pyro6xq2VsQ==
+"@dipperin/dipperin.js@^0.4.40":
+  version "0.4.40"
+  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.40.tgz#67527408b32fd1b1a7c09148f4b252c931e2df4e"
+  integrity sha512-cgNqWpWvdURdUJgKHv2mtPlhRIQyB4YB3kismPZbsQQfqEqUTNeMEbO8SQbZB+wbHfJuntyqK2+0iyl7T3PHlg==
   dependencies:
     axios "^0.18.0"
     bignumber.js "^7.2.1"
