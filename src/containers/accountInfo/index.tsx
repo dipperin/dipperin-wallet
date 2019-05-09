@@ -9,6 +9,7 @@ import { RouteComponentProps } from 'react-router'
 import { I18nCollectionAccount } from '@/i18n/i18n'
 import ChangeAccount from '@/images/change-account.png'
 import Lock from '@/images/lock-wallet.png'
+import WhiteLock from '@/images/whiteLock.png'
 import AccountStore from '@/stores/account'
 import WalletStore from '@/stores/wallet'
 import RootStore from '@/stores/root'
@@ -152,9 +153,15 @@ export class AccountInfo extends React.Component<Props> {
             {labels.account} {activeAccount.id}
           </p>
           <p>
-            {activeAccount.balance}
+            {Number(activeAccount.balance).toLocaleString()}
             <span>&nbsp;&nbsp;DIP</span>
           </p>
+          {Number(activeAccount.lockMoney) > 0 && (
+            <p>
+              <img src={WhiteLock} />
+              <span> &nbsp;{Number(activeAccount.lockMoney).toLocaleString()} &nbsp;DIP</span>
+            </p>
+          )}
           <p>{activeAccount.address}</p>
         </div>
         <div className={classes.btnWrap}>

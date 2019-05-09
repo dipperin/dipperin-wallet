@@ -92,7 +92,7 @@ export const REMOTE_MECURY = 'remoteMecury'
  * net/host obj
  */
 export const NET_HOST_OBJ = {
-  [REMOTE_TEST]: 'http://10.200.0.139:3035',
+  [REMOTE_TEST]: 'http://172.16.5.201:3035',
   [REMOTE_MECURY]: 'http://14.17.65.122:3035'
 }
 /**

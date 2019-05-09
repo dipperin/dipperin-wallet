@@ -44,8 +44,11 @@ const styles = createStyles({
   },
   right: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
     height: 81,
-    padding: '11px 0 9px 9px',
+    padding: '0px 0 0 9px',
 
     '& p:nth-child(1)': {
       fontSize: 12,
@@ -53,7 +56,7 @@ const styles = createStyles({
       fontWeight: 'bold'
     },
     '& p:nth-child(2)': {
-      margin: '4px 0',
+      margin: '0 0 0',
       fontSize: 24,
       color: '#fff',
       fontWeight: 400,
@@ -63,6 +66,20 @@ const styles = createStyles({
       }
     },
     '& p:nth-child(3)': {
+      // margin: '2px 0',
+      fontSize: 16,
+      color: 'rgba(255,255,255,0.4)',
+      fontWeight: 400,
+      '& img': {
+        height: 12,
+        width: 9
+      },
+      '& span': {
+        fontSize: 16,
+        fontWeight: 'bold'
+      }
+    },
+    '& p:nth-last-child(1)': {
       fontSize: 12,
       color: '#fff',
       fontWeight: 'bold'
