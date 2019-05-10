@@ -10,6 +10,8 @@ export default class AccountModel {
 
   @observable
   private _balance: BigNumber = new BigNumber(0)
+  @observable
+  private _lockMoney: BigNumber = new BigNumber(0)
 
   /**
    * Get Account model from an object
@@ -54,6 +56,11 @@ export default class AccountModel {
   }
 
   @computed
+  get lockMoney() {
+    return Utils.fromUnit(this._lockMoney.toString(10))
+  }
+
+  @computed
   get balanceUnit() {
     return this._balance.toString(10)
   }
@@ -66,6 +73,14 @@ export default class AccountModel {
   updateBalance(balance: string) {
     if (balance) {
       this._balance = new BigNumber(balance)
+    }
+  }
+
+  @action
+  updatelockMoney(lockMoney: string) {
+    if (lockMoney) {
+      // console.log('update lockMoney:', lockMoney)
+      this._lockMoney = new BigNumber(lockMoney)
     }
   }
 

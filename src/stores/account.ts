@@ -42,8 +42,10 @@ export default class AccountStore {
    */
   startUpdate() {
     this.updateAccountsBalance()
+    this.updateAddressLockMoney()
     this.updateAccountsNonce()
     this._store.timer.on('update-balance', this.updateAccountsBalance.bind(this), 5000)
+    this._store.timer.on('update-lockMoney', this.updateAddressLockMoney.bind(this), 5000)
     this._store.timer.on('update-nonce', this.updateAccountsNonce.bind(this), 30000)
   }
 
@@ -118,6 +120,7 @@ export default class AccountStore {
    * @param id Account id
    */
   async updateAccountsBalance(id?: string): Promise<void> {
+    console.log('updateAccountsBalance..........')
     if (id) {
       const selectAccount = this._accountMap.get(id)
       if (selectAccount) {
@@ -126,6 +129,24 @@ export default class AccountStore {
     } else {
       for (const account of this._accountMap.values()) {
         account.updateBalance(await this.getAccountBalance(account.address))
+      }
+    }
+  }
+
+  async updateAddressLockMoney(id?: string): Promise<void> {
+    console.log('start updateAddressLockMoney.....')
+    if (id) {
+      const selectAccount = this._accountMap.get(id)
+      if (selectAccount) {
+        const lockMoney = await this.getAddressLockMoney(selectAccount.address)
+        console.log(selectAccount.address, lockMoney)
+        selectAccount.updatelockMoney(lockMoney)
+      }
+    } else {
+      for (const account of this._accountMap.values()) {
+        const lockMoney = await this.getAddressLockMoney(account.address)
+        console.log(account.address, lockMoney)
+        account.updatelockMoney(lockMoney)
       }
     }
   }
@@ -154,6 +175,16 @@ export default class AccountStore {
   private async getAccountBalance(address: string): Promise<string> {
     try {
       const res = await this._store.dipperin.dr.getBalance(address)
+      return res || '0'
+    } catch (err) {
+      return ''
+    }
+  }
+
+  private async getAddressLockMoney(address: string): Promise<string> {
+    try {
+      const res = await this._store.dipperin.dr.getLockedMoney(address)
+      console.log('getAddressLockMoney', res)
       return res || '0'
     } catch (err) {
       return ''
