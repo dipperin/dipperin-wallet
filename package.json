@@ -1,6 +1,6 @@
 {
   "name": "dipperin-wallet",
-  "version": "0.3.13",
+  "version": "1.0.1",
   "description": "Dipperin Offcial Wallet",
   "private": false,
   "license": "MIT",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
-    "@dipperin/dipperin.js": "^0.4.38",
+    "@dipperin/dipperin.js": "^0.4.40",
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.1",
     "@material-ui/styles": "^3.0.0-alpha.10",
@@ -237,7 +237,7 @@
     ]
   },
   "dipperin": {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "server": "114.119.116.157:9000"
   },
   "babel": {

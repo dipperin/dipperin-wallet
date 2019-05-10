@@ -816,33 +816,11 @@
     esutils "^2.0.2"
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
-"@dipperin/dipperin.js@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.38.tgz#6ab1238073d9e3721414434c3e0c6e74f5f75291"
-  integrity sha512-4bkA1MPQ1SPUVmbXPRPCyzphnjHfuR4WdNZ3TsdL5W4wp+oiTGWBJyd5J+7ra7I+NMApY9j+mRc1GpN0B5K++Q==
-  dependencies:
-    axios "^0.18.0"
-    bignumber.js "^7.2.1"
-    crypto-js "^3.1.9-1"
-    eventemitter3 "^3.1.0"
-    isomorphic-ws "^4.0.1"
-    js-base64 "^2.4.5"
-    keccak "^1.4.0"
-    lodash "^4.17.10"
-    oboe "^2.1.4"
-    qs "^6.5.2"
-    scryptsy "^2.0.0"
-    secp256k1 "^3.5.0"
-    sha.js "^2.4.10"
-    t-hd-key "^0.1.6"
-    utf8 "^3.0.0"
-    uuid "^3.2.1"
-    ws "^6.1.2"
 
-"@dipperin/dipperin.js@^0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.36.tgz#a7d035eb9d7720e7eb10f61b851c056175d2a178"
-  integrity sha512-KL4WCDtabci4QgHs39bZF9AELcCMux88KFZbDr57tEtOb0EtrA7Hi9vyCn7Si8a0k+/nz8HFv409kU8uOLZ6fw==
+"@dipperin/dipperin.js@^0.4.40":
+  version "0.4.40"
+  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.40.tgz#67527408b32fd1b1a7c09148f4b252c931e2df4e"
+  integrity sha512-cgNqWpWvdURdUJgKHv2mtPlhRIQyB4YB3kismPZbsQQfqEqUTNeMEbO8SQbZB+wbHfJuntyqK2+0iyl7T3PHlg==
   dependencies:
     axios "^0.18.0"
     bignumber.js "^7.2.1"

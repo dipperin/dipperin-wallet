@@ -42,6 +42,8 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
     .catch(noop)
     .then(() => fsChmod(dipperinPath(), '755')) // Should already be 755 after download, just to be sure
     .then(() => {
+      log.info('dipperinPath:', dipperinPath())
+      log.info('chainDataDir:', chainDataDir)
       dipperin = spawn(
         dipperinPath(),
         [
