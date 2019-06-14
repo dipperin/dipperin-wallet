@@ -12,10 +12,12 @@ import {
   OWNER_DB,
   TRANSACTION_DB,
   TRANSACTION_STATUS_SUCCESS,
-  WALLET_DB
+  WALLET_DB,
+  VM_CONTRACT_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
+import { VmContractObj } from '@/models/vmContract'
 
 const getDB = (type: string): Nedb => {
   const { remote } = require('electron')
@@ -166,6 +168,36 @@ export const updateActiveId = (walletId: number, activeAccountId: string) => {
 export const updateErrTimes = (walletId: number, unlockErrTimes: number = 0) => {
   const db = getDB(WALLET_DB)
   db.update({ walletId }, { $set: { unlockErrTimes } })
+}
+
+/**
+ * vm contract
+ */
+
+export const insertVmContract = (contract: VmContractObj, net: string = DEFAULT_NET) => {
+  const db = getDB(VM_CONTRACT_DB)
+  db.update({ txHash: contract.txHash }, { $set: { ...contract, net } }, { upsert: true })
+}
+
+export const updateVmContractStatus = (
+  txHash: string,
+  status: string,
+  contractAddress: string,
+  net: string = DEFAULT_NET
+) => {
+  const db = getDB(VM_CONTRACT_DB)
+  db.update({ txHash, net }, { $set: { status, contractAddress } }, { multi: true })
+}
+
+export const getVmContract = async (net: string = DEFAULT_NET): Promise<VmContractObj[]> => {
+  const db = getDB(VM_CONTRACT_DB)
+  const contracts = (await new Promise(resolve => {
+    db.find({ net }, (err, res) => {
+      resolve(res)
+    })
+  })) as VmContractObj[]
+
+  return contracts
 }
 
 /**

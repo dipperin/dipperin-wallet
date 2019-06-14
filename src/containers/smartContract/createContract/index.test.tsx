@@ -45,13 +45,6 @@ describe('favoriteContract', () => {
     expect(component.exists()).toBe(true)
   })
 
-  it('test jumpBack', () => {
-    const mockHistoryPush = jest.fn()
-    mockRouterProps.history.push = mockHistoryPush
-    instance.jumpBack()
-    expect(mockHistoryPush.mock.calls[0][0]).toBe('/auth/smart_contract/list/created')
-  })
-
   it('change type/name/symbol/amount/decimal/fee', () => {
     component.find(Select).simulate('change', {
       target: {

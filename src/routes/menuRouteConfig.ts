@@ -38,6 +38,13 @@ const dashboardRoutes: DashboardRoutes[] = [
     iconActive: contractActive
   },
   {
+    path: '/main/vm_contract',
+    sidebarName: 'vmContract',
+    navbarName: 'VM Contract',
+    icon: contract,
+    iconActive: contractActive
+  },
+  {
     path: '/main/setting',
     sidebarName: 'setting',
     navbarName: 'Setting',

@@ -10,6 +10,7 @@ import AccountInfo from '@/containers/accountInfo'
 import Accounts from '@/containers/accounts'
 import Setting from '@/containers/setting'
 import SmartContract from '@/containers/smartContract'
+import VmContract from '@/containers/vmContract'
 // stores
 import WalletStore from '@/stores/wallet'
 import settings from '@/utils/settings'
@@ -89,6 +90,7 @@ class Main extends React.Component<Props> {
           <Route path="/main/wallet" component={Account} />
           <Route path="/main/setting" component={Setting} />
           <Route path="/main/contract" component={SmartContract} />
+          <Route path="/main/vm_contract" component={VmContract} />
         </Switch>
         {this.showAccounts && <Accounts handleClose={this.handleClose} history={this.props.history} />}
         {this.showTour && (

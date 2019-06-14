@@ -134,18 +134,15 @@ export default class AccountStore {
   }
 
   async updateAddressLockMoney(id?: string): Promise<void> {
-    console.log('start updateAddressLockMoney.....')
     if (id) {
       const selectAccount = this._accountMap.get(id)
       if (selectAccount) {
         const lockMoney = await this.getAddressLockMoney(selectAccount.address)
-        console.log(selectAccount.address, lockMoney)
         selectAccount.updatelockMoney(lockMoney)
       }
     } else {
       for (const account of this._accountMap.values()) {
         const lockMoney = await this.getAddressLockMoney(account.address)
-        console.log(account.address, lockMoney)
         account.updatelockMoney(lockMoney)
       }
     }
@@ -184,7 +181,6 @@ export default class AccountStore {
   private async getAddressLockMoney(address: string): Promise<string> {
     try {
       const res = await this._store.dipperin.dr.getLockedMoney(address)
-      console.log('getAddressLockMoney', res)
       return res || '0'
     } catch (err) {
       return ''

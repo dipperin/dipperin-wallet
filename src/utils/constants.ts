@@ -46,6 +46,7 @@ export const ACCOUNT_DB = 'account'
 export const TRANSACTION_DB = 'transaction'
 export const WALLET_DB = 'wallet'
 export const CONTRACT_DB = 'contract'
+export const VM_CONTRACT_DB = 'vmContrat'
 export const FAVORITE_CONTRACT = 'favoriteContract'
 export const OWNER_DB = 'owner'
 
@@ -101,3 +102,5 @@ export const NET_HOST_OBJ = {
 export enum TIMET_NAME {
   CONNECTING = 'connecting'
 }
+
+export const VM_CONTRACT_ADDRESS = '0x00120000000000000000000000000000000000000000'

@@ -57,6 +57,7 @@ export const zhCN = {
     sidebar: {
       wallet: '钱包',
       contract: '智能合约',
+      vmContract: '虚拟机智能合约',
       setting: '设置',
       title: 'Dipperin 钱包',
       walletVersion: '钱包版本',
@@ -245,6 +246,7 @@ export const zhCN = {
   contract: {
     contract: {
       add: '添加',
+      call: '调用',
       favoriteContract: '收藏合约',
       contractType: '合约类型',
       contract: '合约',
@@ -254,6 +256,12 @@ export const zhCN = {
       status: '状态',
       address: '地址',
       name: '合约名',
+      code: '代码',
+      abi: 'ABI',
+      gas: 'Gas',
+      gasPrice: 'Gas Price',
+      detail: '详情',
+      initParams: '初始化参数',
       type: '合约类型',
       amount: '总量',
       balance: '余额',
@@ -262,6 +270,7 @@ export const zhCN = {
       fee: '手续费',
       moreThan: '不少于',
       createTitle: '创建新通证',
+      createVmTitle: '创建新合约',
       return: '返回',
       pending: '打包中',
       success: '成功',
@@ -273,6 +282,14 @@ export const zhCN = {
         addSuccess: '添加成功',
         addFailed: '找不到该合约',
         swalConfirm: '确定'
+      },
+      callDialog: {
+        title: '调用合约方法',
+        name: '方法名',
+        params: '参数',
+        callSuccess: '调用成功',
+        callFail: '调用失败',
+        incorrectPassword: '密码错误'
       },
       createSwal: {
         createSuccess: '创建合约成功',
@@ -456,6 +473,7 @@ export const enUS: I18nCollection = {
     sidebar: {
       wallet: 'Wallet',
       contract: 'Contract',
+      vmContract: 'VM Contract',
       setting: 'Setting',
       title: 'Dipperin Wallet',
       walletVersion: 'Wallet Version',
@@ -645,6 +663,7 @@ export const enUS: I18nCollection = {
   contract: {
     contract: {
       add: 'Add',
+      call: 'Call',
       favoriteContract: 'favorite contract',
       contractType: 'Contract Type',
       contract: 'contract',
@@ -655,6 +674,12 @@ export const enUS: I18nCollection = {
       address: 'Address',
       name: 'Name',
       type: 'Type',
+      code: 'Code',
+      abi: 'ABI',
+      gas: 'Gas',
+      gasPrice: 'Gas Price',
+      initParams: 'Init Params',
+      detail: 'Detail',
       amount: 'Amount',
       balance: 'Balance',
       decimals: 'Decimals',
@@ -662,6 +687,7 @@ export const enUS: I18nCollection = {
       fee: 'Poundage',
       moreThan: 'more than',
       createTitle: 'Create New Token',
+      createVmTitle: 'Create New Contract',
       return: 'Return',
       pending: 'pending',
       success: 'success',
@@ -673,6 +699,14 @@ export const enUS: I18nCollection = {
         addSuccess: 'Add contract success',
         addFailed: `Can't find this contract`,
         swalConfirm: 'OK'
+      },
+      callDialog: {
+        title: 'Call Contract Method',
+        name: 'Method Name',
+        params: 'Params',
+        callSuccess: 'Call Success',
+        callFail: 'Call Failed',
+        incorrectPassword: 'Incorrect password'
       },
       createSwal: {
         createSuccess: 'Create contract success',
