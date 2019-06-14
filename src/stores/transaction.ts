@@ -99,10 +99,17 @@ class TransactionStore {
     }
   }
 
-  async confirmTransaction(address: string, amount: string, memo: string, fee: string): Promise<TxResponse> {
+  async confirmTransaction(
+    address: string,
+    amount: string,
+    memo: string,
+    fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
     try {
-      const transaction = this.createNewTransaction(address, amount, memo, fee)
+      const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
       // console.dir(transaction.toJS())
@@ -187,16 +194,30 @@ class TransactionStore {
     this.load()
   }
 
-  private createNewTransaction(address: string, amount: string, memo: string, fee?: string): TransactionModel {
+  private createNewTransaction(
+    address: string,
+    amount: string,
+    memo: string,
+    fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): TransactionModel {
     const fromAccount = this._store.account.activeAccount
     const amountUnit = Utils.toUnit(amount)
 
     const feeUnit = fee ? Utils.toUnit(fee) : '0'
+    const gasUnit = gas ? gas : '0'
+    const gasPriceUnit = gasPrice ? gasPrice : '0'
 
     const accountAmount = Utils.toUnit(fromAccount.balance)
-    if (new BN(accountAmount).lt(new BN(amountUnit).plus(new BN(feeUnit)))) {
+    if (
+      new BN(accountAmount).lt(
+        new BN(amountUnit).plus(new BN(feeUnit)).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
+      )
+    ) {
       throw new Errors.NoEnoughBalanceError()
     }
+
     return new TransactionModel({
       nonce: fromAccount.nonce,
       extraData: memo,
@@ -204,7 +225,9 @@ class TransactionStore {
       hashLock: DEFAULT_HASH_LOCK,
       from: fromAccount.address,
       to: address,
-      fee: feeUnit
+      fee: feeUnit,
+      gas: gasUnit,
+      gasPrice: gasPriceUnit
     })
   }
 
