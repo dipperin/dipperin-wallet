@@ -59,10 +59,6 @@ export class CreateContract extends React.Component<IProps> {
     reaction(() => this.props.account.activeAccount, () => this.setWaitConfirm(false)) // TODO
   }
 
-  jumpBack = () => {
-    this.props.history.push('/auth/smart_contract/list/created')
-  }
-
   @action
   handleChangeType = (e: React.ChangeEvent<{ value: string }>) => {
     this.type = e.target.value

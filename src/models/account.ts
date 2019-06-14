@@ -79,7 +79,6 @@ export default class AccountModel {
   @action
   updatelockMoney(lockMoney: string) {
     if (lockMoney) {
-      // console.log('update lockMoney:', lockMoney)
       this._lockMoney = new BigNumber(lockMoney)
     }
   }

@@ -15,6 +15,10 @@ export default class TransactionModel {
   @observable
   private _fee: string
   @observable
+  private _gas: string
+  @observable
+  private _gasPrice: string
+  @observable
   private _status: string
   @observable
   private _timestamp: number
@@ -39,6 +43,8 @@ export default class TransactionModel {
       hashLock,
       transactionHash,
       fee,
+      gas,
+      gasPrice,
       timestamp
     } = transaction
 
@@ -54,10 +60,9 @@ export default class TransactionModel {
     if (transactionHash) {
       this._transactionHash = transactionHash as string
     }
-
     if (fee && fee !== '0') {
       this._fee = fee
-    } else {
+    } else if ((!gas && !gasPrice) || (gas === '0' && gasPrice === '0')) {
       this._fee = Accounts.getTransactionFee({
         extraData,
         fee: '0',
@@ -67,6 +72,13 @@ export default class TransactionModel {
         to,
         value
       })
+    } else {
+      this._fee = '0'
+    }
+
+    if (gas && gasPrice) {
+      this._gas = gas
+      this._gasPrice = gasPrice
     }
 
     if (timestamp) {
@@ -123,6 +135,16 @@ export default class TransactionModel {
   }
 
   @computed
+  get gas() {
+    return this._gas
+  }
+
+  @computed
+  get gasPrice() {
+    return this._gasPrice
+  }
+
+  @computed
   get feeUint() {
     return this._fee
   }
@@ -174,7 +196,9 @@ export default class TransactionModel {
         timeLock: this.timeLock,
         to: this._to,
         value: this._value,
-        from: this._from
+        from: this._from,
+        gas: this.gas,
+        gasPrice: this.gasPrice
       },
       privateKey,
       chainId
@@ -209,6 +233,8 @@ export interface TransactionInterface {
   from: string
   extraData?: string
   fee?: string
+  gas?: string
+  gasPrice?: string
   status?: string
   timeLock?: number
   timestamp?: number

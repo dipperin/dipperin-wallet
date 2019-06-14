@@ -14,6 +14,7 @@ import LoadingStore from './loading'
 import TimerStore from './timer'
 import TransactionStore from './transaction'
 import WalletStore from './wallet'
+import VmContractStore from './vmContract'
 
 interface Window {
   dipperin: any
@@ -28,6 +29,7 @@ class RootStore {
   loading: LoadingStore
   timer: TimerStore
   contract: ContractStore
+  vmContract: VmContractStore
   dipperin: Dipperin
 
   private _subscribeBlock
@@ -44,6 +46,7 @@ class RootStore {
     this.account = new AccountStore(this)
     this.transaction = new TransactionStore(this)
     this.contract = new ContractStore(this)
+    this.vmContract = new VmContractStore(this)
     this.startCheckConnect()
     this.loadData()
 
@@ -130,6 +133,7 @@ class RootStore {
     this.account.clear()
     this.transaction.clear()
     this.contract.clear()
+    this.vmContract.clear()
     if (isReset) {
       resetDB()
       this.wallet.clear()
@@ -184,6 +188,7 @@ class RootStore {
     await this.account.load()
     await this.transaction.load()
     await this.contract.load()
+    await this.vmContract.load()
     this.startUpdate()
   }
 
@@ -198,6 +203,7 @@ class RootStore {
     this.account.startUpdate()
     this.transaction.startUpdate()
     this.contract.startUpdate()
+    this.vmContract.startUpdate()
     this.startSubscribe()
   }
 

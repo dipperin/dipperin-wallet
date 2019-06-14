@@ -92,7 +92,6 @@ class Routes extends React.Component<Props> {
       wallet,
       loading: { downloading }
     } = this.props
-    console.log('sss')
     return (
       <Fragment>
         <Sidebar logo={Logo} routes={routes} location={location} history={history} wallet={wallet} />
