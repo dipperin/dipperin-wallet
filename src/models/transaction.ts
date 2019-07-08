@@ -65,7 +65,7 @@ export default class TransactionModel {
     } else if ((!gas && !gasPrice) || (gas === '0' && gasPrice === '0')) {
       this._fee = Accounts.getTransactionFee({
         extraData,
-        fee: '0',
+        // fee: '0',
         hashLock,
         nonce,
         timeLock,
@@ -190,7 +190,7 @@ export default class TransactionModel {
     const signedTransaction = Accounts.signTransaction(
       {
         extraData: this.extraData,
-        fee: this._fee,
+        // fee: this._fee,
         hashLock: this._hashLock,
         nonce: this._nonce,
         timeLock: this.timeLock,

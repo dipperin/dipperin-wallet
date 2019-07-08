@@ -120,6 +120,7 @@ export default class AccountStore {
    * @param id Account id
    */
   async updateAccountsBalance(id?: string): Promise<void> {
+    console.log('updateAccountsBalance..........')
     if (id) {
       const selectAccount = this._accountMap.get(id)
       if (selectAccount) {

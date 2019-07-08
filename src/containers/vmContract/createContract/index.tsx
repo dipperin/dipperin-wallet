@@ -171,7 +171,7 @@ export class CreateContract extends React.Component<IProps> {
           </div>
           <div className={classes.inputItem}>
             <FormControl fullWidth={true}>
-              <InputLabel>{labels.amount}</InputLabel>
+              <InputLabel>{labels.value}</InputLabel>
               <Input type="text" value={this.amount} required={true} onChange={this.amountChange} />
             </FormControl>
           </div>
