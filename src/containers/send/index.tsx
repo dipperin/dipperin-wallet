@@ -121,7 +121,7 @@ export class Send extends React.Component<IProps> {
   send = async () => {
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
-    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, this.fee)
+    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo)
     if (res.success) {
       this.handleCloseDialog()
       this.initState()

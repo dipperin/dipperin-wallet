@@ -14,7 +14,7 @@ import format from 'date-fns/format'
 interface Props {
   labels: I18nCollectionContract['contract']
   contracts: VmContractModel[]
-  jumpToCall: (contractAddress: string) => void
+  jumpToCall: (contractAddress: string, contractTxHash: string) => void
   jumpToDetail: (contractAddress: string) => void
 }
 
@@ -44,14 +44,14 @@ export default ContractTable
 interface ItemProps extends WithStyles {
   labels: I18nCollectionContract['contract']
   contract: VmContractModel
-  jumpToCall: (contractAddress: string) => void
+  jumpToCall: (contractAddress: string, contractTxHash: string) => void
   jumpToDetail: (contractAddress: string) => void
 }
 
 @observer
 export class ContractItem extends React.Component<ItemProps> {
   jumpToCall = () => {
-    this.props.jumpToCall(this.props.contract.contractAddress)
+    this.props.jumpToCall(this.props.contract.contractAddress, this.props.contract.txHash)
   }
   jumpToDetail = () => {
     this.props.jumpToDetail(this.props.contract.contractAddress)

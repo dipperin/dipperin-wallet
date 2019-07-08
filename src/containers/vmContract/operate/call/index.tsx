@@ -84,7 +84,7 @@ export class Call extends React.Component<IProps> {
     if (res) {
       const callContract = vmContract.contract.get(address)!
       const callRes = await vmContract.confirmCallContractMethod(
-        address,
+        callContract.contractAddress,
         callContract.contractAbi,
         this.name,
         this.gas,
@@ -147,6 +147,7 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (!callContract) {
+      console.log('vmContract.contract.get(address)', address, callContract)
       return null
     }
     return (
@@ -161,7 +162,7 @@ export class Call extends React.Component<IProps> {
             onChange={this.nameChange}
             autoFocus={true}
             margin="dense"
-            label={labels.name}
+            label={labels.functionName}
             type="text"
             fullWidth={true}
           />
