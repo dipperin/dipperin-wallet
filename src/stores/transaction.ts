@@ -103,13 +103,15 @@ class TransactionStore {
     address: string,
     amount: string,
     memo: string,
-    fee?: string,
+    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
     try {
-      const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
       // console.dir(transaction.toJS())
@@ -198,21 +200,23 @@ class TransactionStore {
     address: string,
     amount: string,
     memo: string,
-    fee?: string,
+    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): TransactionModel {
     const fromAccount = this._store.account.activeAccount
     const amountUnit = Utils.toUnit(amount)
 
-    const feeUnit = fee ? Utils.toUnit(fee) : '0'
-    const gasUnit = gas ? gas : '0'
-    const gasPriceUnit = gasPrice ? gasPrice : '0'
+    // const feeUnit = fee ? Utils.toUnit(fee) : '0'
+    // TODO: confirm default with yc
+    const gasUnit = gas ? gas : '120000'
+    const gasPriceUnit = gasPrice ? gasPrice : '1'
 
     const accountAmount = Utils.toUnit(fromAccount.balance)
     if (
       new BN(accountAmount).lt(
-        new BN(amountUnit).plus(new BN(feeUnit)).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
+        // new BN(amountUnit).plus(new BN(feeUnit)).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
+        new BN(amountUnit).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
       )
     ) {
       throw new Errors.NoEnoughBalanceError()
@@ -225,7 +229,7 @@ class TransactionStore {
       hashLock: DEFAULT_HASH_LOCK,
       from: fromAccount.address,
       to: address,
-      fee: feeUnit,
+      // fee: feeUnit,
       gas: gasUnit,
       gasPrice: gasPriceUnit
     })

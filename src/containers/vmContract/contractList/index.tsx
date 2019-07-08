@@ -48,9 +48,13 @@ export class VmContractList extends React.Component<Props> {
     this.page = value
   }
 
-  jumpToCall = (contractAddress: string) => {
-    const { match, history } = this.props
-    history.push(`${match.url}/call/${contractAddress}`)
+  jumpToCall = (contractAddress: string, contractTxHash: string) => {
+    const { vmContract, match, history } = this.props
+    if (vmContract.contract.has(contractAddress)) {
+      history.push(`${match.url}/call/${contractAddress}`)
+    } else {
+      history.push(`${match.url}/call/${contractTxHash}`)
+    }
   }
 
   jumpToDetail = (contractAddress: string) => {

@@ -85,7 +85,7 @@ class VmContractStore {
         VM_CONTRACT_ADDRESS,
         amount,
         contract.contractData,
-        '0',
+        // '0',
         gas,
         gasPrice
       )
@@ -125,7 +125,7 @@ class VmContractStore {
     try {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
 
-      const res = await this._store.transaction.confirmTransaction(address, '0', callData, '0', gas, gasPrice)
+      const res = await this._store.transaction.confirmTransaction(address, '0', callData, gas, gasPrice)
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
         this._contractTxsMap.set(address, [...txs, res.hash as string])
@@ -189,6 +189,7 @@ class VmContractStore {
   }
 
   updateContractStatus() {
+    // const newContracts: VmContractModel[] = []
     this._contract.forEach(contract => {
       if (!contract.isSuccess && !contract.isOverLongTime(getNowTimestamp())) {
         this._store.dipperin.dr.vmContract
@@ -210,6 +211,12 @@ class VmContractStore {
               if (res) {
                 contract.contractAddress = res
                 contract.setSuccess()
+                console.log('update contract status.....................')
+                // if(!this._contract.get(res)) {
+                //   console.log('update contract status', contract.contractAddress)
+                //   newContracts.push(contract)
+                //   console.log('after update contract status', newContracts.length)
+                // }
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,
@@ -234,6 +241,15 @@ class VmContractStore {
           })
       }
     })
+    // console.log('newContracts keys',newContracts.length)
+    // newContracts.forEach(contract=>{
+    //   console.log('new contract')
+    //   if(contract.contractAddress) {
+    //     console.log('new contract to _contract')
+    //     this._contract.set(contract.contractAddress, contract)
+    //     console.log('after casting', this._contract.get(contract.contractAddress))
+    //   }
+    // })
   }
 
   private getContractsFromObj(contractObj: VmContractObj[] = []) {
