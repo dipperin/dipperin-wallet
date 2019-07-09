@@ -147,6 +147,39 @@ export class CreateContract extends React.Component<IProps> {
     this.props.history.push('/main/vm_contract/list')
   }
 
+  // handleConfirmMock = async () => {
+  //   this.handleShowDialog()
+  // }
+
+  // dialogConfirmMock = async () => {
+  //   const { labels } = this.props
+  //   const res = true
+  //   if (res) {
+  //     const contractRes = await this.props.vmContract.confirmCreateContractMock()
+  //     if (contractRes.success) {
+  //       await swal.fire({
+  //         title: labels.createSwal.createSuccess,
+  //         type: 'success',
+  //         timer: 1000
+  //       })
+  //     } else {
+  //       this.handleCloseDialog()
+  //       swal.fire({
+  //         title: labels.createSwal.createErr,
+  //         text: contractRes.info,
+  //         type: 'error'
+  //       })
+  //     }
+  //   } else {
+  //     await swal.fire({
+  //       type: 'error',
+  //       title: labels.createSwal.incorrectPassword
+  //     })
+  //   }
+  // }
+
+  // handleDialogConfirmMock = debounce(this.dialogConfirmMock, 1000)
+
   render() {
     const { classes, labels } = this.props
     return (
@@ -155,6 +188,9 @@ export class CreateContract extends React.Component<IProps> {
           <img src={returnImg} alt="" />
           <span>{labels.return}</span>
         </p>
+        {/* <button onClick={this.handleDialogConfirmMock}>
+          Create Mock Contract
+        </button> */}
         <p className={classes.title}>{labels.createVmTitle}</p>
         <form onSubmit={this.handleConfirm} className={classes.form}>
           <div className={classes.inputItem}>

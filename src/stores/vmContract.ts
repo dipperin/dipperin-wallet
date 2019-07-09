@@ -11,6 +11,8 @@ import { TxResponse } from './transaction'
 import { VmContract } from '@dipperin/dipperin.js'
 import Receipt from '@/models/receipt'
 
+// import ExtraData from './vmTestData'
+
 class VmContractStore {
   private _store: RootStore
 
@@ -65,6 +67,36 @@ class VmContractStore {
     this._store.timer.on('update_vmContracts_receipts', this.getContractReceipt.bind(this), 3000)
   }
 
+  // async confirmCreateContractMock(): Promise<TxResponse> {
+  //   try {
+  //     const res = await this._store.transaction.confirmTransaction(
+  //       VM_CONTRACT_ADDRESS,
+  //       '0',
+  //       ExtraData,
+  //       // '0',
+  //       '5000000',
+  //       '1'
+  //     )
+  //     if (res.success) {
+  //         console.log('CreateContractMock success!')
+  //       return {
+  //         success: true
+  //       }
+  //     } else {
+  //       return {
+  //         success: false,
+  //         info: res.info
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error(String(err))
+  //     return {
+  //       success: false,
+  //       info: String(err)
+  //     }
+  //   }
+  // }
+
   async confirmCreateContract(
     code: string,
     abi: string,
@@ -80,7 +112,7 @@ class VmContractStore {
         initParams: params,
         owner: this._store.account.activeAccount.address
       })
-
+      console.log('contractData', contract.contractData)
       const res = await this._store.transaction.confirmTransaction(
         VM_CONTRACT_ADDRESS,
         amount,

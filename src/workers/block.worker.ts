@@ -5,7 +5,7 @@ const ctx = self as any
 export interface ReqTransaction {
   value: number
   nonce: number
-  fee: number
+  // fee: number
   from: string
   to: string
   tx_id: string
@@ -17,7 +17,7 @@ export interface RespTransaction {
   nonce: string
   to: string
   from: string
-  fee: string
+  // fee: string
   transactionHash: string
   timestamp: number
   extraData?: string
@@ -69,7 +69,7 @@ export const filterTransactions = (
           nonce: tx.nonce.toString(),
           to: tx.to,
           from: tx.from,
-          fee: tx.fee.toString(),
+          // fee: tx.fee.toString(),
           transactionHash: tx.tx_id,
           timestamp: parseInt((timestamp / 1000000).toFixed(0), 10),
           extraData: tx.input
