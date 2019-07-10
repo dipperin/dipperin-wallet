@@ -1,11 +1,42 @@
 import { createStyles } from '@material-ui/core/styles'
 import CreateImg from '@/images/create_contract.png'
 import sCreateImg from '@/images/create_contract_small.png'
+import addCircleImg from '@/images/add-circle-default.png'
+import addCircleHoverImg from '@/images/add-circle-hover.png'
 import { textOverflow, grayColor, materialButton } from '@/styles/appStyle'
+
 const styles = createStyles({
   root: {
     padding: '0 24px',
     position: 'relative'
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    cursor: 'pointer',
+    display: 'inline-block',
+    // marginTop: '32px',
+    // marginBottom: '36px',
+    '& img': {
+      margin: '0 24px'
+    },
+    '& span': {
+      fontWeight: 'bold'
+    },
+    '&:hover': {
+      opacity: 0.7
+    }
+  },
+  addCircle: {
+    display: 'inline-block',
+    fontSize: 22,
+    width: 22,
+    height: 22,
+    background: `url(${addCircleImg}) no-repeat`,
+    '&:hover': {
+      background: `url(${addCircleHoverImg}) no-repeat`
+    }
   },
   link: {
     position: 'absolute',
@@ -69,7 +100,7 @@ const styles = createStyles({
     backgroundColor: '#fff'
   },
   row: {
-    height: '48px',
+    // height: '48px',
     lineHeight: '48px',
     backgroundColor: '#fff',
     color: '#999',
@@ -83,7 +114,7 @@ const styles = createStyles({
   item: {
     display: 'inline-block',
     fontSize: '12px',
-    width: '14%',
+    // width: '14%',
     textAlign: 'center',
     fontWeight: 400,
     verticalAlign: 'top',
@@ -93,13 +124,13 @@ const styles = createStyles({
     },
 
     '&:nth-of-type(2)': {
-      textAlign: 'center',
-      width: '40%'
+      textAlign: 'center'
+      // width: '40%'
     },
 
     '&:last-of-type': {
       textAlign: 'center',
-      width: '30%',
+      // width: '30%',
       paddingRight: '30px'
     }
   },

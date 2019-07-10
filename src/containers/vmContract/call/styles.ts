@@ -14,7 +14,7 @@ const styles = createStyles({
   button: {
     display: 'block',
     margin: '15px auto',
-    width: '262px',
+    // width: '262px',
     height: '36px',
     textTransform: 'none',
     fontSize: '16px',
@@ -27,7 +27,7 @@ const styles = createStyles({
     display: 'block',
     position: 'relative',
     margin: '0 auto',
-    width: 450
+    width: '100%'
   },
   title: {
     fontSize: 20,

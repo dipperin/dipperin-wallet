@@ -64,13 +64,17 @@ export class ContractItem extends React.Component<ItemProps> {
           [classes.success]: contract.status === TRANSACTION_STATUS_SUCCESS
         })}
       >
-        <div className={classes.item}>{labels[contract.status]}</div>
-        <div className={classes.item}>{contract.contractAddress}</div>
+        {!(contract.status === TRANSACTION_STATUS_SUCCESS) && (
+          <div className={classes.item}>{labels[contract.status]}</div>
+        )}
+        <div className={classes.item} style={{ cursor: 'pointer' }} onClick={this.jumpToCall}>
+          {contract.contractAddress}
+        </div>
         <div className={classes.item}>{format(new Date(contract.timestamp), 'YY/MM/DD HH:mm')}</div>
         <div className={classes.item}>
-          <Button style={{ marginRight: '20px' }} variant="contained" color="primary" onClick={this.jumpToCall}>
+          {/* <Button style={{ marginRight: '20px' }} variant="contained" color="primary" onClick={this.jumpToCall}>
             {labels.call}
-          </Button>
+          </Button> */}
           <Button variant="contained" color="primary" onClick={this.jumpToDetail}>
             {labels.detail}
           </Button>

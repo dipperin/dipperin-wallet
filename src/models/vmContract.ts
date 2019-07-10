@@ -159,3 +159,15 @@ export interface VmContractObj {
   timestamp: number
   txHash?: string
 }
+
+export interface VmContractAbiInput {
+  name: string
+  type: string
+}
+export interface VmcontractAbi {
+  name: string
+  inputs: VmContractAbiInput[]
+  outputs?: VmContractAbiInput[]
+  constants?: string
+  type: string
+}

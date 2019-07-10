@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -26,9 +26,15 @@ interface IProps extends WithStyles<typeof styles>, WrapProps {
 @inject('vmContract')
 @observer
 export class Receipts extends React.Component<IProps> {
+  switchToList = () => {
+    this.props.history.push('/main/vm_contract/')
+  }
+
   render() {
     const {
       vmContract,
+      classes,
+      labels,
       match: {
         params: { address }
       }
@@ -36,7 +42,12 @@ export class Receipts extends React.Component<IProps> {
     const receipts = vmContract.receipts.get(address) || []
 
     return (
-      <Fragment>
+      <div className={classes.container}>
+        <p className={classes.return}>
+          <span onClick={this.switchToList}>{labels.return}</span>
+          <span>>></span>
+          <span>{labels.return}</span>
+        </p>
         {receipts.map((receipt, index) => {
           return (
             <div key={index}>
@@ -59,7 +70,7 @@ export class Receipts extends React.Component<IProps> {
             </div>
           )
         })}
-      </Fragment>
+      </div>
     )
   }
 }

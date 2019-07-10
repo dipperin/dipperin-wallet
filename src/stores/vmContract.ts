@@ -162,7 +162,8 @@ class VmContractStore {
         const txs = this._contractTxsMap.get(address) || []
         this._contractTxsMap.set(address, [...txs, res.hash as string])
         return {
-          success: true
+          success: true,
+          info: res.hash
         }
       } else {
         return {

@@ -8,25 +8,53 @@ const styles = createStyles({
     fontWeight: 'bold',
     marginBottom: '40px'
   },
-  return: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    cursor: 'pointer',
-    marginTop: '32px',
-    marginBottom: '36px',
-    '& img': {
-      margin: '0 24px'
+  tab: {
+    height: 36,
+    width: 260,
+    marginTop: 21,
+    border: `1px solid ${primaryColor}`,
+    borderRadius: '4px',
+    overflow: 'hidden'
+  },
+  tabLeft: {
+    display: 'inline-block',
+    width: '50%',
+    height: '100%',
+    borderRight: `1px solid ${primaryColor}`
+  },
+  tabRight: {
+    display: 'inline-block',
+    width: '50%',
+    height: '100%'
+  },
+  tabButton: {
+    width: '100%',
+    height: '100%',
+    padding: 0,
+    textTransform: 'none',
+    background: '#fff',
+    borderRadius: 0,
+    ...materialButton,
+    '&:hover': {
+      background: '#fff'
     },
     '& span': {
-      fontWeight: 'bold'
-    },
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: grayColor
+    }
+  },
+  active: {
+    background: primaryColor,
     '&:hover': {
-      opacity: 0.7
+      background: primaryColor
+    },
+    '& span': {
+      color: '#fff'
     }
   },
   form: {
-    width: 576,
+    width: '100%',
     margin: '0 auto'
   },
   inputItem: {
@@ -54,7 +82,7 @@ const styles = createStyles({
     height: '36px',
     textTransform: 'none',
     fontSize: '16px',
-    margin: '30px auto',
+    // margin: '30px auto',
     ...materialButton,
     '& span': {
       fontWeight: 'bold'

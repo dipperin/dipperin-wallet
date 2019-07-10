@@ -7,9 +7,10 @@ import swal from 'sweetalert2'
 import debounce from 'lodash/debounce'
 import isFloat from 'validator/lib/isFloat'
 import isInt from 'validator/lib/isInt'
+import classNames from 'classnames'
 
 import PasswordConfirm from '@/components/passwordConfirm'
-import returnImg from '@/images/return.png'
+// import returnImg from '@/images/return.png'
 import VmContractStore from '@/stores/vmContract'
 import WalletStore from '@/stores/wallet'
 import AccountStore from '@/stores/account'
@@ -18,12 +19,12 @@ import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
-import { helper } from '@dipperin/dipperin.js'
+import { helper, Utils } from '@dipperin/dipperin.js'
 
 interface WrapProps extends RouteComponentProps<{}> {
-  account: AccountStore
-  wallet: WalletStore
-  vmContract: VmContractStore
+  account?: AccountStore
+  wallet?: WalletStore
+  vmContract?: VmContractStore
 }
 
 interface IProps extends WithStyles<typeof styles>, WrapProps {
@@ -46,6 +47,10 @@ export class CreateContract extends React.Component<IProps> {
   params: string = ''
   @observable
   showDialog: boolean = false
+  @observable
+  isCreated: boolean = true
+  @observable
+  contractAddress: string = ''
 
   @action
   codeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +61,16 @@ export class CreateContract extends React.Component<IProps> {
         this.code = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
       }
     }
+  }
+
+  @action
+  jumpToCreated = () => {
+    this.isCreated = true
+  }
+
+  @action
+  jumpToFavorite = () => {
+    this.isCreated = false
   }
 
   @action
@@ -91,6 +106,15 @@ export class CreateContract extends React.Component<IProps> {
   }
 
   @action
+  contractAddressChange = (e: React.ChangeEvent<{ value: string }>) => {
+    const address = e.target.value
+    const hexAddress = `0x${address.replace('0x', '')}`
+    if (Utils.isAddress(hexAddress)) {
+      this.contractAddress = address
+    }
+  }
+
+  @action
   paramsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.params = e.target.value
   }
@@ -104,7 +128,7 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      const contractRes = await this.props.vmContract.confirmCreateContract(
+      const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
         this.gas,
@@ -118,7 +142,7 @@ export class CreateContract extends React.Component<IProps> {
           type: 'success',
           timer: 1000
         })
-        this.switchToList()
+        // this.switchToList()
       } else {
         this.handleCloseDialog()
         swal.fire({
@@ -184,55 +208,97 @@ export class CreateContract extends React.Component<IProps> {
     const { classes, labels } = this.props
     return (
       <Fragment>
-        <p className={classes.return} onClick={this.switchToList}>
+        <div className={classes.tab}>
+          <div className={classes.tabLeft} data-tour="created-btn">
+            <Button
+              onClick={this.jumpToCreated}
+              variant="contained"
+              className={classNames(classes.tabButton, { [classes.active]: this.isCreated })}
+            >
+              {labels.created}
+            </Button>
+          </div>
+          <div className={classes.tabRight} data-tour="receive-btn">
+            <Button
+              onClick={this.jumpToFavorite}
+              variant="contained"
+              className={classNames(classes.tabButton, { [classes.active]: !this.isCreated })}
+            >
+              {labels.favorite}
+            </Button>
+          </div>
+        </div>
+        {/* <p className={classes.return} onClick={this.switchToList}>
           <img src={returnImg} alt="" />
           <span>{labels.return}</span>
-        </p>
+        </p> */}
         {/* <button onClick={this.handleDialogConfirmMock}>
           Create Mock Contract
         </button> */}
-        <p className={classes.title}>{labels.createVmTitle}</p>
+        {/* <p className={classes.title}>{labels.createVmTitle}</p> */}
         <form onSubmit={this.handleConfirm} className={classes.form}>
-          <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel shrink={true}>{labels.code}</InputLabel>
-              <Input type="file" onChange={this.codeChange} required={true} />
-            </FormControl>
-          </div>
           <div className={classes.inputItem}>
             <FormControl fullWidth={true}>
               <InputLabel shrink={true}>{labels.abi}</InputLabel>
               <Input type="file" required={true} onChange={this.abiChange} />
             </FormControl>
           </div>
-          <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel>{labels.value}</InputLabel>
-              <Input type="text" value={this.amount} required={true} onChange={this.amountChange} />
-            </FormControl>
-          </div>
-          <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel>{labels.gas}</InputLabel>
-              <Input type="text" value={this.gas} required={true} onChange={this.gasChange} />
-            </FormControl>
-          </div>
-          <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel>{labels.gasPrice}</InputLabel>
-              <Input value={this.gasPrice} type="text" required={true} onChange={this.gasPriceChange} />
-            </FormControl>
-          </div>
-          <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel>{labels.initParams}</InputLabel>
-              <Input value={this.params} type="text" required={true} onChange={this.paramsChange} />
-            </FormControl>
-          </div>
+          {this.isCreated && (
+            <Fragment>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel shrink={true}>{labels.code}</InputLabel>
+                  <Input type="file" onChange={this.codeChange} required={true} />
+                </FormControl>
+              </div>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel>{labels.value}</InputLabel>
+                  <Input type="text" value={this.amount} required={true} onChange={this.amountChange} />
+                </FormControl>
+              </div>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel>{labels.gas}</InputLabel>
+                  <Input type="text" value={this.gas} required={true} onChange={this.gasChange} />
+                </FormControl>
+              </div>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel>{labels.gasPrice}</InputLabel>
+                  <Input value={this.gasPrice} type="text" required={true} onChange={this.gasPriceChange} />
+                </FormControl>
+              </div>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel>{labels.initParams}</InputLabel>
+                  <Input value={this.params} type="text" required={true} onChange={this.paramsChange} />
+                </FormControl>
+              </div>
+              <Button variant="contained" color="primary" className={classes.button} type="submit">
+                {labels.create}
+              </Button>
+            </Fragment>
+          )}
 
-          <Button variant="contained" color="primary" className={classes.button} type="submit">
-            {labels.create}
-          </Button>
+          {!this.isCreated && (
+            <Fragment>
+              <div className={classes.inputItem}>
+                <FormControl fullWidth={true}>
+                  <InputLabel>{labels.address}</InputLabel>
+                  <Input
+                    type="text"
+                    value={this.contractAddress}
+                    required={true}
+                    onChange={this.contractAddressChange}
+                  />
+                </FormControl>
+              </div>
+              <Button variant="contained" color="primary" className={classes.button} type="submit">
+                {labels.add}
+              </Button>
+            </Fragment>
+          )}
         </form>
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
       </Fragment>

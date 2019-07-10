@@ -4,10 +4,13 @@ import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-import { Button, TextField } from '@material-ui/core'
+import { TextField } from '@material-ui/core'
 import swal from 'sweetalert2'
 import _ from 'lodash'
 import isInt from 'validator/lib/isInt'
+
+// model
+import { VmcontractAbi } from '@/models/vmContract'
 
 // store
 import VmContractStore from '@/stores/vmContract'
@@ -15,8 +18,10 @@ import WalletStore from '@/stores/wallet'
 
 // components
 import PasswordConfirm from '@/components/passwordConfirm'
+import FunctionCaller from './functionCaller'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
+import { helper } from '@dipperin/dipperin.js'
 import styles from './styles'
 
 interface WrapProps extends RouteComponentProps<{ address: string }> {
@@ -38,9 +43,26 @@ export class Call extends React.Component<IProps> {
   @observable
   showDialog: boolean = false
   @observable
-  gas: string = ''
+  gas: string = '1000000'
   @observable
-  gasPrice: string = ''
+  gasPrice: string = '1'
+  @observable
+  abi: VmcontractAbi[] = []
+
+  constructor(props) {
+    super(props)
+    const {
+      match: {
+        params: { address }
+      },
+      vmContract
+    } = this.props
+    const callContract = vmContract.contract.get(address)
+    if (callContract) {
+      this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
+      console.log(JSON.parse(helper.Bytes.toString(callContract.contractAbi)))
+    }
+  }
 
   @action
   nameChange = e => {
@@ -69,6 +91,12 @@ export class Call extends React.Component<IProps> {
   handleConfirm = async e => {
     e.preventDefault()
     // TODO: Add validate
+    this.handleShowDialog()
+  }
+
+  handleCall = async (funcName: string, params: string) => {
+    this.name = funcName
+    this.params = params
     this.handleShowDialog()
   }
 
@@ -139,7 +167,7 @@ export class Call extends React.Component<IProps> {
   render() {
     const {
       vmContract,
-      classes,
+      // classes,
       labels,
       match: {
         params: { address }
@@ -152,12 +180,12 @@ export class Call extends React.Component<IProps> {
     }
     return (
       <Fragment>
-        <form onSubmit={this.handleConfirm} className={classes.form}>
-          <p className={classes.title}>{`${labels.callDialog.title}:`}</p>
-          <p className={classes.config}>
+        {/* <form onSubmit={this.handleConfirm} className={classes.form}> */}
+        {/* <p className={classes.title}>{`${labels.callDialog.title}:`}</p> */}
+        {/* <p className={classes.config}>
             <b>{labels.address}:</b> {callContract.contractAddress}
-          </p>
-          <TextField
+          </p> */}
+        {/* <TextField
             value={this.name}
             onChange={this.nameChange}
             autoFocus={true}
@@ -165,32 +193,32 @@ export class Call extends React.Component<IProps> {
             label={labels.functionName}
             type="text"
             fullWidth={true}
-          />
-          <TextField
+          /> */}
+        {/* <TextField
             value={this.params}
             onChange={this.paramsChange}
             margin="dense"
             label={labels.callDialog.params}
             type="text"
             fullWidth={true}
-          />
-          <TextField
-            value={this.gas}
-            onChange={this.gasChange}
-            margin="dense"
-            label={labels.gas}
-            type="text"
-            fullWidth={true}
-          />
-          <TextField
-            value={this.gasPrice}
-            onChange={this.gasPriceChange}
-            margin="dense"
-            label={labels.gasPrice}
-            type="text"
-            fullWidth={true}
-          />
-          <Button
+          /> */}
+        <TextField
+          value={this.gas}
+          onChange={this.gasChange}
+          margin="dense"
+          label={labels.gas}
+          type="text"
+          fullWidth={true}
+        />
+        <TextField
+          value={this.gasPrice}
+          onChange={this.gasPriceChange}
+          margin="dense"
+          label={labels.gasPrice}
+          type="text"
+          fullWidth={true}
+        />
+        {/* <Button
             disabled={!(this.name && this.gas && this.gasPrice)}
             variant="contained"
             color="primary"
@@ -198,8 +226,13 @@ export class Call extends React.Component<IProps> {
             type="submit"
           >
             {labels.call}
-          </Button>
-        </form>
+          </Button> */}
+        {this.abi
+          .filter(item => item.name !== 'init')
+          .map(item => (
+            <FunctionCaller labels={labels} func={item} onCall={this.handleCall} />
+          ))}
+        {/* </form> */}
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
       </Fragment>
     )
