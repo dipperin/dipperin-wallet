@@ -65,23 +65,27 @@ class FunctionCaller extends React.Component<Props> {
     return (
       <div className={classes.callerBox} style={{ borderLeft: `4px solid ${color}` }}>
         <div className={classes.topbar}>
-          <button disabled={this.ifshowDetailInput} className={classes.button} onClick={this.paramsCall}>
+          <button disabled={this.ifshowDetailInput} className={classes.topBtn} onClick={this.paramsCall}>
             {func.name}
           </button>
           <input
+            className={classes.topInput}
             disabled={this.ifshowDetailInput}
             value={this.params}
             placeholder={placeholder}
             onChange={this.paramsChange}
           />
-          <span onClick={this.toggleShowDetailInput}>{this.ifshowDetailInput ? '▲' : '▼'}</span>
+          <span className={classes.arrow} onClick={this.toggleShowDetailInput}>
+            {this.ifshowDetailInput ? '▲' : '▼'}
+          </span>
         </div>
         {this.ifshowDetailInput && (
           <div className={classes.inputList}>
             {func.inputs.map(input => (
               <div key={input.name} className={classes.inputItem}>
-                <span>{input.name}</span>
+                <span className={classes.inputName}>{input.name}:</span>
                 <input
+                  className={classes.inputText}
                   placeholder={input.type}
                   value={this.inputValue[input.name]}
                   onChange={this.InputValueChange(input.name)}

@@ -64,6 +64,11 @@ export class VmContractList extends React.Component<Props> {
     }
   }
 
+  jumpToCreate = () => {
+    const { match, history } = this.props
+    history.push(`${match.url}/create`)
+  }
+
   jumpToDetail = (contractAddress: string) => {
     const { match, history } = this.props
     console.log(`${match.url}/receipts/${contractAddress}`)
@@ -78,55 +83,27 @@ export class VmContractList extends React.Component<Props> {
     return (
       <div className={classes.root}>
         <Fragment>
-          <p className={classes.title}>
+          <div className={classes.title}>
             <span>{labels.contract}</span>
-          </p>
-          {/* <NavLink to="/main/vm_contract/create" className={haveContract ? classes.smallLink : classes.link}>
-            {labels.create} {haveContract ? '' : labels.contract}
-          </NavLink> */}
-          {haveContract && <div className={classes.addCircle} />}
+            {haveContract && <div className={classes.addCircle} onClick={this.jumpToCreate} />}
+          </div>
           {!haveContract && (
-            <div>
+            <div className={classes.noContract}>
               <img src={ContractIcon} alt="" />
               <span>{labels.nocontract}</span>
             </div>
           )}
           {haveContract && (
             <div className={classes.contractsList}>
-              {/* <div className={classes.contractsListHeader}>
-                <p>{labels.status}</p>
-                <p>{labels.address}</p>
-                <p>time</p>
-              </div> */}
-              <div className={classes.contractsListBody}>
-                <ContractList
-                  // contracts={contracts.filter((_, index) => {
-                  //   return index >= this.minIndex && index <= this.maxIndex
-                  // })}
-                  contracts={contracts}
-                  labels={labels}
-                  jumpToCall={this.jumpToCall}
-                  jumpToDetail={this.jumpToDetail}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* {haveContract && (
-            <div className={classes.pagination}>
-              <Pagination
-                current={this.page}
-                total={contracts.length}
-                pageSize={PER_PAGE}
-                onChange={this.pageChange}
-                hideOnSinglePage={true}
+              <ContractList
+                contracts={contracts}
+                labels={labels}
+                jumpToCall={this.jumpToCall}
+                jumpToDetail={this.jumpToDetail}
               />
             </div>
-          )} */}
+          )}
         </Fragment>
-        {/* <Switch>
-          <Route path={`${basePath}/receipts/:address`} component={Operate} />
-        </Switch> */}
       </div>
     )
   }

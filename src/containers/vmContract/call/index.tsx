@@ -4,7 +4,7 @@ import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-import { TextField } from '@material-ui/core'
+// import { TextField } from '@material-ui/core'
 import swal from 'sweetalert2'
 import _ from 'lodash'
 import isInt from 'validator/lib/isInt'
@@ -167,7 +167,7 @@ export class Call extends React.Component<IProps> {
   render() {
     const {
       vmContract,
-      // classes,
+      classes,
       labels,
       match: {
         params: { address }
@@ -180,59 +180,40 @@ export class Call extends React.Component<IProps> {
     }
     return (
       <Fragment>
-        {/* <form onSubmit={this.handleConfirm} className={classes.form}> */}
-        {/* <p className={classes.title}>{`${labels.callDialog.title}:`}</p> */}
-        {/* <p className={classes.config}>
-            <b>{labels.address}:</b> {callContract.contractAddress}
-          </p> */}
+        <div className={classes.title}>
+          <span>{labels.contract}</span>
+        </div>
+        <div className={classes.inputRow}>
+          <span>{labels.gas}</span>
+          <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
+        </div>
+        <div className={classes.inputRow}>
+          <span>{labels.gasPrice}</span>
+          <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
+        </div>
         {/* <TextField
-            value={this.name}
-            onChange={this.nameChange}
-            autoFocus={true}
-            margin="dense"
-            label={labels.functionName}
-            type="text"
-            fullWidth={true}
-          /> */}
-        {/* <TextField
-            value={this.params}
-            onChange={this.paramsChange}
-            margin="dense"
-            label={labels.callDialog.params}
-            type="text"
-            fullWidth={true}
-          /> */}
-        <TextField
           value={this.gas}
           onChange={this.gasChange}
           margin="dense"
           label={labels.gas}
           type="text"
           fullWidth={true}
-        />
-        <TextField
+        /> */}
+        {/* <TextField
           value={this.gasPrice}
           onChange={this.gasPriceChange}
           margin="dense"
           label={labels.gasPrice}
           type="text"
           fullWidth={true}
-        />
-        {/* <Button
-            disabled={!(this.name && this.gas && this.gasPrice)}
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            type="submit"
-          >
-            {labels.call}
-          </Button> */}
+        /> */}
+
         {this.abi
           .filter(item => item.name !== 'init')
           .map(item => (
             <FunctionCaller labels={labels} func={item} onCall={this.handleCall} />
           ))}
-        {/* </form> */}
+
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
       </Fragment>
     )

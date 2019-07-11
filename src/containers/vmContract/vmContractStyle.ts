@@ -7,7 +7,7 @@ const styles = createStyles({
     width: 530,
     height: 450,
     margin: '0 24px',
-    padding: '32px 24px 26px',
+    padding: '20px 15px 15px',
     verticalAlign: 'top',
     borderRadius: '6px',
     background: '#fff'
@@ -16,10 +16,17 @@ const styles = createStyles({
     display: 'inline-block',
     width: 338,
     height: 450,
-    padding: '10px 12px 0',
+    padding: '10px 16px 0',
     borderRadius: '6px',
     background: '#fff',
-    overflow: 'auto'
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '4px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '2px',
+      background: '#bbb'
+    }
   },
   vmContract: {
     position: 'relative'

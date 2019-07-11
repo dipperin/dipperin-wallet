@@ -146,6 +146,27 @@ class VmContractStore {
     }
   }
 
+  addContract(abi: string, address: string): TxResponse {
+    const contract = new VmContractModel({
+      contractAbi: abi,
+      contractAddress: address,
+      owner: this._store.account.activeAccount.address
+    })
+    // console.log('contractData', contract.contractData)
+    if (this._contract.has(contract.contractAddress)) {
+      return {
+        success: false,
+        info: 'The Contract has already existed!'
+      }
+    }
+    this._contract.set(contract.contractAddress, contract)
+    // insert to all contract
+    insertVmContract(contract.toJS(), getCurrentNet())
+    return {
+      success: true
+    }
+  }
+
   async confirmCallContractMethod(
     address: string,
     abi: string,

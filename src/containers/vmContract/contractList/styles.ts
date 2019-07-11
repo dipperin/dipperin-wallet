@@ -2,30 +2,35 @@ import { createStyles } from '@material-ui/core/styles'
 import CreateImg from '@/images/create_contract.png'
 import sCreateImg from '@/images/create_contract_small.png'
 import addCircleImg from '@/images/add-circle-default.png'
+import detailImg from '@/images/detail.png'
+import detailHoverImg from '@/images/detail-hover.png'
 import addCircleHoverImg from '@/images/add-circle-hover.png'
 import { textOverflow, grayColor, materialButton } from '@/styles/appStyle'
 
 const styles = createStyles({
   root: {
-    padding: '0 24px',
+    padding: '0',
     position: 'relative'
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-    cursor: 'pointer',
+    width: '100%',
     display: 'inline-block',
+    padding: '0 5px',
     // marginTop: '32px',
     // marginBottom: '36px',
     '& img': {
       margin: '0 24px'
     },
     '& span': {
-      fontWeight: 'bold'
-    },
-    '&:hover': {
-      opacity: 0.7
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      float: 'left',
+      '&:hover': {
+        opacity: 0.7
+      }
     }
   },
   addCircle: {
@@ -33,9 +38,83 @@ const styles = createStyles({
     fontSize: 22,
     width: 22,
     height: 22,
+    cursor: 'pointer',
+    float: 'right',
+    marginTop: '2px',
     background: `url(${addCircleImg}) no-repeat`,
     '&:hover': {
       background: `url(${addCircleHoverImg}) no-repeat`
+    }
+  },
+  noContract: {
+    width: '128px',
+    position: 'absolute',
+    left: '172px',
+    top: '127px',
+    '& span': {
+      textAlign: 'center',
+      display: 'block',
+      color: 'rgba(197,197,199,1)',
+      transform: 'translateY(-20px)',
+      fontSize: '14px'
+    }
+  },
+  row: {
+    // height: '48px',
+    width: '100%',
+    height: '66px',
+    marginBottom: '10px',
+    padding: '0 5px',
+    backgroundColor: 'rgba(248,251,252,1)',
+    color: '#999',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    border: '1px solid rgba(229,229,229,1)',
+    borderRadius: '4px'
+  },
+  rowLeft: {
+    height: '40px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    marginLeft: '10px'
+  },
+  address: {
+    fontWeight: 'bold',
+    display: 'inline-block',
+    fontSize: '14px',
+    cursor: 'pointer'
+  },
+  copy: {
+    display: 'inline-block',
+    width: 12,
+    height: 14,
+    minHeight: 0,
+    minWidth: 0,
+    padding: 0,
+    margin: '-10px 4px 0',
+    '& img': {
+      width: 12,
+      height: 14
+    }
+  },
+  date: {
+    textAlign: 'left',
+    fontSize: '12px',
+    height: '20px',
+    lineHeight: '20px',
+    verticalAlign: 'bottom'
+  },
+  rowRight: {},
+  detail: {
+    width: '28px',
+    height: '28px',
+    marginRight: '13px',
+    background: `url(${detailImg})`,
+    cursor: 'pointer',
+    '&:hover': {
+      background: `url(${detailHoverImg})`
     }
   },
   link: {
@@ -68,46 +147,22 @@ const styles = createStyles({
     }
   },
   contractsList: {
-    height: '430px',
+    // height: '430px',
     width: '100%',
-    paddingTop: '26px'
-  },
-  contractsListHeader: {
-    height: '30px',
-    lineHeight: '30px',
-    backgroundColor: grayColor,
-
-    '& p': {
-      display: 'inline-block',
-      width: '14%',
-      fontSize: '12px',
-      fontWeight: 'bold',
-      color: '#fff',
-      textAlign: 'center',
-
-      '&:first-of-type': {
-        paddingLeft: '30px',
-        textAlign: 'left'
-      },
-
-      '&:nth-of-type(2)': {
-        width: '40%',
-        textAlign: 'center'
-      }
-    }
-  },
-  contractsListBody: {
-    backgroundColor: '#fff'
-  },
-  row: {
-    // height: '48px',
-    lineHeight: '48px',
+    marginTop: '5px',
+    paddingRight: '5px',
+    height: '380px',
     backgroundColor: '#fff',
-    color: '#999',
-    '&:nth-of-type(2n)': {
-      backgroundColor: '#F5F5F5'
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '4px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#ddd',
+      borderRadius: '2px'
     }
   },
+
   success: {
     color: '#000'
   },
@@ -116,23 +171,8 @@ const styles = createStyles({
     fontSize: '12px',
     // width: '14%',
     textAlign: 'center',
-    fontWeight: 400,
-    verticalAlign: 'top',
-    '&:first-of-type': {
-      paddingLeft: '30px',
-      textAlign: 'left'
-    },
-
-    '&:nth-of-type(2)': {
-      textAlign: 'center'
-      // width: '40%'
-    },
-
-    '&:last-of-type': {
-      textAlign: 'center',
-      // width: '30%',
-      paddingRight: '30px'
-    }
+    fontWeight: 400
+    // verticalAlign: 'top',
   },
   overflow: {
     ...textOverflow

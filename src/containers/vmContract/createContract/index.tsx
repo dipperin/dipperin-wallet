@@ -14,7 +14,7 @@ import PasswordConfirm from '@/components/passwordConfirm'
 import VmContractStore from '@/stores/vmContract'
 import WalletStore from '@/stores/wallet'
 import AccountStore from '@/stores/account'
-import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
@@ -161,6 +161,25 @@ export class CreateContract extends React.Component<IProps> {
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
 
+  addContract = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    const { labels } = this.props
+    const contractRes = this.props.vmContract!.addContract(this.abi, this.contractAddress)
+    if (contractRes.success) {
+      await swal.fire({
+        title: labels.createSwal.createSuccess,
+        type: 'success',
+        timer: 1000
+      })
+    } else {
+      swal.fire({
+        title: labels.createSwal.createErr,
+        text: contractRes.info,
+        type: 'error'
+      })
+    }
+  }
+
   @action
   handleCloseDialog = () => (this.showDialog = false)
 
@@ -228,53 +247,70 @@ export class CreateContract extends React.Component<IProps> {
             </Button>
           </div>
         </div>
-        {/* <p className={classes.return} onClick={this.switchToList}>
-          <img src={returnImg} alt="" />
-          <span>{labels.return}</span>
-        </p> */}
-        {/* <button onClick={this.handleDialogConfirmMock}>
-          Create Mock Contract
-        </button> */}
-        {/* <p className={classes.title}>{labels.createVmTitle}</p> */}
+
         <form onSubmit={this.handleConfirm} className={classes.form}>
-          <div className={classes.inputItem}>
+          <div className={classes.inputRow}>
+            <span>{labels.abi}</span>
+            <input type="file" required={true} onChange={this.abiChange} />
+          </div>
+          {/* <div className={classes.inputItem}>
             <FormControl fullWidth={true}>
               <InputLabel shrink={true}>{labels.abi}</InputLabel>
               <Input type="file" required={true} onChange={this.abiChange} />
             </FormControl>
-          </div>
+          </div> */}
           {this.isCreated && (
             <Fragment>
-              <div className={classes.inputItem}>
+              <div className={classes.inputRow}>
+                <span>{labels.code}</span>
+                <input type="file" required={true} onChange={this.codeChange} />
+              </div>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel shrink={true}>{labels.code}</InputLabel>
                   <Input type="file" onChange={this.codeChange} required={true} />
                 </FormControl>
+              </div> */}
+              <div className={classes.inputRow}>
+                <span>{labels.value}</span>
+                <input type="text" value={this.amount} required={true} onChange={this.amountChange} />
               </div>
-              <div className={classes.inputItem}>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel>{labels.value}</InputLabel>
                   <Input type="text" value={this.amount} required={true} onChange={this.amountChange} />
                 </FormControl>
+              </div> */}
+              <div className={classes.inputRow}>
+                <span>{labels.gas}</span>
+                <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
               </div>
-              <div className={classes.inputItem}>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel>{labels.gas}</InputLabel>
                   <Input type="text" value={this.gas} required={true} onChange={this.gasChange} />
                 </FormControl>
+              </div> */}
+              <div className={classes.inputRow}>
+                <span>{labels.gasPrice}</span>
+                <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
               </div>
-              <div className={classes.inputItem}>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel>{labels.gasPrice}</InputLabel>
                   <Input value={this.gasPrice} type="text" required={true} onChange={this.gasPriceChange} />
                 </FormControl>
+              </div> */}
+              <div className={classes.inputRow}>
+                <span>{labels.initParams}</span>
+                <input type="text" value={this.params} required={true} onChange={this.paramsChange} />
               </div>
-              <div className={classes.inputItem}>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel>{labels.initParams}</InputLabel>
                   <Input value={this.params} type="text" required={true} onChange={this.paramsChange} />
                 </FormControl>
-              </div>
+              </div> */}
               <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.create}
               </Button>
@@ -283,7 +319,11 @@ export class CreateContract extends React.Component<IProps> {
 
           {!this.isCreated && (
             <Fragment>
-              <div className={classes.inputItem}>
+              <div className={classes.inputRow}>
+                <span>{labels.address}</span>
+                <input type="text" value={this.contractAddress} required={true} onChange={this.contractAddressChange} />
+              </div>
+              {/* <div className={classes.inputItem}>
                 <FormControl fullWidth={true}>
                   <InputLabel>{labels.address}</InputLabel>
                   <Input
@@ -293,13 +333,14 @@ export class CreateContract extends React.Component<IProps> {
                     onChange={this.contractAddressChange}
                   />
                 </FormControl>
-              </div>
-              <Button variant="contained" color="primary" className={classes.button} type="submit">
+              </div> */}
+              <Button variant="contained" color="primary" className={classes.button} onClick={this.addContract}>
                 {labels.add}
               </Button>
             </Fragment>
           )}
         </form>
+
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
       </Fragment>
     )
