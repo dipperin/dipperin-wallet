@@ -36,8 +36,8 @@ const styles = createStyles({
     height: 450,
     margin: '0 auto',
     borderRadius: 6,
-    background: '#fff',
-    overflow: 'auto'
+    background: '#fff'
+    // overflow: 'auto'
   }
 })
 

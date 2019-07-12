@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-import { Utils } from '@dipperin/dipperin.js'
+// import { Utils } from '@dipperin/dipperin.js'
 
 import _ from 'lodash'
 
@@ -13,6 +13,9 @@ import WalletStore from '@/stores/wallet'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
+
+// components
+import ContractList from './contractList'
 
 interface WrapProps extends RouteComponentProps<{ address: string }> {
   vmContract: VmContractStore
@@ -44,11 +47,28 @@ export class Receipts extends React.Component<IProps> {
     return (
       <div className={classes.container}>
         <p className={classes.return}>
-          <span onClick={this.switchToList}>{labels.return}</span>
-          <span>>></span>
-          <span>{labels.return}</span>
+          <span onClick={this.switchToList}>{labels.contract}</span>
+          <span> >> </span>
+          <span>{labels.detail}</span>
         </p>
-        {receipts.map((receipt, index) => {
+        <div className={classes.contractsList}>
+          <div className={classes.contractsListHeader}>
+            <p>{labels.status}</p>
+            <p>{labels.address}</p>
+            <p>{labels.name}</p>
+            {/* <p>{labels.type}</p> */}
+            {/* <p>{labels.amount}</p> */}
+          </div>
+          <div className={classes.contractsListBody}>
+            <ContractList
+              receipts={receipts}
+              // handleShowTransfer={this.handleShowTransfer}
+              // handleShowContractTx={this.handleShowContractTx}
+              labels={labels}
+            />
+          </div>
+        </div>
+        {/* {receipts.map((receipt, index) => {
           return (
             <div key={index}>
               <h2>Receipt {index + 1}</h2>
@@ -69,7 +89,7 @@ export class Receipts extends React.Component<IProps> {
               <p>-------------------------------------------</p>
             </div>
           )
-        })}
+        })} */}
       </div>
     )
   }
