@@ -32,7 +32,7 @@ const styles = createStyles({
     alignItems: 'center',
     marginBottom: '15px',
     '&>span': {
-      width: 70,
+      width: 92,
       fontWeight: 'bold',
       color: '#72747D'
     },
@@ -55,7 +55,7 @@ const styles = createStyles({
       }
     },
     '&>input[type=text]': {
-      width: '226px',
+      flexGrow: 1,
       height: '30px',
       border: '1px solid #D5D5D5',
       padding: '4px',
