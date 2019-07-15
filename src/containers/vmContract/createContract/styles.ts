@@ -133,7 +133,7 @@ const styles = createStyles({
     cursor: 'pointer',
     boxSizing: 'border-box',
     height: '30px',
-    padding: '5px',
+    padding: '8px 5px',
     position: 'absolute',
     right: '0',
     top: '3px'

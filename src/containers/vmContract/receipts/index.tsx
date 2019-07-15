@@ -53,9 +53,9 @@ export class Receipts extends React.Component<IProps> {
         </p>
         <div className={classes.contractsList}>
           <div className={classes.contractsListHeader}>
-            <p>{labels.status}</p>
-            <p>{labels.address}</p>
-            <p>{labels.name}</p>
+            <p>{labels.txHash}</p>
+            <p>{labels.method}</p>
+            <p>{labels.data}</p>
             {/* <p>{labels.type}</p> */}
             {/* <p>{labels.amount}</p> */}
           </div>

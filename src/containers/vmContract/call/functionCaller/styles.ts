@@ -107,7 +107,7 @@ const styles = createStyles({
     cursor: 'pointer',
     boxSizing: 'border-box',
     height: '30px',
-    padding: '5px',
+    padding: '8px 3px',
     fontSize: '12px'
   },
   title: {
