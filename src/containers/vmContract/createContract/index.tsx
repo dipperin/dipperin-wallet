@@ -361,7 +361,7 @@ export class CreateContract extends React.Component<IProps> {
                     disabled={this.showDetailParams}
                     value={this.params}
                     placeholder={placeholder}
-                    required={true}
+                    required={initFunc && initFunc.inputs.length > 0}
                     onChange={this.paramsChange}
                   />
                   {initFunc && initFunc.inputs.length > 0 && (
