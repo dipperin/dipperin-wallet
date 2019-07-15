@@ -15,14 +15,16 @@
   <div id="root"></div>
   <script>
     function resetSize() {
+      
+      // window.resizeTo(1080, 608);
       const currentHeight = window.innerHeight;
       const currentWidth = window.innerWidth;
-      window.resizeBy(1080-currentHeight, 608-currentWidth);
+      window.resizeBy(1080-currentWidth,608-currentHeight)
     }
 
-    document.onload = function () {
-      resetSize()
-    }
+    
+    resetSize()
+
   </script>
 </body>
 

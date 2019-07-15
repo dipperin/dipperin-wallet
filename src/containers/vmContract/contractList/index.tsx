@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx'
+import { observable, action, reaction, runInAction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -40,6 +40,32 @@ export class VmContractList extends React.Component<Props> {
   @observable
   currentContract: string = ''
 
+  constructor(props) {
+    super(props)
+    this.redirect()
+    reaction(
+      () => this.props.wallet!.activeAccountId,
+      () => {
+        this.redirect()
+      }
+    )
+  }
+
+  redirect = () => {
+    const { match } = this.props
+    const { contracts } = this.props.vmContract!
+    const haveContract = contracts && contracts.length > 0
+    if (haveContract) {
+      const firstContract = contracts[0].contractAddress
+      this.props.history.push(`${match.url}/call/${firstContract}`)
+      runInAction(() => {
+        this.currentContract = firstContract
+      })
+    } else {
+      this.props.history.push(`${match.url}/create`)
+    }
+  }
+
   @action
   jumpToCall = (contractAddress: string, contractTxHash: string) => {
     const { vmContract, match, history } = this.props
@@ -49,6 +75,7 @@ export class VmContractList extends React.Component<Props> {
     } else {
       history.push(`${match.url}/call/${contractTxHash}`)
     }
+    console.log(match, location)
   }
 
   @action
@@ -70,6 +97,12 @@ export class VmContractList extends React.Component<Props> {
     const { contracts } = vmContract!
     const haveContract = contracts && contracts.length > 0
     // const basePath = match.url
+    // if(haveContract) {
+    //   const firstContract = contracts[0].contractAddress
+    //   this.props.history.push(`${match.url}/call/${firstContract}`)
+    // } else {
+    //   this.props.history.push(`${match.url}/create`)
+    // }
     return (
       <Fragment>
         <div className={classes.title}>

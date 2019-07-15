@@ -57,7 +57,7 @@ export const zhCN = {
     sidebar: {
       wallet: '钱包',
       contract: '智能合约',
-      vmContract: '虚拟机智能合约',
+      vmContract: '智能合约',
       setting: '设置',
       title: 'Dipperin 钱包',
       walletVersion: '钱包版本',
@@ -482,7 +482,7 @@ export const enUS: I18nCollection = {
     sidebar: {
       wallet: 'Wallet',
       contract: 'Contract',
-      vmContract: 'VM Contract',
+      vmContract: 'Contract',
       setting: 'Setting',
       title: 'Dipperin Wallet',
       walletVersion: 'Wallet Version',

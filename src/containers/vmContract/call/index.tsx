@@ -195,7 +195,7 @@ export class Call extends React.Component<IProps> {
         {this.abi
           .filter(item => item.name !== 'init')
           .map(item => (
-            <FunctionCaller labels={labels} func={item} onCall={this.handleCall} />
+            <FunctionCaller labels={labels} func={item} onCall={this.handleCall} key={item.name} />
           ))}
 
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}

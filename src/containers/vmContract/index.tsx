@@ -1,6 +1,10 @@
 import React, { Fragment } from 'react'
 import { RouteComponentProps } from 'react-router'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import {
+  // Redirect,
+  Route,
+  Switch
+} from 'react-router-dom'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
@@ -28,7 +32,7 @@ export class VmContractHome extends React.Component<RouteComponentProps & WithSt
         </div>
         <div className={classes.right}>
           <Switch>
-            <Redirect from={`${basePath}`} exact={true} strict={true} to={`${basePath}/create`} />
+            {/* <Redirect from={`${basePath}`} exact={true} strict={true} to={`${basePath}/create`} /> */}
             <Route path={`${basePath}/call/:address`} component={Call} />
             <Route path={`${basePath}/create`} component={CreateContract} />
           </Switch>
