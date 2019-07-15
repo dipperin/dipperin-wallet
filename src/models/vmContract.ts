@@ -168,6 +168,6 @@ export interface VmcontractAbi {
   name: string
   inputs: VmContractAbiInput[]
   outputs?: VmContractAbiInput[]
-  constants?: string
+  constant?: string
   type: string
 }

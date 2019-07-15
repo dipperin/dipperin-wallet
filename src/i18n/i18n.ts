@@ -672,7 +672,7 @@ export const enUS: I18nCollection = {
       call: 'Call',
       favoriteContract: 'favorite contract',
       contractType: 'Contract Type',
-      contract: 'contract',
+      contract: 'Contract',
       copySuccess: 'Copy Success',
       contractCall: 'Contract Call',
       confirm: 'confirm',

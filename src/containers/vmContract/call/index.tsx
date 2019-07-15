@@ -175,13 +175,13 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (!callContract) {
-      console.log('vmContract.contract.get(address)', address, callContract)
+      // console.log('vmContract.contract.get(address)', address, callContract)
       return null
     }
     return (
       <Fragment>
         <div className={classes.title}>
-          <span>{labels.contract}</span>
+          <span>{labels.contractCall}</span>
         </div>
         <div className={classes.inputRow}>
           <span>{labels.gas}</span>
@@ -191,22 +191,6 @@ export class Call extends React.Component<IProps> {
           <span>{labels.gasPrice}</span>
           <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
         </div>
-        {/* <TextField
-          value={this.gas}
-          onChange={this.gasChange}
-          margin="dense"
-          label={labels.gas}
-          type="text"
-          fullWidth={true}
-        /> */}
-        {/* <TextField
-          value={this.gasPrice}
-          onChange={this.gasPriceChange}
-          margin="dense"
-          label={labels.gasPrice}
-          type="text"
-          fullWidth={true}
-        /> */}
 
         {this.abi
           .filter(item => item.name !== 'init')

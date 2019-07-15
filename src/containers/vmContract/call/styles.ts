@@ -37,7 +37,7 @@ const styles = createStyles({
       color: '#72747D'
     },
     '&>input[type=file]': {
-      border: '1px solid #E5E5E5',
+      border: '1px solid #D5D5D5',
       background: '#F9F9F9',
       color: '#999',
       borderRadius: '4px',
@@ -57,8 +57,10 @@ const styles = createStyles({
     '&>input[type=text]': {
       width: '226px',
       height: '30px',
-      border: '1px solid #E5E5E5',
+      border: '1px solid #D5D5D5',
       padding: '4px',
+      fontWeight: 400,
+      color: '#72747D',
       '&::placeholder': {
         color: '#C8C8C8'
       }
@@ -71,9 +73,26 @@ const styles = createStyles({
     width: '100%'
   },
   title: {
-    fontSize: 20,
+    marginBottom: 18,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15
+    color: '#000',
+    width: '100%',
+    display: 'inline-block',
+    padding: '0 5px',
+    // marginTop: '32px',
+    // marginBottom: '36px',
+    '& img': {
+      margin: '0 24px'
+    },
+    '& span': {
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      float: 'left',
+      '&:hover': {
+        opacity: 0.7
+      }
+    }
   },
   config: {
     color: '#333',

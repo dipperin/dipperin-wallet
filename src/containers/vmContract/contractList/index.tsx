@@ -1,4 +1,4 @@
-import { computed, observable, action } from 'mobx'
+import { observable, action } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -18,12 +18,12 @@ import WalletStore from '@/stores/wallet'
 
 import ContractIcon from '@/images/contract.png'
 
-import ContractList from './list'
+import { StyleContractItem } from './list'
 // import Operate from '@/containers/vmContract/operate'
 
 import styles from './styles'
 
-const PER_PAGE = 10
+// const PER_PAGE = 10
 
 interface WrapProps extends RouteComponentProps {
   vmContract?: VmContractStore
@@ -38,25 +38,12 @@ interface Props extends WithStyles<typeof styles>, WrapProps {
 @observer
 export class VmContractList extends React.Component<Props> {
   @observable
-  page: number = 1
-
-  @computed
-  get minIndex() {
-    return (this.page - 1) * PER_PAGE
-  }
-
-  @computed
-  get maxIndex() {
-    return this.page * PER_PAGE - 1
-  }
+  currentContract: string = ''
 
   @action
-  pageChange = value => {
-    this.page = value
-  }
-
   jumpToCall = (contractAddress: string, contractTxHash: string) => {
     const { vmContract, match, history } = this.props
+    this.currentContract = contractAddress
     if (vmContract!.contract.has(contractAddress)) {
       history.push(`${match.url}/call/${contractAddress}`)
     } else {
@@ -64,15 +51,18 @@ export class VmContractList extends React.Component<Props> {
     }
   }
 
+  @action
   jumpToCreate = () => {
     const { match, history } = this.props
     history.push(`${match.url}/create`)
+    this.currentContract = ''
   }
 
+  @action
   jumpToDetail = (contractAddress: string) => {
     const { match, history } = this.props
-    console.log(`${match.url}/receipts/${contractAddress}`)
     history.push(`${match.url}/receipts/${contractAddress}`)
+    this.currentContract = ''
   }
 
   render() {
@@ -81,30 +71,34 @@ export class VmContractList extends React.Component<Props> {
     const haveContract = contracts && contracts.length > 0
     // const basePath = match.url
     return (
-      <div className={classes.root}>
-        <Fragment>
-          <div className={classes.title}>
-            <span>{labels.contract}</span>
-            {haveContract && <div className={classes.addCircle} onClick={this.jumpToCreate} />}
+      <Fragment>
+        <div className={classes.title}>
+          <span>{labels.contract}</span>
+          {haveContract && <div className={classes.addCircle} onClick={this.jumpToCreate} />}
+        </div>
+        {!haveContract && (
+          <div className={classes.noContract}>
+            <img src={ContractIcon} alt="" />
+            <span>{labels.nocontract}</span>
           </div>
-          {!haveContract && (
-            <div className={classes.noContract}>
-              <img src={ContractIcon} alt="" />
-              <span>{labels.nocontract}</span>
-            </div>
-          )}
-          {haveContract && (
-            <div className={classes.contractsList}>
-              <ContractList
-                contracts={contracts}
-                labels={labels}
-                jumpToCall={this.jumpToCall}
-                jumpToDetail={this.jumpToDetail}
-              />
-            </div>
-          )}
-        </Fragment>
-      </div>
+        )}
+        {haveContract && (
+          <div className={classes.contractsList}>
+            {contracts.map((contract, index) => {
+              return (
+                <StyleContractItem
+                  jumpToCall={this.jumpToCall}
+                  jumpToDetail={this.jumpToDetail}
+                  labels={labels}
+                  contract={contract}
+                  key={index}
+                  ifCurrent={this.currentContract === contract.contractAddress}
+                />
+              )
+            })}
+          </div>
+        )}
+      </Fragment>
     )
   }
 }

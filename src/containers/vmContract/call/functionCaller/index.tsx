@@ -61,7 +61,7 @@ class FunctionCaller extends React.Component<Props> {
       return null
     }
     const placeholder = this.props.func.inputs.map(item => `${item.type} ${item.name}`).join(',')
-    const color = `#${func.constants === 'true' ? '207FDE' : 'F48E0B'}`
+    const color = `#${func.constant === 'true' ? '207FDE' : 'F48E0B'}`
     return (
       <div className={classes.callerBox} style={{ borderLeft: `4px solid ${color}` }}>
         <div className={classes.topbar}>
@@ -96,7 +96,7 @@ class FunctionCaller extends React.Component<Props> {
             <Button
               disabled={false}
               variant="contained"
-              style={{ background: color }}
+              style={{ background: '#0A174C' }}
               className={classes.button}
               onClick={this.detailCall}
             >

@@ -30,7 +30,7 @@ interface IProps extends WithStyles<typeof styles>, WrapProps {
 @observer
 export class Receipts extends React.Component<IProps> {
   switchToList = () => {
-    this.props.history.push('/main/vm_contract/')
+    this.props.history.push('/main/vm_contract')
   }
 
   render() {

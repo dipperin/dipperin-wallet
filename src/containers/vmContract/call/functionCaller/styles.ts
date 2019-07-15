@@ -38,7 +38,7 @@ const styles = createStyles({
     marginRight: '9px',
     padding: '0 5px',
     height: 24,
-    width: '190px',
+    width: '200px',
     borderRadius: '4px',
     border: '1px solid #D8D8D8'
   },
@@ -62,7 +62,8 @@ const styles = createStyles({
     height: '24px',
     textTransform: 'none',
     fontSize: '12px',
-    lineHeight: '30px',
+    lineHeight: '24px',
+    fontWeight: 'bold',
     ...materialButton
     // '& span': {
     //   fontWeight: 'bold'
@@ -80,7 +81,7 @@ const styles = createStyles({
     width: '88px',
     height: '30px',
     textTransform: 'none',
-    fontSize: '14px',
+    fontSize: '12px',
     color: '#72747D',
     fontWeight: 'bold',
     lineHeight: '30px',
@@ -91,19 +92,23 @@ const styles = createStyles({
     outline: 'none',
     cursor: 'pointer',
     padding: '0 4px',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden'
   },
   topInput: {
     border: 'none',
     height: '30px',
     borderWidth: '0 1px',
+    padding: '0 9px',
     flexGrow: 1
   },
   arrow: {
     cursor: 'pointer',
     boxSizing: 'border-box',
     height: '30px',
-    padding: '5px'
+    padding: '5px',
+    fontSize: '12px'
   },
   title: {
     fontSize: 20,

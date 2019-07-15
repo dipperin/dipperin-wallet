@@ -12,39 +12,10 @@ import { TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
 import format from 'date-fns/format'
 import Copy from '@/images/copy.png'
 
-interface Props {
-  labels: I18nCollectionContract['contract']
-  contracts: VmContractModel[]
-  jumpToCall: (contractAddress: string, contractTxHash: string) => void
-  jumpToDetail: (contractAddress: string) => void
-}
-
-class ContractTable extends React.Component<Props> {
-  render() {
-    const { labels, contracts, jumpToCall, jumpToDetail } = this.props
-    return (
-      <React.Fragment>
-        {contracts.map((contract, index) => {
-          return (
-            <StyleContractItem
-              jumpToCall={jumpToCall}
-              jumpToDetail={jumpToDetail}
-              labels={labels}
-              contract={contract}
-              key={index}
-            />
-          )
-        })}
-      </React.Fragment>
-    )
-  }
-}
-
-export default ContractTable
-
 interface ItemProps extends WithStyles {
   labels: I18nCollectionContract['contract']
   contract: VmContractModel
+  ifCurrent?: boolean
   jumpToCall: (contractAddress: string, contractTxHash: string) => void
   jumpToDetail: (contractAddress: string) => void
 }
@@ -54,9 +25,11 @@ export class ContractItem extends React.Component<ItemProps> {
   jumpToCall = () => {
     this.props.jumpToCall(this.props.contract.contractAddress, this.props.contract.txHash)
   }
+
   jumpToDetail = () => {
     this.props.jumpToDetail(this.props.contract.contractAddress)
   }
+
   copyAddress = (address: string, e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation()
     const input = document.createElement('input')
@@ -80,33 +53,30 @@ export class ContractItem extends React.Component<ItemProps> {
     return (
       <div
         className={classNames(classes.row, {
-          [classes.success]: contract.status === TRANSACTION_STATUS_SUCCESS
+          [classes.success]: contract.status === TRANSACTION_STATUS_SUCCESS,
+          [classes.current]: this.props.ifCurrent
         })}
       >
         <div className={classes.rowLeft}>
-          {!(contract.status === TRANSACTION_STATUS_SUCCESS) && (
+          {/* {!(contract.status === TRANSACTION_STATUS_SUCCESS) && (
             <div className={classes.item}>{labels[contract.status]}</div>
-          )}
+          )} */}
           <div className={classes.address} onClick={this.jumpToCall}>
+            {!(contract.status === TRANSACTION_STATUS_SUCCESS) && <span>{labels[contract.status]}</span>}
             {contract.contractAddress}
             <Button className={classes.copy} onClick={this.copyAddress.bind(this, contract.contractAddress)}>
               <img src={Copy} alt="" title="copy" />
             </Button>
           </div>
-          <div className={classes.date}>{format(new Date(contract.timestamp), 'YY/MM/DD HH:mm')}</div>
+          <div className={classes.date}>{format(new Date(contract.timestamp), 'YYYY/MM/DD HH:mm')}</div>
         </div>
+
         <div className={classes.rowRight}>
-          {/* <Button style={{ marginRight: '20px' }} variant="contained" color="primary" onClick={this.jumpToCall}>
-            {labels.call}
-          </Button> */}
           <div className={classes.detail} onClick={this.jumpToDetail} />
-          {/* <Button variant="contained" color="primary" onClick={this.jumpToDetail}>
-            {labels.detail}
-          </Button> */}
         </div>
       </div>
     )
   }
 }
 
-const StyleContractItem = withStyles(styles)(ContractItem)
+export const StyleContractItem = withStyles(styles)(ContractItem)

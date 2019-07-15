@@ -11,7 +11,7 @@ const styles = createStyles({
   tab: {
     height: 28,
     width: 200,
-    margin: '18px auto 25px',
+    margin: '0 auto 18px',
     border: `1px solid ${primaryColor}`,
     borderRadius: '4px',
     overflow: 'hidden'
@@ -58,13 +58,14 @@ const styles = createStyles({
     margin: '0 auto'
   },
   inputRow: {
+    // position: 'relative',
     fontSize: 12,
     width: '100%',
     height: '30px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '15px',
+    marginBottom: '14px',
     '&>span': {
       width: 70,
       fontWeight: 'bold',
@@ -97,6 +98,81 @@ const styles = createStyles({
         color: '#C8C8C8'
       }
     }
+  },
+  initParamsInput: {
+    width: '226px',
+    height: '30px',
+    border: '1px solid #E5E5E5',
+    padding: '4px 15px 4px 5px',
+    '&::placeholder': {
+      color: '#C8C8C8'
+    }
+  },
+  paramsBox: {
+    position: 'relative'
+  },
+  detailInputs: {
+    position: 'absolute',
+    width: '226px',
+    height: '146px',
+    padding: '10px 10px',
+    border: '1px solid #E5E5E5',
+    zIndex: 1,
+    background: '#fff',
+    borderRadius: '0 0 4px 4px',
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '4px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#ddd',
+      borderRadius: '2px'
+    }
+  },
+  arrow: {
+    cursor: 'pointer',
+    boxSizing: 'border-box',
+    height: '30px',
+    padding: '5px',
+    position: 'absolute',
+    right: '0',
+    top: '3px'
+  },
+  paramRow: {
+    fontSize: 12,
+    width: '100%',
+    height: '24px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '7px',
+    '&>span': {
+      width: 55,
+      fontWeight: 'bold',
+      color: '#72747D'
+    },
+    '&>input[type=text]': {
+      width: '146px',
+      height: '24px',
+      border: '1px solid #E5E5E5',
+      padding: '4px',
+      '&::placeholder': {
+        color: '#C8C8C8'
+      }
+    }
+  },
+  paramBtn: {
+    float: 'right',
+    border: 'none',
+    margin: '5px 8px',
+    padding: 0,
+    color: '#fff',
+    width: '68px',
+    height: '24px',
+    textTransform: 'none',
+    fontSize: '12px',
+    lineHeight: '24px',
+    ...materialButton
   },
   inputItem: {
     position: 'relative',

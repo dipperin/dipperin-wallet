@@ -1,6 +1,6 @@
 import { createStyles } from '@material-ui/core/styles'
-import CreateImg from '@/images/create_contract.png'
-import sCreateImg from '@/images/create_contract_small.png'
+// import CreateImg from '@/images/create_contract.png'
+// import sCreateImg from '@/images/create_contract_small.png'
 import addCircleImg from '@/images/add-circle-default.png'
 import detailImg from '@/images/detail.png'
 import detailHoverImg from '@/images/detail-hover.png'
@@ -8,10 +8,6 @@ import addCircleHoverImg from '@/images/add-circle-hover.png'
 import { textOverflow, grayColor, materialButton } from '@/styles/appStyle'
 
 const styles = createStyles({
-  root: {
-    padding: '0',
-    position: 'relative'
-  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -71,10 +67,19 @@ const styles = createStyles({
     justifyContent: 'space-between',
     alignItems: 'center',
     border: '1px solid rgba(229,229,229,1)',
+    borderRadius: '4px',
+    '&:hover': {
+      opacity: 0.7
+    }
+  },
+  current: {
+    borderWidth: '1px 1px 1px 4px',
+    borderColor: '#207FDE',
+    borderStyle: 'solid',
     borderRadius: '4px'
   },
   rowLeft: {
-    height: '40px',
+    height: '45px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
@@ -84,7 +89,8 @@ const styles = createStyles({
     fontWeight: 'bold',
     display: 'inline-block',
     fontSize: '14px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    '& span': {}
   },
   copy: {
     display: 'inline-block',
@@ -100,11 +106,14 @@ const styles = createStyles({
     }
   },
   date: {
+    marginTop: '5px',
     textAlign: 'left',
     fontSize: '12px',
     height: '20px',
     lineHeight: '20px',
-    verticalAlign: 'bottom'
+    verticalAlign: 'bottom',
+    color: '#838899',
+    fontWeight: 400
   },
   rowRight: {},
   detail: {
@@ -117,41 +126,28 @@ const styles = createStyles({
       background: `url(${detailHoverImg})`
     }
   },
-  link: {
-    position: 'absolute',
-    top: '170px',
-    left: '50%',
-    transform: 'translate(-50%)',
-    textDecoration: 'none',
-    backgroundImage: `url(${CreateImg})`,
-    paddingTop: '86px',
-    backgroundPosition: 'top, center',
-    backgroundRepeat: 'no-repeat',
-    color: grayColor,
-    '&:hover': {
-      opacity: 0.7
-    }
-  },
-  smallLink: {
-    position: 'absolute',
-    bottom: '0px',
-    right: '20px',
-    textDecoration: 'none',
-    backgroundImage: `url(${sCreateImg})`,
-    paddingLeft: '20px',
-    fontWeight: 'bold',
-    backgroundRepeat: 'no-repeat',
-    color: grayColor,
-    '&:hover': {
-      opacity: 0.7
-    }
-  },
+  // link: {
+  //   position: 'absolute',
+  //   top: '170px',
+  //   left: '50%',
+  //   transform: 'translate(-50%)',
+  //   textDecoration: 'none',
+  //   backgroundImage: `url(${CreateImg})`,
+  //   paddingTop: '86px',
+  //   backgroundPosition: 'top, center',
+  //   backgroundRepeat: 'no-repeat',
+  //   color: grayColor,
+  //   '&:hover': {
+  //     opacity: 0.7
+  //   }
+  // },
+
   contractsList: {
     // height: '430px',
     width: '100%',
-    marginTop: '5px',
+    marginTop: '15px',
     paddingRight: '5px',
-    height: '380px',
+    height: '376px',
     backgroundColor: '#fff',
     overflowY: 'auto',
     '&::-webkit-scrollbar': {
@@ -166,14 +162,14 @@ const styles = createStyles({
   success: {
     color: '#000'
   },
-  item: {
-    display: 'inline-block',
-    fontSize: '12px',
-    // width: '14%',
-    textAlign: 'center',
-    fontWeight: 400
-    // verticalAlign: 'top',
-  },
+  // item: {
+  //   display: 'inline-block',
+  //   fontSize: '12px',
+  //   // width: '14%',
+  //   textAlign: 'center',
+  //   fontWeight: 400
+  //   // verticalAlign: 'top',
+  // },
   overflow: {
     ...textOverflow
   },
@@ -195,19 +191,19 @@ const styles = createStyles({
       borderRadius: '100%',
       background: grayColor
     }
-  },
-  pagination: {
-    position: 'absolute',
-    width: '844px',
-    bottom: 15,
-    textAlign: 'center',
-    '& ul': {
-      display: 'inline-block',
-      '& li': {
-        outline: 'none'
-      }
-    }
   }
+  // pagination: {
+  //   position: 'absolute',
+  //   width: '844px',
+  //   bottom: 15,
+  //   textAlign: 'center',
+  //   '& ul': {
+  //     display: 'inline-block',
+  //     '& li': {
+  //       outline: 'none'
+  //     }
+  //   }
+  // }
 })
 
 export default styles

@@ -16,7 +16,7 @@ const styles = createStyles({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-    cursor: 'pointer',
+    // cursor: 'pointer',
     // marginTop: '32px',
     // marginBottom: '36px',
     '& img': {
@@ -26,6 +26,7 @@ const styles = createStyles({
       fontWeight: 'bold'
     },
     '& span:first-of-type:hover': {
+      cursor: 'pointer',
       opacity: 0.7
     }
   },
@@ -70,25 +71,26 @@ const styles = createStyles({
 
     '& p': {
       display: 'inline-block',
-      width: '24%',
+      // width: '24%',
       fontSize: '12px',
       fontWeight: 'bold',
       color: '#fff',
-      textAlign: 'center',
+      paddingLeft: '10px',
 
       '&:first-of-type': {
-        paddingLeft: '30px',
-        textAlign: 'left'
+        textAlign: 'left',
+        width: '20%'
       },
 
       '&:nth-of-type(2)': {
-        width: '24%',
+        width: '20%',
         textAlign: 'left'
       },
 
       '&:last-of-type': {
         textAlign: 'left',
-        paddingRight: '30px'
+        paddingRight: '10px',
+        width: '60%'
       }
     }
   },
@@ -110,24 +112,24 @@ const styles = createStyles({
   item: {
     display: 'inline-block',
     fontSize: '12px',
-    width: '14%',
-    textAlign: 'center',
     fontWeight: 400,
     verticalAlign: 'top',
+    textAlign: 'left',
+    wordBreak: 'break-all',
+    paddingLeft: '10px',
+
     '&:first-of-type': {
-      paddingLeft: '30px',
-      textAlign: 'left'
+      width: '20%'
     },
 
     '&:nth-of-type(2)': {
-      textAlign: 'center',
-      width: '40%'
+      width: '20%'
     },
 
     '&:last-of-type': {
       position: 'relative',
-      textAlign: 'right',
-      paddingRight: '30px'
+      paddingRight: '10px',
+      width: '60%'
     }
   },
   overflow: {
