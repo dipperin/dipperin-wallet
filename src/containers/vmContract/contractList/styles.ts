@@ -45,8 +45,8 @@ const styles = createStyles({
   noContract: {
     width: '128px',
     position: 'absolute',
-    left: '172px',
-    top: '127px',
+    left: '195px',
+    top: '150px',
     '& span': {
       textAlign: 'center',
       display: 'block',
