@@ -67,6 +67,7 @@ const styles = createStyles({
     justifyContent: 'space-between',
     alignItems: 'center',
     border: '1px solid rgba(229,229,229,1)',
+    borderWidth: '1px 1px 1px 4px',
     borderRadius: '4px',
     '&:hover': {
       opacity: 0.7
