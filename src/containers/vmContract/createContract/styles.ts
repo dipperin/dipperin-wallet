@@ -93,6 +93,7 @@ const styles = createStyles({
       width: '226px',
       height: '30px',
       border: '1px solid #E5E5E5',
+      borderRadius: '4px',
       padding: '4px',
       '&::placeholder': {
         color: '#C8C8C8'
