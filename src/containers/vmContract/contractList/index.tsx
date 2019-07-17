@@ -51,8 +51,21 @@ export class VmContractList extends React.Component<Props> {
     )
   }
 
+  // componentWillUpdate = (nextProps, nextState) => {
+  //   console.log('componentWillUpdate', this.props.match, this.props.location)
+  //   this.redirect()
+  // }
+
+  componentDidUpdate = (preProps, preState) => {
+    // console.log('componentDidUpdate', this.props.match, this.props.location,preProps)
+    if (this.props.match.url === this.props.location.pathname) {
+      this.redirect()
+    }
+  }
+
   redirect = () => {
     const { match } = this.props
+
     const { contracts } = this.props.vmContract!
     const haveContract = contracts && contracts.length > 0
     if (haveContract) {
@@ -75,7 +88,7 @@ export class VmContractList extends React.Component<Props> {
     } else {
       history.push(`${match.url}/call/${contractTxHash}`)
     }
-    console.log(match, location)
+    // console.log(match, location)
   }
 
   @action
