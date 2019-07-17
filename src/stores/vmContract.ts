@@ -205,7 +205,14 @@ class VmContractStore {
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
     runInAction(() => {
-      this.getContractsFromObj(contractDb).forEach(contract => this._contract.set(contract.contractAddress, contract))
+      const removeList: string[] = []
+      this.getContractsFromObj(contractDb).forEach(contract => {
+        this._contract.set(contract.contractAddress, contract)
+        if (this._contract.has(contract.txHash)) {
+          removeList.push(contract.txHash)
+        }
+      })
+      removeList.forEach(txHash => this._contract.delete(txHash))
     })
   }
 
