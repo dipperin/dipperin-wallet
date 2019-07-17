@@ -79,7 +79,7 @@ const styles = createStyles({
 
       '&:first-of-type': {
         textAlign: 'left',
-        width: '20%'
+        width: '30%'
       },
 
       '&:nth-of-type(2)': {
@@ -90,7 +90,7 @@ const styles = createStyles({
       '&:last-of-type': {
         textAlign: 'left',
         paddingRight: '10px',
-        width: '60%'
+        width: '50%'
       }
     }
   },
@@ -98,7 +98,7 @@ const styles = createStyles({
     backgroundColor: '#fff'
   },
   row: {
-    height: '28px',
+    // height: '28px',
     lineHeight: '28px',
     backgroundColor: '#fff',
     color: '#999',
@@ -119,7 +119,7 @@ const styles = createStyles({
     paddingLeft: '10px',
 
     '&:first-of-type': {
-      width: '20%'
+      width: '30%'
     },
 
     '&:nth-of-type(2)': {
@@ -129,7 +129,7 @@ const styles = createStyles({
     '&:last-of-type': {
       position: 'relative',
       paddingRight: '10px',
-      width: '60%'
+      width: '50%'
     }
   },
   overflow: {
