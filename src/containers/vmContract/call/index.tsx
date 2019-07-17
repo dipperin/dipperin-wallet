@@ -125,7 +125,7 @@ export class Call extends React.Component<IProps> {
           type: 'success',
           timer: 1000
         })
-        this.onClose()
+        this.handleCloseDialog()
       } else {
         this.handleCloseDialog()
         swal.fire({

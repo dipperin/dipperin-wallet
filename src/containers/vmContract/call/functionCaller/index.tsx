@@ -49,10 +49,13 @@ class FunctionCaller extends React.Component<Props> {
     this.props.onCall(funcName, this.params)
   }
 
-  detailCall = () => {
+  @action
+  detailCall = async () => {
     const funcName = this.props.func.name
     const params = Object.values(this.inputValue).join(',')
-    this.props.onCall(funcName, params)
+    this.params = params
+    this.ifshowDetailInput = false
+    await this.props.onCall(funcName, params)
   }
 
   render() {
