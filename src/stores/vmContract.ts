@@ -1,21 +1,36 @@
 import { computed, observable, reaction, runInAction, action } from 'mobx'
+import { isString } from 'lodash'
 
 import { insertVmContract, getVmContract, updateVmContractStatus } from '@/db'
-import { TRANSACTION_STATUS_FAIL, TRANSACTION_STATUS_SUCCESS, VM_CONTRACT_ADDRESS } from '@/utils/constants'
+import {
+  DEFAULT_CHAIN_ID,
+  TRANSACTION_STATUS_FAIL,
+  TRANSACTION_STATUS_SUCCESS,
+  VM_CONTRACT_ADDRESS
+} from '@/utils/constants'
 
 import VmContractModel, { VmContractObj } from '../models/vmContract'
 import { getCurrentNet } from '../utils/node'
 import { getNowTimestamp } from '@/utils'
+
 import RootStore from './root'
 import { TxResponse } from './transaction'
-import { VmContract } from '@dipperin/dipperin.js'
+import Dipperin, {
+  VmContract
+
+  // helper
+} from '@dipperin/dipperin.js'
 import Receipt from '@/models/receipt'
+
+import Errors from '../utils/errors'
 
 // import ExtraData from './vmTestData'
 
+const HTTPHOST = 'http://localhost:7783'
 class VmContractStore {
   private _store: RootStore
 
+  private _dipperin: Dipperin
   // current contract (created & favorite)
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
@@ -28,6 +43,7 @@ class VmContractStore {
 
   constructor(store: RootStore) {
     this._store = store
+    this._dipperin = new Dipperin(HTTPHOST)
     reaction(
       () => this._store.account.activeAccount,
       () => {
@@ -97,6 +113,61 @@ class VmContractStore {
   //   }
   // }
 
+  async confirmTransaction(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
+    try {
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
+      // console.dir(transaction.toJS())
+      const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
+      if (!isString(res)) {
+        const errRes = res
+        return {
+          success: false,
+          info: errRes.error ? errRes.error.message : 'Something wrong!'
+        }
+      }
+      if (res === transaction.transactionHash) {
+        // Append Transaction
+        const activeAccountAddress = this._store.account.activeAccount.address
+        this._store.transaction.appendTransaction(activeAccountAddress, [transaction.toJS()])
+        // Plus account nonce
+        this._store.account.activeAccount.plusNonce()
+        return {
+          success: true,
+          hash: transaction.transactionHash
+        }
+      } else {
+        return {
+          success: false,
+          info: 'Something wrong!'
+        }
+      }
+    } catch (err) {
+      // console.error(String(err))
+      if (err instanceof Errors.NoEnoughBalanceError) {
+        return {
+          success: false,
+          info: err.message
+        }
+      }
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
   async confirmCreateContract(
     code: string,
     abi: string,
@@ -112,15 +183,23 @@ class VmContractStore {
         initParams: params,
         owner: this._store.account.activeAccount.address
       })
-      console.log('contractData', contract.contractData)
-      const res = await this._store.transaction.confirmTransaction(
-        VM_CONTRACT_ADDRESS,
-        amount,
-        contract.contractData,
-        // '0',
-        gas,
-        gasPrice
-      )
+      // console.log('contractData', contract.contractData)
+      let res
+      if (this._store.isRemoteNode) {
+        res = await this._store.transaction.confirmTransaction(
+          VM_CONTRACT_ADDRESS,
+          amount,
+          contract.contractData,
+          gas,
+          gasPrice
+        )
+      } else {
+        res = await this.confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
+      }
+
+      // const res = await this._store.transaction.confirmTransaction(
+
+      // const res = await confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
       if (res.success) {
         contract.txHash = res.hash as string
         runInAction(() => {
@@ -192,6 +271,52 @@ class VmContractStore {
           info: res.info
         }
       }
+    } catch (err) {
+      console.error(String(err))
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
+  async confirmConstantCallContractMethod(
+    address: string,
+    abi: string,
+    methodName: string,
+    gas: string,
+    gasPrice: string,
+    params: string[] = []
+  ) {
+    try {
+      // let callData = helper.Rlp.encode([methodName, params.join(',')])
+      const callData =
+        '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
+      VmContract.createCallMethod(abi, methodName, ...params)
+      // const fromAccount = this._store.account.activeAccount
+      const transactionHash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+
+      // const hash = '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
+      // callData = Array.prototype.slice.call(Buffer.from(hash.replace('0x', ''), 'hex'))
+      const res = await this._store.dipperin.dr.callConstFunc(transactionHash)
+      console.log('confirmConstantCallContractMethod', res)
+      return {
+        success: true,
+        info: 'res.hash'
+      }
+      // if (res.success) {
+      //   const txs = this._contractTxsMap.get(address) || []
+      //   this._contractTxsMap.set(address, [...txs, res.hash as string])
+      //   return {
+      //     success: true,
+      //     info: res.hash
+      //   }
+      // } else {
+      //   return {
+      //     success: false,
+      //     info: res.info
+      //   }
+      // }
     } catch (err) {
       console.error(String(err))
       return {
