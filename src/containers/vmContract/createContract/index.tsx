@@ -151,11 +151,12 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      const contractRes = await this.props.vmContract!.confirmCreateContract(
+      const contractRes = await this.props.vmContract!.createContractEstimateGas(
+        // const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
-        this.gas,
-        this.gasPrice,
+        // this.gas,
+        // this.gasPrice,
         this.amount,
         this.params.split(',').map(param => param.trim())
       )
@@ -222,39 +223,6 @@ export class CreateContract extends React.Component<IProps> {
     this.showDetailParams = false
   }
 
-  // handleConfirmMock = async () => {
-  //   this.handleShowDialog()
-  // }
-
-  // dialogConfirmMock = async () => {
-  //   const { labels } = this.props
-  //   const res = true
-  //   if (res) {
-  //     const contractRes = await this.props.vmContract.confirmCreateContractMock()
-  //     if (contractRes.success) {
-  //       await swal.fire({
-  //         title: labels.createSwal.createSuccess,
-  //         type: 'success',
-  //         timer: 1000
-  //       })
-  //     } else {
-  //       this.handleCloseDialog()
-  //       swal.fire({
-  //         title: labels.createSwal.createErr,
-  //         text: contractRes.info,
-  //         type: 'error'
-  //       })
-  //     }
-  //   } else {
-  //     await swal.fire({
-  //       type: 'error',
-  //       title: labels.createSwal.incorrectPassword
-  //     })
-  //   }
-  // }
-
-  // handleDialogConfirmMock = debounce(this.dialogConfirmMock, 1000)
-
   render() {
     const { classes, labels } = this.props
     let abis
@@ -301,59 +269,22 @@ export class CreateContract extends React.Component<IProps> {
             <span>{labels.abi}</span>
             <input type="file" required={true} onChange={this.abiChange} />
           </div>
-          {/* <div className={classes.inputItem}>
-            <FormControl fullWidth={true}>
-              <InputLabel shrink={true}>{labels.abi}</InputLabel>
-              <Input type="file" required={true} onChange={this.abiChange} />
-            </FormControl>
-          </div> */}
           {this.isCreated && (
             <Fragment>
               <div className={classes.inputRow}>
                 <span>{labels.code}</span>
                 <input type="file" required={true} onChange={this.codeChange} />
               </div>
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel shrink={true}>{labels.code}</InputLabel>
-                  <Input type="file" onChange={this.codeChange} required={true} />
-                </FormControl>
-              </div> */}
-              {/* TODO: amount add when needed */}
-              {/* <div className={classes.inputRow}>
-                <span>{labels.value}</span>
-                <input type="text" value={this.amount} required={true} onChange={this.amountChange} />
-              </div> */}
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel>{labels.value}</InputLabel>
-                  <Input type="text" value={this.amount} required={true} onChange={this.amountChange} />
-                </FormControl>
-              </div> */}
               <div className={classes.inputRow}>
                 <span>{labels.gas}</span>
                 <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
               </div>
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel>{labels.gas}</InputLabel>
-                  <Input type="text" value={this.gas} required={true} onChange={this.gasChange} />
-                </FormControl>
-              </div> */}
               <div className={classes.inputRow}>
                 <span>{labels.gasPrice}</span>
                 <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
               </div>
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel>{labels.gasPrice}</InputLabel>
-                  <Input value={this.gasPrice} type="text" required={true} onChange={this.gasPriceChange} />
-                </FormControl>
-              </div> */}
               <div className={classes.inputRow}>
                 <span>{labels.initParams}</span>
-                {/* <input type="text" value={this.params} required={true} onChange={this.paramsChange} /> */}
-                {/* TODO: */}
                 <div className={classes.paramsBox}>
                   <input
                     type="text"
@@ -397,12 +328,6 @@ export class CreateContract extends React.Component<IProps> {
                   )}
                 </div>
               </div>
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel>{labels.initParams}</InputLabel>
-                  <Input value={this.params} type="text" required={true} onChange={this.paramsChange} />
-                </FormControl>
-              </div> */}
               <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.create}
               </Button>
@@ -415,17 +340,6 @@ export class CreateContract extends React.Component<IProps> {
                 <span>{labels.address}</span>
                 <input type="text" value={this.contractAddress} required={true} onChange={this.contractAddressChange} />
               </div>
-              {/* <div className={classes.inputItem}>
-                <FormControl fullWidth={true}>
-                  <InputLabel>{labels.address}</InputLabel>
-                  <Input
-                    type="text"
-                    value={this.contractAddress}
-                    required={true}
-                    onChange={this.contractAddressChange}
-                  />
-                </FormControl>
-              </div> */}
               <Button variant="contained" color="primary" className={classes.button} onClick={this.addContract}>
                 {labels.add}
               </Button>

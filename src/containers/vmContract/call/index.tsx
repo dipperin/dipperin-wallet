@@ -111,6 +111,18 @@ export class Call extends React.Component<IProps> {
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
       const callContract = vmContract.contract.get(address)!
+      if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
+        const constCallRes = await vmContract.confirmConstantCallContractMethod(
+          callContract.contractAddress,
+          callContract.contractAbi,
+          this.name,
+          this.gas,
+          this.gasPrice,
+          this.params.split(',').map(param => param.trim())
+        )
+        console.log('constCall', constCallRes)
+      }
+
       const callRes = await vmContract.confirmCallContractMethod(
         callContract.contractAddress,
         callContract.contractAbi,

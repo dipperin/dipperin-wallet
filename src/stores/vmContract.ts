@@ -168,6 +168,41 @@ class VmContractStore {
     }
   }
 
+  async createContractEstimateGas(
+    code: string,
+    abi: string,
+    // gas: string,
+    // gasPrice: string,
+    amount: string,
+    params?: string[]
+  ): Promise<TxResponse> {
+    try {
+      const contract = new VmContractModel({
+        contractCode: code,
+        contractAbi: abi,
+        initParams: params,
+        owner: this._store.account.activeAccount.address
+      })
+
+      const res2 = await this._store.transaction.estimateGas(
+        VM_CONTRACT_ADDRESS,
+        amount,
+        contract.contractData
+        // gas,
+        // gasPrice
+      )
+      console.log('vmcontract estimateGas', res2)
+
+      return res2
+    } catch (err) {
+      console.error(String(err))
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
   async confirmCreateContract(
     code: string,
     abi: string,
@@ -197,9 +232,15 @@ class VmContractStore {
         res = await this.confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
       }
 
-      // const res = await this._store.transaction.confirmTransaction(
+      const res2 = await this._store.transaction.estimateGas(
+        VM_CONTRACT_ADDRESS,
+        amount,
+        contract.contractData
+        // gas,
+        // gasPrice
+      )
+      console.log('vmcontract estimateGas', res2)
 
-      // const res = await confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
       if (res.success) {
         contract.txHash = res.hash as string
         runInAction(() => {

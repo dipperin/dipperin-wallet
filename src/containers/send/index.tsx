@@ -122,6 +122,8 @@ export class Send extends React.Component<IProps> {
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
     const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo)
+    const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
+    console.log('estimateGas', res2)
     if (res.success) {
       this.handleCloseDialog()
       this.initState()

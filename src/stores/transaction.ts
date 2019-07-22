@@ -99,6 +99,13 @@ class TransactionStore {
     }
   }
 
+  getSignedTransactionData(address: string, amount: string, memo: string, gas?: string, gasPrice?: string): string {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+    transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+    return transaction.signedTransactionData
+  }
+
   async confirmTransaction(
     address: string,
     amount: string,
@@ -138,6 +145,43 @@ class TransactionStore {
           success: false,
           info: 'Something wrong!'
         }
+      }
+    } catch (err) {
+      // console.error(String(err))
+      if (err instanceof Errors.NoEnoughBalanceError) {
+        return {
+          success: false,
+          info: err.message
+        }
+      }
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
+  async estimateGas(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
+    try {
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
+      // console.dir(transaction.toJS())
+      const res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
+      console.log('estimate running', { res })
+      return {
+        success: true,
+        info: Number(res).toString()
       }
     } catch (err) {
       // console.error(String(err))
@@ -196,7 +240,8 @@ class TransactionStore {
     this.load()
   }
 
-  private createNewTransaction(
+  // private createNewTransaction(
+  createNewTransaction(
     address: string,
     amount: string,
     memo: string,
