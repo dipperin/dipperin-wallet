@@ -218,7 +218,8 @@ class VmContractStore {
         initParams: params,
         owner: this._store.account.activeAccount.address
       })
-      // console.log('contractData', contract.contractData)
+      const callData = Array.prototype.slice.call(Buffer.from(contract.contractData.replace('0x', ''), 'hex'))
+      console.log('contractData', callData)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.transaction.confirmTransaction(
@@ -232,14 +233,14 @@ class VmContractStore {
         res = await this.confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
       }
 
-      const res2 = await this._store.transaction.estimateGas(
-        VM_CONTRACT_ADDRESS,
-        amount,
-        contract.contractData
-        // gas,
-        // gasPrice
-      )
-      console.log('vmcontract estimateGas', res2)
+      // const res2 = await this._store.transaction.estimateGas(
+      //   VM_CONTRACT_ADDRESS,
+      //   amount,
+      //   contract.contractData
+      //   // gas,
+      //   // gasPrice
+      // )
+      // console.log('vmcontract estimateGas', res2)
 
       if (res.success) {
         contract.txHash = res.hash as string
@@ -331,15 +332,20 @@ class VmContractStore {
   ) {
     try {
       // let callData = helper.Rlp.encode([methodName, params.join(',')])
-      const callData =
-        '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
-      VmContract.createCallMethod(abi, methodName, ...params)
+      // const callData =
+      //   '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
+      // VmContract.createCallMethod(abi, methodName, ...params)
       // const fromAccount = this._store.account.activeAccount
-      const transactionHash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+      // const transactionHash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
 
+      // console.log('start confirmConstantCallContractMethod')
+      // const hash = '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'.replace('0x','')
       // const hash = '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
-      // callData = Array.prototype.slice.call(Buffer.from(hash.replace('0x', ''), 'hex'))
-      const res = await this._store.dipperin.dr.callConstFunc(transactionHash)
+      // const callData = Array.prototype.slice.call(Buffer.from(hash, 'hex'))
+      // console.log('callData', hash)
+      const callData = VmContract.createCallMethod(abi, methodName, ...params)
+      const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+      const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
       console.log('confirmConstantCallContractMethod', res)
       return {
         success: true,

@@ -151,12 +151,12 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      const contractRes = await this.props.vmContract!.createContractEstimateGas(
-        // const contractRes = await this.props.vmContract!.confirmCreateContract(
+      // const contractRes = await this.props.vmContract!.createContractEstimateGas(
+      const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
-        // this.gas,
-        // this.gasPrice,
+        this.gas,
+        this.gasPrice,
         this.amount,
         this.params.split(',').map(param => param.trim())
       )
