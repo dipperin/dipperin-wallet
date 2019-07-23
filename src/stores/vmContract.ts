@@ -171,8 +171,8 @@ class VmContractStore {
   async createContractEstimateGas(
     code: string,
     abi: string,
-    // gas: string,
-    // gasPrice: string,
+    gas: string,
+    gasPrice: string,
     amount: string,
     params?: string[]
   ): Promise<TxResponse> {
@@ -187,9 +187,9 @@ class VmContractStore {
       const res2 = await this._store.transaction.estimateGas(
         VM_CONTRACT_ADDRESS,
         amount,
-        contract.contractData
-        // gas,
-        // gasPrice
+        contract.contractData,
+        gas,
+        gasPrice
       )
       console.log('vmcontract estimateGas', res2)
 

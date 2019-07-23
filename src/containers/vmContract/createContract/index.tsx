@@ -154,6 +154,8 @@ export class CreateContract extends React.Component<IProps> {
       const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
         this.code,
         this.abi,
+        this.gas,
+        this.gasPrice,
         this.amount,
         this.params.split(',').map(param => param.trim())
       )

@@ -101,6 +101,7 @@ export class Accounts extends React.Component<Props> {
   handleChangeActiveAccount = (id: string) => {
     this.props.account!.changeActiveAccount(id)
     this.props.handleClose()
+    // console.log('changeActiveAccount Id', id)
   }
 
   @action

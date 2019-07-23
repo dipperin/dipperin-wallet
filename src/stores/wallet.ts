@@ -202,6 +202,10 @@ export default class WalletStore {
         this.destroyMnemonic = this.createDestroyMnemonic(password)
       } else {
         this.initWallet(password, mnemonic)
+        // for(let i =0;i<14;i++) {
+        //   this._store.account.addAccount()
+        // }
+        // this._store.account.changeActiveAccount(FIRST_ACCOUNT_ID)s
       }
     } catch (err) {
       return err
