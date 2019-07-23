@@ -151,7 +151,14 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      // const contractRes = await this.props.vmContract!.createContractEstimateGas(
+      const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
+        this.code,
+        this.abi,
+        this.amount,
+        this.params.split(',').map(param => param.trim())
+      )
+      console.log('createContractEstimateGas', estimateGasRes)
+
       const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
@@ -232,13 +239,13 @@ export class CreateContract extends React.Component<IProps> {
       abis = JSON.parse(helper.Bytes.toString(this.abi))
       if (abis instanceof Array) {
         initFunc = (abis.find(abi => abi.name === 'init' && abi.type === 'function') as unknown) as VmcontractAbi
-        console.log(initFunc)
+        // console.log(initFunc)
         if (initFunc.inputs) {
           placeholder = initFunc.inputs.map(input => `${input.type} ${input.name}`).join(',')
         }
       }
     }
-    console.log('placeholder', placeholder)
+    // console.log('placeholder', placeholder)
 
     // initFunc= JSON.parse(helper.Bytes.toString(this.abi)).filter(abi=>(abi.name==='init')&&(abi.type==='function'))
     return (
