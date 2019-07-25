@@ -53,8 +53,8 @@ export default class AccountStore {
    * Init Account
    */
   @action
-  initAccount(): void {
-    this.addAccount(FIRST_ACCOUNT_ID)
+  initAccount = async (): Promise<void> => {
+    await this.addAccount(FIRST_ACCOUNT_ID)
   }
 
   /**
@@ -65,6 +65,8 @@ export default class AccountStore {
       const accounts = await getAccount()
       if (accounts.length > 0) {
         accounts.forEach(account => {
+          console.log(account)
+          console.log(String(account.id), this.newAccount(String(account.id), account.path, account.address))
           this._accountMap.set(String(account.id), this.newAccount(String(account.id), account.path, account.address))
         })
       }
@@ -81,7 +83,7 @@ export default class AccountStore {
    * @param index
    */
   @action
-  addAccount(index?: string): void {
+  addAccount = async (index?: string) => {
     const newIndex = index ? index : this.getSafeAccountIndex()
     const newPath = `${ACCOUNTS_PATH}/${newIndex}`
     const address = this._store.wallet.getAccountByPath(newPath).address
@@ -90,10 +92,14 @@ export default class AccountStore {
     // Save account
     this._accountMap.set(newIndex, newAccount)
     // add to db
-    insertAccount(newAccount.toJS())
+    await insertAccount(newAccount.toJS())
     this.changeActiveAccount(newAccount.id)
     this.updateAccountsBalance(newAccount.id)
     this.updateAccountsNonce(newAccount.id)
+  }
+
+  showDbAccounts = async () => {
+    console.log('show db account', await getAccount())
   }
 
   /**

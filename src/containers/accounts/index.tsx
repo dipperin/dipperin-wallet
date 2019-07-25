@@ -90,12 +90,13 @@ export class Accounts extends React.Component<Props> {
     })
   }
 
-  addAccount = () => {
+  addAccount = async () => {
     try {
       this.props.account!.addAccount()
     } catch (err) {
       this.props.history.push('/login')
     }
+    await this.props.account!.showDbAccounts()
   }
 
   handleChangeActiveAccount = (id: string) => {

@@ -146,7 +146,8 @@ export class Import extends React.Component<IImportProps> {
       return
     }
     const { wallet } = this.props
-    const err = wallet.create(this.password, this.mnemonic)
+    const err = await wallet.create(this.password, this.mnemonic)
+
     // this.props.account.changeActiveAccount("1")
     if (err) {
       swal.fire({
@@ -159,6 +160,19 @@ export class Import extends React.Component<IImportProps> {
       this.mnemonic = ''
     })
     wallet.save()
+
+    for (let i = 0; i < 14; i++) {
+      await this.props.account.addAccount()
+    }
+    this.props.account.changeActiveAccount('1')
+    for (const act of this.props.account.accounts) {
+      if (act.balance && Number(act.balance) > 0) {
+        this.props.account.changeActiveAccount(String(act.id))
+        break
+      }
+    }
+    // this.props.account.addAccount()
+    this.props.account.showDbAccounts()
     // next operate in reaction
   }
 
