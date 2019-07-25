@@ -220,7 +220,7 @@ export class Send extends React.Component<IProps> {
               inputProps={{ maxLength: 200 }}
             />
           </FormControl>
-          <FormControl fullWidth={true} margin="dense">
+          {/* <FormControl fullWidth={true} margin="dense">
             <InputLabel>{labels.fee}</InputLabel>
             <Input
               type="number"
@@ -231,7 +231,7 @@ export class Send extends React.Component<IProps> {
                 step: 0.000000001
               }}
             />
-          </FormControl>
+          </FormControl> */}
           <p className={classes.min}>{this.minFee ? `${labels.moreThan} ${this.minFee}` : ''}</p>
           <Button
             disabled={!this.waitConfirm || !this.fee || this.fee < this.minFee}
