@@ -60,6 +60,8 @@ export class CreateContract extends React.Component<IProps> {
   showDetailParams: boolean = false
   @observable
   paramsValue: IParamsValue = {}
+  @observable
+  estimateGas: number
 
   @action
   codeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,6 +136,29 @@ export class CreateContract extends React.Component<IProps> {
   @action
   toggleDetailParam = () => {
     this.showDetailParams = !this.showDetailParams
+  }
+
+  @action
+  getContractGas = async () => {
+    const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
+      this.code,
+      this.abi,
+      this.gas,
+      this.gasPrice,
+      this.amount,
+      this.params.split(',').map(param => param.trim())
+    )
+    console.log('createContractEstimateGas', estimateGasRes)
+    if (estimateGasRes.success) {
+      try {
+        const estimateGas = Number(estimateGasRes.info)
+        runInAction(() => {
+          this.estimateGas = estimateGas
+        })
+      } catch (e) {
+        console.log('estimate gas error', e)
+      }
+    }
   }
 
   paramsValueChange = (param: string) => (e: React.ChangeEvent<{ value: string }>) => {
@@ -285,14 +310,6 @@ export class CreateContract extends React.Component<IProps> {
                 <input type="file" required={true} onChange={this.codeChange} />
               </div>
               <div className={classes.inputRow}>
-                <span>{labels.gas}</span>
-                <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
-              </div>
-              <div className={classes.inputRow}>
-                <span>{labels.gasPrice}</span>
-                <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
-              </div>
-              <div className={classes.inputRow}>
                 <span>{labels.initParams}</span>
                 <div className={classes.paramsBox}>
                   <input
@@ -303,6 +320,7 @@ export class CreateContract extends React.Component<IProps> {
                     placeholder={placeholder}
                     required={initFunc && initFunc.inputs.length > 0}
                     onChange={this.paramsChange}
+                    onBlur={this.getContractGas}
                   />
                   {initFunc && initFunc.inputs.length > 0 && (
                     <span className={classes.arrow} onClick={this.toggleDetailParam}>
@@ -337,6 +355,19 @@ export class CreateContract extends React.Component<IProps> {
                   )}
                 </div>
               </div>
+              <div className={classes.inputRow}>
+                <span>{labels.gas}</span>
+                <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
+              </div>
+              <div className={classes.inputRow}>
+                <span>{labels.gasPrice}</span>
+                <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
+              </div>
+              <div className={classes.inputRow}>
+                <span>{labels.estimateGas}</span>
+                <span>{this.estimateGas}</span>
+              </div>
+
               <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.create}
               </Button>

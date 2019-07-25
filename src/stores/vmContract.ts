@@ -168,6 +168,43 @@ class VmContractStore {
     }
   }
 
+  async estimateGas(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
+    try {
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
+      // console.dir(transaction.toJS())
+      const res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
+      console.log('estimate running', { res })
+      return {
+        success: true,
+        info: Number(res).toString()
+      }
+    } catch (err) {
+      // console.error(String(err))
+      if (err instanceof Errors.NoEnoughBalanceError) {
+        return {
+          success: false,
+          info: err.message
+        }
+      }
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
   async createContractEstimateGas(
     code: string,
     abi: string,
@@ -184,14 +221,8 @@ class VmContractStore {
         owner: this._store.account.activeAccount.address
       })
 
-      const res2 = await this._store.transaction.estimateGas(
-        VM_CONTRACT_ADDRESS,
-        amount,
-        contract.contractData,
-        gas,
-        gasPrice
-      )
-      console.log('vmcontract estimateGas', res2)
+      const res2 = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
+      // console.log('vmcontract estimateGas', res2)
 
       return res2
     } catch (err) {
