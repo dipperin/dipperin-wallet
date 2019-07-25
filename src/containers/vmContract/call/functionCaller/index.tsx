@@ -47,8 +47,9 @@ class FunctionCaller extends React.Component<Props> {
   }
 
   InputValueChange = (name: string) => (e: React.ChangeEvent<{ value: string }>) => {
+    const value = e.target.value
     runInAction(() => {
-      this.inputValue[name] = e.target.value
+      this.inputValue[name] = value
     })
   }
 
@@ -56,7 +57,6 @@ class FunctionCaller extends React.Component<Props> {
     const funcName = this.props.func.name
     const constant = this.props.func.constant === 'true'
     const res = await this.props.onCall(funcName, this.params, constant)
-    console.log('detailCall', res, constant)
     if (res && res.success && res.info) {
       runInAction(() => {
         this.result = String(res.info)
@@ -71,8 +71,8 @@ class FunctionCaller extends React.Component<Props> {
     const params = Object.values(this.inputValue).join(',')
     this.params = params
     this.ifshowDetailInput = false
+
     const res = await this.props.onCall(funcName, params, constant)
-    console.log('detailCall', res, constant)
     if (res && res.success && res.info) {
       runInAction(() => {
         this.result = String(res.info)

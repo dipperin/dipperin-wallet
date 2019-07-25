@@ -65,7 +65,7 @@ export class Call extends React.Component<IProps> {
     const callContract = vmContract.contract.get(address)
     if (callContract) {
       this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
-      console.log(JSON.parse(helper.Bytes.toString(callContract.contractAbi)))
+      // console.log(JSON.parse(helper.Bytes.toString(callContract.contractAbi)))
     }
   }
 
@@ -93,11 +93,11 @@ export class Call extends React.Component<IProps> {
     }
   }
 
-  handleConfirm = async e => {
-    e.preventDefault()
-    // TODO: Add validate
-    this.handleShowDialog()
-  }
+  // handleConfirm = async e => {
+  //   e.preventDefault()
+  //   // TODO: Add validate
+  //   this.handleShowDialog()
+  // }
 
   @action
   handleCall = async (funcName: string, params: string, constant?: boolean): Promise<CallRes | void> => {

@@ -365,7 +365,6 @@ class VmContractStore {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
-      console.log('confirmConstantCallContractMethod', res)
       return {
         success: true,
         info: res
