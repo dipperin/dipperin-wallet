@@ -30,6 +30,24 @@ const styles = createStyles({
     justifyContent: 'flex-end',
     alignItems: 'center'
   },
+  resultItem: {
+    width: '100%',
+    margin: '5px 0',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    '& span': {
+      fontSize: '12px',
+      color: '#72747D',
+      fontWeight: 'bold',
+      padding: '5px',
+      textAlign: 'center',
+      minWidth: '90px',
+      maxWidth: '200px',
+      whiteSpace: 'pre-wrap',
+      wordWrap: 'break-word'
+    }
+  },
   inputName: {
     marginRight: '8px',
     fontSize: '12px'

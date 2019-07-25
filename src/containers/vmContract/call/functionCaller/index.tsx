@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, action } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
 // import classNames from 'classnames'
 import { VmcontractAbi } from '@/models/vmContract'
 import { observer } from 'mobx-react'
@@ -14,12 +14,16 @@ import styles from './styles'
 interface Props extends WithStyles {
   func: VmcontractAbi
   labels: I18nCollectionContract['contract']
-  onCall: (funcName: string, params: string) => void
+  onCall: (funcName: string, params: string, constant?: boolean) => any
 }
 
 interface InputValue {
   [inputName: string]: string
 }
+// interface CallRes {
+//   success: boolean
+//   info?: string
+// }
 
 @observer
 class FunctionCaller extends React.Component<Props> {
@@ -29,6 +33,8 @@ class FunctionCaller extends React.Component<Props> {
   params: string = ''
   @observable
   ifshowDetailInput: boolean = false
+  @observable
+  result: string
 
   @action
   paramsChange = (e: React.ChangeEvent<{ value: string }>) => {
@@ -41,21 +47,37 @@ class FunctionCaller extends React.Component<Props> {
   }
 
   InputValueChange = (name: string) => (e: React.ChangeEvent<{ value: string }>) => {
-    this.inputValue[name] = e.target.value
+    runInAction(() => {
+      this.inputValue[name] = e.target.value
+    })
   }
 
-  paramsCall = () => {
+  paramsCall = async () => {
     const funcName = this.props.func.name
-    this.props.onCall(funcName, this.params)
+    const constant = this.props.func.constant === 'true'
+    const res = await this.props.onCall(funcName, this.params, constant)
+    console.log('detailCall', res, constant)
+    if (res && res.success && res.info) {
+      runInAction(() => {
+        this.result = String(res.info)
+      })
+    }
   }
 
   @action
   detailCall = async () => {
     const funcName = this.props.func.name
+    const constant = this.props.func.constant === 'true'
     const params = Object.values(this.inputValue).join(',')
     this.params = params
     this.ifshowDetailInput = false
-    await this.props.onCall(funcName, params)
+    const res = await this.props.onCall(funcName, params, constant)
+    console.log('detailCall', res, constant)
+    if (res && res.success && res.info) {
+      runInAction(() => {
+        this.result = String(res.info)
+      })
+    }
   }
 
   render() {
@@ -105,6 +127,14 @@ class FunctionCaller extends React.Component<Props> {
             >
               {labels.confirm}
             </Button>
+          </div>
+        )}
+        {this.result && (
+          <div className={classes.inputList}>
+            <div className={classes.resultItem}>
+              <span style={{ fontWeight: 'bold' }}>Result:</span>
+              <span style={{ fontWeight: 'bold' }}>{this.result}</span>
+            </div>
           </div>
         )}
         {/* <div className={classes.resultBox}>

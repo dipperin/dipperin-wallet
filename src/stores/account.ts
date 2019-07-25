@@ -65,8 +65,6 @@ export default class AccountStore {
       const accounts = await getAccount()
       if (accounts.length > 0) {
         accounts.forEach(account => {
-          console.log(account)
-          console.log(String(account.id), this.newAccount(String(account.id), account.path, account.address))
           this._accountMap.set(String(account.id), this.newAccount(String(account.id), account.path, account.address))
         })
       }

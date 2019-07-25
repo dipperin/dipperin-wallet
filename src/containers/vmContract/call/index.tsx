@@ -33,6 +33,11 @@ interface IProps extends WithStyles<typeof styles>, WrapProps {
   labels: I18nCollectionContract['contract']
 }
 
+interface CallRes {
+  success: boolean
+  info: string | { error: { message: string } } | undefined
+}
+
 @inject('vmContract', 'wallet')
 @observer
 export class Call extends React.Component<IProps> {
@@ -94,13 +99,35 @@ export class Call extends React.Component<IProps> {
     this.handleShowDialog()
   }
 
-  handleCall = async (funcName: string, params: string) => {
+  @action
+  handleCall = async (funcName: string, params: string, constant?: boolean): Promise<CallRes | void> => {
     this.name = funcName
     this.params = params
-    this.handleShowDialog()
+    if (constant) {
+      const {
+        match: {
+          params: { address }
+        },
+        vmContract
+      } = this.props
+      const callContract = vmContract.contract.get(address)!
+      if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
+        const callRes = await vmContract.confirmConstantCallContractMethod(
+          callContract.contractAddress,
+          callContract.contractAbi,
+          this.name,
+          this.gas,
+          this.gasPrice,
+          this.params.split(',').map(param => param.trim())
+        )
+        return callRes
+      }
+    } else {
+      this.handleShowDialog()
+    }
   }
 
-  dialogConfirm = async (password: string) => {
+  dialogConfirm = async (password: string): Promise<CallRes | void> => {
     const {
       match: {
         params: { address }
@@ -111,8 +138,9 @@ export class Call extends React.Component<IProps> {
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
       const callContract = vmContract.contract.get(address)!
+      let callRes: CallRes
       if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
-        const constCallRes = await vmContract.confirmConstantCallContractMethod(
+        callRes = await vmContract.confirmConstantCallContractMethod(
           callContract.contractAddress,
           callContract.contractAbi,
           this.name,
@@ -120,17 +148,19 @@ export class Call extends React.Component<IProps> {
           this.gasPrice,
           this.params.split(',').map(param => param.trim())
         )
-        console.log('constCall', constCallRes)
+
+        // console.log('constCall', constCallRes)
+      } else {
+        callRes = await vmContract.confirmCallContractMethod(
+          callContract.contractAddress,
+          callContract.contractAbi,
+          this.name,
+          this.gas,
+          this.gasPrice,
+          this.params.split(',').map(param => param.trim())
+        )
       }
 
-      const callRes = await vmContract.confirmCallContractMethod(
-        callContract.contractAddress,
-        callContract.contractAbi,
-        this.name,
-        this.gas,
-        this.gasPrice,
-        this.params.split(',').map(param => param.trim())
-      )
       if (callRes.success) {
         await swal.fire({
           title: labels.callDialog.callSuccess,
@@ -138,11 +168,13 @@ export class Call extends React.Component<IProps> {
           timer: 1000
         })
         this.handleCloseDialog()
+        console.log('after swal fire', callRes)
+        return callRes
       } else {
         this.handleCloseDialog()
-        swal.fire({
+        await swal.fire({
           title: labels.callDialog.callFail,
-          text: callRes.info,
+          text: String(callRes.info),
           type: 'error'
         })
       }
@@ -151,6 +183,10 @@ export class Call extends React.Component<IProps> {
         type: 'error',
         title: labels.callDialog.incorrectPassword
       })
+    }
+    return {
+      success: false,
+      info: 'unknown'
     }
   }
 

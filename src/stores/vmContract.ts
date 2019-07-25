@@ -362,39 +362,14 @@ class VmContractStore {
     params: string[] = []
   ) {
     try {
-      // let callData = helper.Rlp.encode([methodName, params.join(',')])
-      // const callData =
-      //   '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
-      // VmContract.createCallMethod(abi, methodName, ...params)
-      // const fromAccount = this._store.account.activeAccount
-      // const transactionHash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
-
-      // console.log('start confirmConstantCallContractMethod')
-      // const hash = '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'.replace('0x','')
-      // const hash = '0xf83a8a67657442616c616e6365ae30783030303035353836423838334563366464346638633236303633453138656234426432323865353963334539'
-      // const callData = Array.prototype.slice.call(Buffer.from(hash, 'hex'))
-      // console.log('callData', hash)
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
       console.log('confirmConstantCallContractMethod', res)
       return {
         success: true,
-        info: 'res.hash'
+        info: res
       }
-      // if (res.success) {
-      //   const txs = this._contractTxsMap.get(address) || []
-      //   this._contractTxsMap.set(address, [...txs, res.hash as string])
-      //   return {
-      //     success: true,
-      //     info: res.hash
-      //   }
-      // } else {
-      //   return {
-      //     success: false,
-      //     info: res.info
-      //   }
-      // }
     } catch (err) {
       console.error(String(err))
       return {
