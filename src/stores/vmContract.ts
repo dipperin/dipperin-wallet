@@ -61,7 +61,13 @@ class VmContractStore {
     const accountAddress = this._store.account.activeAccount.address
 
     this._contract.forEach((contract: VmContractModel) => {
-      if (contract.owner.toLocaleLowerCase() === accountAddress.toLocaleLowerCase()) {
+      let owners: string[]
+      if (contract.owner instanceof Array) {
+        owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
+      } else {
+        owners = [contract.owner.toLocaleLowerCase()]
+      }
+      if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
       }
     })
@@ -82,36 +88,6 @@ class VmContractStore {
     this._store.timer.on('update_vmContracts', this.updateContractStatus.bind(this), 5000)
     this._store.timer.on('update_vmContracts_receipts', this.getContractReceipt.bind(this), 3000)
   }
-
-  // async confirmCreateContractMock(): Promise<TxResponse> {
-  //   try {
-  //     const res = await this._store.transaction.confirmTransaction(
-  //       VM_CONTRACT_ADDRESS,
-  //       '0',
-  //       ExtraData,
-  //       // '0',
-  //       '5000000',
-  //       '1'
-  //     )
-  //     if (res.success) {
-  //         console.log('CreateContractMock success!')
-  //       return {
-  //         success: true
-  //       }
-  //     } else {
-  //       return {
-  //         success: false,
-  //         info: res.info
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error(String(err))
-  //     return {
-  //       success: false,
-  //       info: String(err)
-  //     }
-  //   }
-  // }
 
   async confirmTransaction(
     address: string,
@@ -177,15 +153,11 @@ class VmContractStore {
     gasPrice?: string
   ): Promise<TxResponse> {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-    // console.log('confirmTransaction.............')
     try {
       // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
       const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
-      // console.dir(transaction.toJS())
       const res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
-      console.log('estimate running', { res })
       return {
         success: true,
         info: Number(res).toString()
@@ -222,7 +194,6 @@ class VmContractStore {
       })
 
       const res2 = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
-      // console.log('vmcontract estimateGas', res2)
 
       return res2
     } catch (err) {
@@ -264,15 +235,6 @@ class VmContractStore {
         res = await this.confirmTransaction(VM_CONTRACT_ADDRESS, amount, contract.contractData, gas, gasPrice)
       }
 
-      // const res2 = await this._store.transaction.estimateGas(
-      //   VM_CONTRACT_ADDRESS,
-      //   amount,
-      //   contract.contractData
-      //   // gas,
-      //   // gasPrice
-      // )
-      // console.log('vmcontract estimateGas', res2)
-
       if (res.success) {
         contract.txHash = res.hash as string
         runInAction(() => {
@@ -305,14 +267,21 @@ class VmContractStore {
       owner: this._store.account.activeAccount.address
     })
     // console.log('contractData', contract.contractData)
-    if (this._contract.has(contract.contractAddress)) {
+    if (
+      this._contract.has(contract.contractAddress) &&
+      this._contract.get(contract.contractAddress)!.hasOwner(address)
+    ) {
       return {
         success: false,
         info: 'The Contract has already existed!'
       }
+    } else if (this._contract.has(contract.contractAddress)) {
+      this._contract.get(address)!.addOwner(address)
+    } else {
+      this._contract.set(contract.contractAddress, contract)
     }
-    this._contract.set(contract.contractAddress, contract)
     // insert to all contract
+    console.log('after addContract', this._contract.get(address))
     insertVmContract(contract.toJS(), getCurrentNet())
     return {
       success: true
@@ -345,7 +314,6 @@ class VmContractStore {
         }
       }
     } catch (err) {
-      console.error(String(err))
       return {
         success: false,
         info: String(err)
@@ -370,7 +338,6 @@ class VmContractStore {
         info: res
       }
     } catch (err) {
-      console.error(String(err))
       return {
         success: false,
         info: String(err)
@@ -381,6 +348,7 @@ class VmContractStore {
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
+    console.log('vmContractStore load', contractDb)
     runInAction(() => {
       const removeList: string[] = []
       this.getContractsFromObj(contractDb).forEach(contract => {
@@ -409,7 +377,6 @@ class VmContractStore {
           try {
             const res = await this._store.dipperin.dr.vmContract.getReceiptByTxHash(tx)
             if (res) {
-              console.log(res)
               const preReceipts = this._receipts.get(address) || []
               preReceipts.push(res)
               this._receipts.set(address, preReceipts)
@@ -450,11 +417,6 @@ class VmContractStore {
                 contract.contractAddress = res
                 contract.setSuccess()
                 console.log('update contract status.....................')
-                // if(!this._contract.get(res)) {
-                //   console.log('update contract status', contract.contractAddress)
-                //   newContracts.push(contract)
-                //   console.log('after update contract status', newContracts.length)
-                // }
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,

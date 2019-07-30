@@ -20,7 +20,7 @@ class ContractModel {
   @observable
   private _txHash: string
   @observable
-  private _owner: string
+  private _owner: string | string[]
 
   @observable
   private _contractData: string
@@ -102,6 +102,15 @@ class ContractModel {
     return this.status === TRANSACTION_STATUS_SUCCESS
   }
 
+  @action
+  addOwner = (address: string) => {
+    if (this._owner instanceof Array) {
+      this._owner.push(address)
+    } else {
+      this._owner = [this._owner, address]
+    }
+  }
+
   isOverTime(now: number): boolean {
     return now - this._timestamp > TRANSACTION_LIMIT_TIME
   }
@@ -124,6 +133,14 @@ class ContractModel {
     this._contractData = VmContract.createVmContract(code, abi, ...params)
   }
 
+  hasOwner = (address: string) => {
+    if (this._owner instanceof Array) {
+      return this._owner.includes(address)
+    } else {
+      return this._owner.toLocaleLowerCase() === address.toLocaleLowerCase()
+    }
+  }
+
   toJS(): VmContractObj {
     const { owner, contractAddress, status, timestamp, txHash, contractAbi } = this
 
@@ -142,7 +159,7 @@ export default ContractModel
 
 interface VmContractOptions {
   contractAbi: string
-  owner: string
+  owner: string | string[]
   contractAddress?: string
   contractCode?: string
   status?: string
@@ -152,7 +169,7 @@ interface VmContractOptions {
 }
 
 export interface VmContractObj {
-  owner: string
+  owner: string | string[]
   contractAddress: string
   contractAbi: string
   status: string

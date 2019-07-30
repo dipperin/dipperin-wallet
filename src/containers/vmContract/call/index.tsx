@@ -223,7 +223,6 @@ export class Call extends React.Component<IProps> {
       }
     } = this.props
     const callContract = vmContract.contract.get(address)
-    console.log('Call', address, callContract)
     if (!callContract) {
       // return null
       return <div>No callContract</div>

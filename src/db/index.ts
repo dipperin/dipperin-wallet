@@ -297,4 +297,5 @@ export const resetDB = () => {
   getDB(CONTRACT_DB).remove({}, { multi: true })
   getDB(FAVORITE_CONTRACT).remove({}, { multi: true })
   getDB(OWNER_DB).remove({}, { multi: true })
+  getDB(VM_CONTRACT_DB).remove({}, { multi: true })
 }
