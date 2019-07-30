@@ -56,40 +56,11 @@ export class Receipts extends React.Component<IProps> {
             <p>{labels.txHash}</p>
             <p>{labels.method}</p>
             <p>{labels.data}</p>
-            {/* <p>{labels.type}</p> */}
-            {/* <p>{labels.amount}</p> */}
           </div>
           <div className={classes.contractsListBody}>
-            <ContractList
-              receipts={receipts}
-              // handleShowTransfer={this.handleShowTransfer}
-              // handleShowContractTx={this.handleShowContractTx}
-              labels={labels}
-            />
+            <ContractList receipts={receipts} labels={labels} />
           </div>
         </div>
-        {/* {receipts.map((receipt, index) => {
-          return (
-            <div key={index}>
-              <h2>Receipt {index + 1}</h2>
-              <p>id: {receipt.transactionHash}</p>
-              <p>Gas Used: {receipt.gasUsed}</p>
-              <div>
-                <h3>Logs:</h3>
-                {receipt.logs.map((log, index2) => {
-                  return (
-                    <div key={index2}>
-                      <p>Topic: {log.topicName}</p>
-                      <p>Block Number: {log.blockNumber}</p>
-                      <p>data: {Utils.decodeBase64(log.data)}</p>
-                    </div>
-                  )
-                })}
-              </div>
-              <p>-------------------------------------------</p>
-            </div>
-          )
-        })} */}
       </div>
     )
   }

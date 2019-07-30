@@ -20,23 +20,14 @@ export class VmContractHome extends React.Component<RouteComponentProps & WithSt
     const basePath = match.url
     return (
       <Fragment>
-        {/* <div className={classes.container}>
-          <Switch>
-            <Redirect from={`${basePath}`} exact={true} strict={true} to={`${basePath}/list`} />
-            <Route path={`${basePath}/list`} component={ContractList} />
-            <Route path={`${basePath}/create`} component={CreateContract} />
-          </Switch>
-        </div> */}
         <div className={classes.left}>
           <ContractList history={history} location={location} match={match} />
         </div>
         <div className={classes.right}>
           <Switch>
-            {/* <Redirect from={`${basePath}`} exact={true} strict={true} to={`${basePath}/create`} /> */}
             <Route path={`${basePath}/call/:address`} component={Call} />
             <Route path={`${basePath}/create`} component={CreateContract} />
           </Switch>
-          {/* <CreateContract history={history} location={location} match={match} /> */}
         </div>
       </Fragment>
     )

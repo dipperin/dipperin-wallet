@@ -64,7 +64,11 @@ export class VmContractList extends React.Component<Props> {
     const haveContract = contracts && contracts.length > 0
     if (haveContract) {
       const firstContract = contracts[0].contractAddress
-      this.props.history.push(`${match.url}/call/${firstContract}`)
+      if (this.props.vmContract!.contract.get(firstContract)) {
+        this.props.history.push(`${match.url}/call/${firstContract}`)
+      } else {
+        this.props.history.push(`${match.url}/call/${contracts[0].txHash}`)
+      }
       runInAction(() => {
         this.currentContract = firstContract
       })
@@ -102,13 +106,7 @@ export class VmContractList extends React.Component<Props> {
     const { vmContract, classes, labels } = this.props
     const { contracts } = vmContract!
     const haveContract = contracts && contracts.length > 0
-    // const basePath = match.url
-    // if(haveContract) {
-    //   const firstContract = contracts[0].contractAddress
-    //   this.props.history.push(`${match.url}/call/${firstContract}`)
-    // } else {
-    //   this.props.history.push(`${match.url}/create`)
-    // }
+
     return (
       <Fragment>
         <div className={classes.title}>

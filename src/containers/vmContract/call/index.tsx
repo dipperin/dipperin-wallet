@@ -1,10 +1,9 @@
-import { observable, action } from 'mobx'
+import { observable, action, reaction } from 'mobx'
 import React, { Fragment } from 'react'
 import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-// import { TextField } from '@material-ui/core'
 import swal from 'sweetalert2'
 import _ from 'lodash'
 import isInt from 'validator/lib/isInt'
@@ -65,8 +64,16 @@ export class Call extends React.Component<IProps> {
     const callContract = vmContract.contract.get(address)
     if (callContract) {
       this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
-      // console.log(JSON.parse(helper.Bytes.toString(callContract.contractAbi)))
     }
+    reaction(
+      () => this.props.match.params.address,
+      (ad: string) => {
+        const callContract1 = vmContract.contract.get(ad)
+        if (callContract1) {
+          this.abi = JSON.parse(helper.Bytes.toString(callContract1.contractAbi)) as VmcontractAbi[]
+        }
+      }
+    )
   }
 
   @action
@@ -92,12 +99,6 @@ export class Call extends React.Component<IProps> {
       this.gasPrice = e.target.value
     }
   }
-
-  // handleConfirm = async e => {
-  //   e.preventDefault()
-  //   // TODO: Add validate
-  //   this.handleShowDialog()
-  // }
 
   @action
   handleCall = async (funcName: string, params: string, constant?: boolean): Promise<CallRes | void> => {
@@ -222,9 +223,10 @@ export class Call extends React.Component<IProps> {
       }
     } = this.props
     const callContract = vmContract.contract.get(address)
+    console.log('Call', address, callContract)
     if (!callContract) {
-      // console.log('vmContract.contract.get(address)', address, callContract)
-      return null
+      // return null
+      return <div>No callContract</div>
     }
     return (
       <Fragment>

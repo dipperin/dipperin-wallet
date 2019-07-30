@@ -95,7 +95,8 @@ const styles = createStyles({
     }
   },
   contractsListBody: {
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    overflowY: 'auto'
   },
   row: {
     // height: '28px',

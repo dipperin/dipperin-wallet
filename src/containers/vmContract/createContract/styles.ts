@@ -137,7 +137,7 @@ const styles = createStyles({
     padding: '8px 5px',
     position: 'absolute',
     right: '0',
-    top: '3px'
+    top: '1px'
   },
   paramRow: {
     fontSize: 12,
