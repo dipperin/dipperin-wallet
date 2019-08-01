@@ -131,37 +131,37 @@ describe('Containers: Send', () => {
     expect(mockSwalFire.mock.calls[0][0]).toEqual(labels.swal.insufficientFunds)
   })
 
-  it('handleGetTxFee, Correct', () => {
-    instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
-    instance.amount = '10'
+  // it('handleGetTxFee, Correct', () => {
+  //   instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
+  //   instance.amount = '10'
 
-    component
-      .find(Input)
-      .at(2)
-      .simulate('blur')
+  //   component
+  //     .find(Input)
+  //     .at(2)
+  //     .simulate('blur')
 
-    expect(instance.fee).toEqual('0.0000111')
-    expect(instance.minFee).toEqual('0.0000111')
-    expect(instance.waitConfirm).toEqual(true)
-  })
+  //   expect(instance.fee).toEqual('0.0000111')
+  //   expect(instance.minFee).toEqual('0.0000111')
+  //   expect(instance.waitConfirm).toEqual(true)
+  // })
 
-  it('feeChange', () => {
-    const mockFeeChange = jest.spyOn(instance, 'feeChange')
-    instance.forceUpdate()
-    const mockEvent = {
-      target: {
-        value: '0.1'
-      }
-    }
+  // it('feeChange', () => {
+  //   // const mockFeeChange = jest.spyOn(instance, 'feeChange')
+  //   instance.forceUpdate()
+  //   const mockEvent = {
+  //     target: {
+  //       value: '0.1'
+  //     }
+  //   }
 
-    component
-      .find(Input)
-      .at(3)
-      .simulate('change', mockEvent)
-    expect(mockFeeChange).toHaveBeenCalled()
-    expect(mockFeeChange.mock.calls[0][0]).toEqual(mockEvent)
-    expect(instance.fee).toEqual('0.1')
-  })
+  //   component
+  //     .find(Input)
+  //     .at(3)
+  //     .simulate('change', mockEvent)
+  //   expect(mockFeeChange).toHaveBeenCalled()
+  //   expect(mockFeeChange.mock.calls[0][0]).toEqual(mockEvent)
+  //   // expect(instance.fee).toEqual('0.1')
+  // })
 
   it('handleSend, Enter an invalid amount', () => {
     const mockHandleSend = jest.spyOn(instance, 'handleSend')
@@ -169,8 +169,8 @@ describe('Containers: Send', () => {
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10f'
-    instance.minFee = '0.01'
-    instance.fee = '0.1'
+    // instance.minFee = '0.01'
+    // instance.fee = '0.1'
     instance.waitConfirm = true
     component
       .find('form')
@@ -189,8 +189,8 @@ describe('Containers: Send', () => {
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10'
-    instance.minFee = '0.01'
-    instance.fee = '0.1f'
+    instance.gasPrice = '1'
+    // instance.fee = '0.1f'
     instance.waitConfirm = true
     component
       .find('form')
@@ -209,8 +209,8 @@ describe('Containers: Send', () => {
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10'
-    instance.minFee = '0.01'
-    instance.fee = '0.1'
+    // instance.minFee = '0.01'
+    // instance.fee = '0.1'
     instance.waitConfirm = true
     component
       .find('form')

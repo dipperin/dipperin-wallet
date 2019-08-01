@@ -171,6 +171,8 @@ export const zhCN = {
       password: '密码',
       cancel: '取消',
       dialogSend: '发送',
+      gasPrice: 'gas费用',
+      estimateGas: '预估Gas',
       swal: {
         invalidAddress: '无效地址',
         insufficientFunds: '余额不足',
@@ -598,6 +600,8 @@ export const enUS: I18nCollection = {
       password: 'Password',
       cancel: 'Cancel',
       dialogSend: 'Send',
+      gasPrice: 'Gas Price',
+      estimateGas: 'Estimate Gas',
       swal: {
         invalidAddress: 'Provided address is invalid',
         insufficientFunds: 'Insufficient funds',
