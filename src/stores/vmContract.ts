@@ -71,6 +71,7 @@ class VmContractStore {
         contracts.push(contract)
       }
     })
+    console.log('contracts', contracts)
 
     return contracts.sort((a, b) => a.timestamp - b.timestamp)
   }
@@ -264,25 +265,28 @@ class VmContractStore {
     const contract = new VmContractModel({
       contractAbi: abi,
       contractAddress: address,
-      owner: this._store.account.activeAccount.address
+      owner: this._store.account.activeAccount.address,
+      status: 'success'
     })
     // console.log('contractData', contract.contractData)
     if (
-      this._contract.has(contract.contractAddress) &&
-      this._contract.get(contract.contractAddress)!.hasOwner(address)
+      this._contract.has(address) &&
+      this._contract.get(contract.contractAddress)!.hasOwner(this._store.account.activeAccount.address)
     ) {
       return {
         success: false,
         info: 'The Contract has already existed!'
       }
     } else if (this._contract.has(contract.contractAddress)) {
-      this._contract.get(address)!.addOwner(address)
+      this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
+      insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
     } else {
       this._contract.set(contract.contractAddress, contract)
+      insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
     console.log('after addContract', this._contract.get(address))
-    insertVmContract(contract.toJS(), getCurrentNet())
+
     return {
       success: true
     }
