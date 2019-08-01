@@ -17,7 +17,6 @@ import RootStore from './root'
 import { TxResponse } from './transaction'
 import Dipperin, {
   VmContract
-
   // helper
 } from '@dipperin/dipperin.js'
 import Receipt from '@/models/receipt'
