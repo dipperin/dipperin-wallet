@@ -157,7 +157,12 @@ class VmContractStore {
       // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
       const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      const res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
+      let res
+      if (this._store.isRemoteNode) {
+        res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
+      } else {
+        res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
+      }
       return {
         success: true,
         info: Number(res).toString()
