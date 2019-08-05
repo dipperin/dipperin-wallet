@@ -18,6 +18,9 @@ import { Button } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import { VmcontractAbi } from '@/models/vmContract'
 
+import SelctFile from '@/images/select-file.png'
+import SelectedFile from '@/images/select-file-ed.png'
+
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
 import { helper, Utils } from '@dipperin/dipperin.js'
@@ -62,10 +65,24 @@ export class CreateContract extends React.Component<IProps> {
   paramsValue: IParamsValue = {}
   @observable
   estimateGas: number
+  inputABI: HTMLInputElement | null
+  @observable
+  inputABIPlaceholder: string = ''
+  inputWasm: HTMLInputElement | null
+  @observable
+  inputWasmPlaceholder: string = ''
 
   @action
   codeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      if (e.target.files[0].name.split('.').reverse()[0] !== 'wasm') {
+        await swal.fire({
+          type: 'error',
+          title: this.props.labels.errorWasmFile
+        })
+        return
+      }
+      this.inputWasmPlaceholder = e.target.files[0].name
       const reader = new FileReader()
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
@@ -86,8 +103,18 @@ export class CreateContract extends React.Component<IProps> {
     this.isCreated = false
   }
 
+  @action
   abiChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      console.log(e.target.files[0].name.split('.').reverse())
+      if (e.target.files[0].name.split('.').reverse()[0] !== 'json') {
+        await swal.fire({
+          type: 'error',
+          title: this.props.labels.errorAbiFile
+        })
+        return
+      }
+      this.inputABIPlaceholder = e.target.files[0].name
       const reader = new FileReader()
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
@@ -257,6 +284,14 @@ export class CreateContract extends React.Component<IProps> {
     this.showDetailParams = false
   }
 
+  addfile = () => {
+    this.inputABI!.click()
+  }
+
+  addWasmFile = () => {
+    this.inputWasm!.click()
+  }
+
   render() {
     const { classes, labels } = this.props
     let abis
@@ -301,13 +336,45 @@ export class CreateContract extends React.Component<IProps> {
         <form onSubmit={this.handleConfirm} className={classes.form}>
           <div className={classes.inputRow}>
             <span>{labels.abi}</span>
-            <input type="file" required={true} onChange={this.abiChange} />
+            <div
+              style={this.inputABIPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
+              className={classes.selectFile}
+              onClick={this.addfile}
+            >
+              {this.inputABIPlaceholder ? this.inputABIPlaceholder : labels.selectFile}
+              <img src={this.inputABIPlaceholder ? SelectedFile : SelctFile} />
+            </div>
+            <input
+              style={{ display: 'none' }}
+              type="file"
+              required={true}
+              onChange={this.abiChange}
+              ref={input => {
+                this.inputABI = input
+              }}
+            />
           </div>
           {this.isCreated && (
             <Fragment>
               <div className={classes.inputRow}>
                 <span>{labels.code}</span>
-                <input type="file" required={true} onChange={this.codeChange} />
+                <div
+                  style={this.inputWasmPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
+                  className={classes.selectFile}
+                  onClick={this.addWasmFile}
+                >
+                  {this.inputWasmPlaceholder ? this.inputWasmPlaceholder : labels.selectFile}
+                  <img src={this.inputWasmPlaceholder ? SelectedFile : SelctFile} />
+                </div>
+                <input
+                  style={{ display: 'none' }}
+                  type="file"
+                  required={true}
+                  onChange={this.codeChange}
+                  ref={input => {
+                    this.inputWasm = input
+                  }}
+                />
               </div>
               <div className={classes.inputRow}>
                 <span>{labels.initParams}</span>

@@ -100,6 +100,23 @@ const styles = createStyles({
       }
     }
   },
+  selectFile: {
+    width: '226px',
+    border: '1px solid #E5E5E5',
+    background: '#F9F9F9',
+    padding: '0 4px',
+    height: '30px',
+    borderRadius: '4px',
+    lineHeight: '30px',
+    verticalAlign: 'middle',
+    color: 'rgba(200,200,200,1)',
+    fontWeight: 400,
+    cursor: 'pointer',
+    '& img': {
+      float: 'right',
+      padding: '7px 4px'
+    }
+  },
   initParamsInput: {
     width: '226px',
     height: '30px',
