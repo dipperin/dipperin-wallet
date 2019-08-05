@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-import { Utils } from '@dipperin/dipperin.js'
+// import { Utils } from '@dipperin/dipperin.js'
 
 import _ from 'lodash'
 
@@ -13,6 +13,9 @@ import WalletStore from '@/stores/wallet'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
+
+// components
+import ContractList from './contractList'
 
 interface WrapProps extends RouteComponentProps<{ address: string }> {
   vmContract: VmContractStore
@@ -26,9 +29,15 @@ interface IProps extends WithStyles<typeof styles>, WrapProps {
 @inject('vmContract')
 @observer
 export class Receipts extends React.Component<IProps> {
+  switchToList = () => {
+    this.props.history.push('/main/vm_contract')
+  }
+
   render() {
     const {
       vmContract,
+      classes,
+      labels,
       match: {
         params: { address }
       }
@@ -36,30 +45,23 @@ export class Receipts extends React.Component<IProps> {
     const receipts = vmContract.receipts.get(address) || []
 
     return (
-      <Fragment>
-        {receipts.map((receipt, index) => {
-          return (
-            <div key={index}>
-              <h2>Receipt {index + 1}</h2>
-              <p>id: {receipt.transactionHash}</p>
-              <p>Gas Used: {receipt.gasUsed}</p>
-              <div>
-                <h3>Logs:</h3>
-                {receipt.logs.map((log, index2) => {
-                  return (
-                    <div key={index2}>
-                      <p>Topic: {log.topicName}</p>
-                      <p>Block Number: {log.blockNumber}</p>
-                      <p>data: {Utils.decodeBase64(log.data)}</p>
-                    </div>
-                  )
-                })}
-              </div>
-              <p>-------------------------------------------</p>
-            </div>
-          )
-        })}
-      </Fragment>
+      <div className={classes.container}>
+        <p className={classes.return}>
+          <span onClick={this.switchToList}>{labels.contract}</span>
+          <span> >> </span>
+          <span>{labels.detail}</span>
+        </p>
+        <div className={classes.contractsList}>
+          <div className={classes.contractsListHeader}>
+            <p>{labels.txHash}</p>
+            <p>{labels.method}</p>
+            <p>{labels.data}</p>
+          </div>
+          <div className={classes.contractsListBody}>
+            <ContractList receipts={receipts} labels={labels} />
+          </div>
+        </div>
+      </div>
     )
   }
 }

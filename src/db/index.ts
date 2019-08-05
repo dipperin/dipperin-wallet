@@ -39,9 +39,13 @@ export const getAccount = async (): Promise<AccountObj[]> => {
   return account
 }
 
-export const insertAccount = (account: AccountObj[] | AccountObj) => {
+export const insertAccount = async (account: AccountObj[] | AccountObj) => {
   const db = getDB(ACCOUNT_DB)
-  db.insert(account)
+  await new Promise(resolve => {
+    db.insert(account, (_, res) => {
+      resolve(true)
+    })
+  })
 }
 
 export const getTx = async (address: string, net: string = DEFAULT_NET): Promise<TransactionInterface[]> => {
@@ -293,4 +297,5 @@ export const resetDB = () => {
   getDB(CONTRACT_DB).remove({}, { multi: true })
   getDB(FAVORITE_CONTRACT).remove({}, { multi: true })
   getDB(OWNER_DB).remove({}, { multi: true })
+  getDB(VM_CONTRACT_DB).remove({}, { multi: true })
 }

@@ -12,11 +12,13 @@ describe('import', () => {
   const root = mockRootBuilder(true)
   const mockWallet = root.wallet
   const mockLoading = root.loading
+  const mockAccount = root.account
   const MockChangeLanguage = jest.fn()
   const component = shallow(
     <StyleImport
       wallet={mockWallet}
       loading={mockLoading}
+      account={mockAccount}
       language={'zh-CN'}
       changeLanguage={MockChangeLanguage}
       labels={i18n['zh-CN'].wallet.import}

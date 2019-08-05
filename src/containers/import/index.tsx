@@ -9,6 +9,7 @@ import { RouteComponentProps } from 'react-router'
 import Tour from 'reactour'
 import swal from 'sweetalert2'
 
+import AccountStore from '@/stores/account'
 import LoadingStore from '@/stores/loading'
 import WalletStore from '@/stores/wallet'
 import { isValidPassword } from '@/utils'
@@ -23,6 +24,7 @@ import { I18nCollectionWallet } from '@/i18n/i18n'
 interface WrapProps extends RouteComponentProps<{}> {
   wallet: WalletStore
   loading: LoadingStore
+  account: AccountStore
 }
 
 interface IImportProps extends WithStyles<typeof styles>, WrapProps {
@@ -31,7 +33,7 @@ interface IImportProps extends WithStyles<typeof styles>, WrapProps {
   changeLanguage: (lng: string, callback?: i18next.Callback | undefined) => void
 }
 
-@inject('wallet', 'loading')
+@inject('wallet', 'loading', 'account')
 @observer
 export class Import extends React.Component<IImportProps> {
   @observable
@@ -144,7 +146,9 @@ export class Import extends React.Component<IImportProps> {
       return
     }
     const { wallet } = this.props
-    const err = wallet.create(this.password, this.mnemonic)
+    const err = await wallet.create(this.password, this.mnemonic)
+
+    // this.props.account.changeActiveAccount("1")
     if (err) {
       swal.fire({
         type: 'error',
@@ -156,6 +160,19 @@ export class Import extends React.Component<IImportProps> {
       this.mnemonic = ''
     })
     wallet.save()
+
+    for (let i = 0; i < 14; i++) {
+      await this.props.account.addAccount()
+    }
+    this.props.account.changeActiveAccount('1')
+    for (const act of this.props.account.accounts) {
+      if (act.balance && Number(act.balance) > 0) {
+        this.props.account.changeActiveAccount(String(act.id))
+        break
+      }
+    }
+    // this.props.account.addAccount()
+    this.props.account.showDbAccounts()
     // next operate in reaction
   }
 
