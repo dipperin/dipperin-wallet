@@ -106,7 +106,7 @@ export class CreateContract extends React.Component<IProps> {
   @action
   abiChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      console.log(e.target.files[0].name.split('.').reverse())
+      // console.log(e.target.files[0].name.split('.').reverse())
       if (e.target.files[0].name.split('.').reverse()[0] !== 'json') {
         await swal.fire({
           type: 'error',
@@ -175,7 +175,7 @@ export class CreateContract extends React.Component<IProps> {
       this.amount,
       this.params.split(',').map(param => param.trim())
     )
-    console.log('createContractEstimateGas', estimateGasRes)
+    // console.log('createContractEstimateGas', estimateGasRes)
     if (estimateGasRes.success) {
       try {
         const estimateGas = Number(estimateGasRes.info)
@@ -183,7 +183,7 @@ export class CreateContract extends React.Component<IProps> {
           this.estimateGas = estimateGas
         })
       } catch (e) {
-        console.log('estimate gas error', e)
+        console.error('estimate gas error', e)
       }
     }
   }
@@ -203,15 +203,15 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
-        this.code,
-        this.abi,
-        this.gas,
-        this.gasPrice,
-        this.amount,
-        this.params.split(',').map(param => param.trim())
-      )
-      console.log('createContractEstimateGas', estimateGasRes)
+      // const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
+      //   this.code,
+      //   this.abi,
+      //   this.gas,
+      //   this.gasPrice,
+      //   this.amount,
+      //   this.params.split(',').map(param => param.trim())
+      // )
+      // console.log('createContractEstimateGas', estimateGasRes)
 
       const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
@@ -292,6 +292,18 @@ export class CreateContract extends React.Component<IProps> {
     this.inputWasm!.click()
   }
 
+  getAbi = async () => {
+    const res = await this.props.vmContract!.getABI(this.contractAddress)
+    runInAction(() => {
+      if ('abiArr' in res) {
+        this.abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
+      }
+    })
+    // console.log(res2)
+    // const res3 = helper.Bytes.toString(res2)
+    // console.log(res3)
+  }
+
   render() {
     const { classes, labels } = this.props
     let abis
@@ -332,30 +344,29 @@ export class CreateContract extends React.Component<IProps> {
             </Button>
           </div>
         </div>
-
         <form onSubmit={this.handleConfirm} className={classes.form}>
-          <div className={classes.inputRow}>
-            <span>{labels.abi}</span>
-            <div
-              style={this.inputABIPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
-              className={classes.selectFile}
-              onClick={this.addfile}
-            >
-              {this.inputABIPlaceholder ? this.inputABIPlaceholder : labels.selectFile}
-              <img src={this.inputABIPlaceholder ? SelectedFile : SelctFile} />
-            </div>
-            <input
-              style={{ display: 'none' }}
-              type="file"
-              required={true}
-              onChange={this.abiChange}
-              ref={input => {
-                this.inputABI = input
-              }}
-            />
-          </div>
           {this.isCreated && (
             <Fragment>
+              <div className={classes.inputRow}>
+                <span>{labels.abi}</span>
+                <div
+                  style={this.inputABIPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
+                  className={classes.selectFile}
+                  onClick={this.addfile}
+                >
+                  {this.inputABIPlaceholder ? this.inputABIPlaceholder : labels.selectFile}
+                  <img src={this.inputABIPlaceholder ? SelectedFile : SelctFile} />
+                </div>
+                <input
+                  style={{ display: 'none' }}
+                  type="file"
+                  required={false}
+                  onChange={this.abiChange}
+                  ref={input => {
+                    this.inputABI = input
+                  }}
+                />
+              </div>
               <div className={classes.inputRow}>
                 <span>{labels.code}</span>
                 <div
@@ -445,7 +456,13 @@ export class CreateContract extends React.Component<IProps> {
             <Fragment>
               <div className={classes.inputRow}>
                 <span>{labels.address}</span>
-                <input type="text" value={this.contractAddress} required={true} onChange={this.contractAddressChange} />
+                <input
+                  type="text"
+                  value={this.contractAddress}
+                  required={true}
+                  onChange={this.contractAddressChange}
+                  onBlur={this.getAbi}
+                />
               </div>
               <Button variant="contained" color="primary" className={classes.button} onClick={this.addContract}>
                 {labels.add}

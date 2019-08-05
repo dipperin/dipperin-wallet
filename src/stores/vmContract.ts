@@ -285,7 +285,9 @@ class VmContractStore {
       this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
       insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
     } else {
-      this._contract.set(contract.contractAddress, contract)
+      runInAction(() => {
+        this._contract.set(contract.contractAddress, contract)
+      })
       insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
@@ -399,6 +401,12 @@ class VmContractStore {
       const newTxs = txs.filter(tx => !removeTxs.find(t => tx === t))
       this._contractTxsMap.set(address, newTxs)
     })
+  }
+
+  getABI = async (address: string) => {
+    const res = await this._store.dipperin.dr.getAbi(address)
+    // console.log("vmcontract getAbI response", res)
+    return res
   }
 
   updateContractStatus() {

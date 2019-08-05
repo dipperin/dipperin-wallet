@@ -1,4 +1,4 @@
-import { observable, action, reaction } from 'mobx'
+import { observable, action, reaction, runInAction } from 'mobx'
 import React, { Fragment } from 'react'
 import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
@@ -63,7 +63,10 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (callContract) {
-      this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
+      console.log(helper.Bytes.toString(callContract.contractAbi))
+      runInAction(() => {
+        this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
+      })
     }
     reaction(
       () => this.props.match.params.address,
