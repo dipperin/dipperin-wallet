@@ -21,7 +21,9 @@ export const styles = createStyles({
     width: 390,
     verticalAlign: 'top',
     wordBreak: 'break-all',
-    fontWeight: 400
+    fontWeight: 400,
+    maxHeight: 200,
+    overflow: 'hidden'
   },
   title: {
     fontSize: 18,

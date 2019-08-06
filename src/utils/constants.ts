@@ -1,3 +1,4 @@
+// export const LOCALHOST = 'http://localhost:7783'
 export const LOCALHOST = 'ws://localhost:8893'
 
 /**
@@ -46,6 +47,7 @@ export const ACCOUNT_DB = 'account'
 export const TRANSACTION_DB = 'transaction'
 export const WALLET_DB = 'wallet'
 export const CONTRACT_DB = 'contract'
+export const VM_CONTRACT_DB = 'vmContrat'
 export const FAVORITE_CONTRACT = 'favoriteContract'
 export const OWNER_DB = 'owner'
 
@@ -92,7 +94,7 @@ export const REMOTE_MECURY = 'remoteMecury'
  * net/host obj
  */
 export const NET_HOST_OBJ = {
-  [REMOTE_TEST]: 'http://10.200.0.139:3035',
+  [REMOTE_TEST]: 'http://172.16.5.201:3035',
   [REMOTE_MECURY]: 'http://14.17.65.122:3035'
 }
 /**
@@ -101,3 +103,5 @@ export const NET_HOST_OBJ = {
 export enum TIMET_NAME {
   CONNECTING = 'connecting'
 }
+
+export const VM_CONTRACT_ADDRESS = '0x00120000000000000000000000000000000000000000'

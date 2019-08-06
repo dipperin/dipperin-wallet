@@ -194,14 +194,15 @@ export default class WalletStore {
    *
    * @param password wallet decrypt password
    */
-  create(password: string, mnemonic?: string): Error | void {
+  create = async (password: string, mnemonic?: string): Promise<Error | void> => {
     this._store.loading.start()
     try {
       if (!mnemonic) {
         // If not input a mnemonic, generate a new mnemonic and save
         this.destroyMnemonic = this.createDestroyMnemonic(password)
       } else {
-        this.initWallet(password, mnemonic)
+        await this.initWallet(password, mnemonic)
+        // this._store.account.showDbAccounts()
       }
     } catch (err) {
       return err
@@ -293,7 +294,7 @@ export default class WalletStore {
    * @param mnemonic
    */
   @action
-  private initWallet(password: string, mnemonic: string): void {
+  private initWallet = async (password: string, mnemonic: string): Promise<void> => {
     // init wallet id
     const walletId = new Date().valueOf()
     // Try to parse mnemonic to seed, if fail, return error
@@ -311,7 +312,7 @@ export default class WalletStore {
     this._currentWallet = new WalletModel(walletObj)
     this._hdAccount = hdAccount
     // init account
-    this._store.account.initAccount()
+    await this._store.account.initAccount()
   }
 
   /**

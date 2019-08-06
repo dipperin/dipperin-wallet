@@ -13,6 +13,19 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <div id="root"></div>
+  <script>
+    function resetSize() {
+      
+      // window.resizeTo(1080, 608);
+      const currentHeight = window.innerHeight;
+      const currentWidth = window.innerWidth;
+      window.resizeBy(1080-currentWidth,608-currentHeight)
+    }
+
+    
+    resetSize()
+
+  </script>
 </body>
 
 </html>

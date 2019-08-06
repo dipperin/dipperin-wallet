@@ -5,7 +5,7 @@ describe('worker: block', () => {
     {
       value: 100,
       nonce: 1,
-      fee: 1,
+      // fee: 1,
       from: '0x00009328d55ccb3fce531f199382339f0e576ee840b2',
       to: '0x00009328d55ccb3fce531f199382339f0e576ee840b1',
       tx_id: '1',
@@ -14,7 +14,7 @@ describe('worker: block', () => {
     {
       value: 100,
       nonce: 1,
-      fee: 1,
+      // fee: 1,
       from: '0x00009328d55ccb3fce531f199382339f0e576ee840b4',
       to: '0x00009328d55ccb3fce531f199382339f0e576ee840b3',
       tx_id: '2',
@@ -26,7 +26,7 @@ describe('worker: block', () => {
     {
       value: '100',
       nonce: '1',
-      fee: '1',
+      // fee: '1',
       from: '0x00009328d55ccb3fce531f199382339f0e576ee840b2',
       to: '0x00009328d55ccb3fce531f199382339f0e576ee840b1',
       transactionHash: '1',

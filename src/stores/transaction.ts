@@ -99,10 +99,26 @@ class TransactionStore {
     }
   }
 
-  async confirmTransaction(address: string, amount: string, memo: string, fee: string): Promise<TxResponse> {
+  getSignedTransactionData(address: string, amount: string, memo: string, gas?: string, gasPrice?: string): string {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+    transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+    return transaction.signedTransactionData
+  }
+
+  async confirmTransaction(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
     try {
-      const transaction = this.createNewTransaction(address, amount, memo, fee)
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
       // console.dir(transaction.toJS())
@@ -129,6 +145,43 @@ class TransactionStore {
           success: false,
           info: 'Something wrong!'
         }
+      }
+    } catch (err) {
+      // console.error(String(err))
+      if (err instanceof Errors.NoEnoughBalanceError) {
+        return {
+          success: false,
+          info: err.message
+        }
+      }
+      return {
+        success: false,
+        info: String(err)
+      }
+    }
+  }
+
+  async estimateGas(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): Promise<TxResponse> {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // console.log('confirmTransaction.............')
+    try {
+      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
+      // console.dir(transaction.toJS())
+      const res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
+      console.log('estimate running', { res })
+      return {
+        success: true,
+        info: Number(res).toString()
       }
     } catch (err) {
       // console.error(String(err))
@@ -187,16 +240,33 @@ class TransactionStore {
     this.load()
   }
 
-  private createNewTransaction(address: string, amount: string, memo: string, fee?: string): TransactionModel {
+  // private createNewTransaction(
+  createNewTransaction(
+    address: string,
+    amount: string,
+    memo: string,
+    // fee?: string,
+    gas?: string,
+    gasPrice?: string
+  ): TransactionModel {
     const fromAccount = this._store.account.activeAccount
     const amountUnit = Utils.toUnit(amount)
 
-    const feeUnit = fee ? Utils.toUnit(fee) : '0'
+    // const feeUnit = fee ? Utils.toUnit(fee) : '0'
+    // TODO: confirm default with yc
+    const gasUnit = gas ? gas : '120000'
+    const gasPriceUnit = gasPrice ? gasPrice : '1'
 
     const accountAmount = Utils.toUnit(fromAccount.balance)
-    if (new BN(accountAmount).lt(new BN(amountUnit).plus(new BN(feeUnit)))) {
+    if (
+      new BN(accountAmount).lt(
+        // new BN(amountUnit).plus(new BN(feeUnit)).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
+        new BN(amountUnit).plus(new BN(gasUnit).times(new BN(gasPriceUnit)))
+      )
+    ) {
       throw new Errors.NoEnoughBalanceError()
     }
+
     return new TransactionModel({
       nonce: fromAccount.nonce,
       extraData: memo,
@@ -204,7 +274,9 @@ class TransactionStore {
       hashLock: DEFAULT_HASH_LOCK,
       from: fromAccount.address,
       to: address,
-      fee: feeUnit
+      // fee: feeUnit,
+      gas: gasUnit,
+      gasPrice: gasPriceUnit
     })
   }
 
