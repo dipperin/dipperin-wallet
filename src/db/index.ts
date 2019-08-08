@@ -48,6 +48,15 @@ export const insertAccount = async (account: AccountObj[] | AccountObj) => {
   })
 }
 
+export const removeAccount = async (id: number) => {
+  const db = getDB(ACCOUNT_DB)
+  await new Promise(resolve => {
+    db.remove({ id }, (_, res) => {
+      resolve(true)
+    })
+  })
+}
+
 export const getTx = async (address: string, net: string = DEFAULT_NET): Promise<TransactionInterface[]> => {
   const db = getDB(TRANSACTION_DB)
   const tx = (await new Promise(resolve => {
