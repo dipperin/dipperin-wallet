@@ -24,8 +24,8 @@ const MAX_LOG_SIZE = 100 * 1024 * 1024
 export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
-  const chainDataDir = path.join(os.homedir(), `tmp/dipperin_apps/${getNodeEnv(net)}/wallet`)
-  const chainLogPath = `${chainDataDir}/dipperin.log`
+  const chainDataDir = path.join(os.homedir(), `tmp`,`dipperin_apps`,`${getNodeEnv(net)}`,`wallet`)
+  const chainLogPath = path.join(`${chainDataDir}`,`dipperin.log`)
 
   if (dipperin) {
     return

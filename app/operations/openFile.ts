@@ -8,8 +8,8 @@ import { getNodeEnv } from './runDipperin'
 
 export const openTmp = () => {
   const net: string = settings.get('netEnv') as string
-  const chainDataDir = path.join(os.homedir(), `tmp/dipperin_apps/${getNodeEnv(net)}/wallet`)
-  const chainLogPath = `${chainDataDir}/dipperin.log`
+  const chainDataDir = path.join(os.homedir(), `tmp`,`dipperin_apps`,`${getNodeEnv(net)}`,`wallet`)
+  const chainLogPath = path.join(`${chainDataDir}`,`dipperin.log`)
   shell.showItemInFolder(chainLogPath)
 }
 
