@@ -3,7 +3,7 @@ import { computed, observable, action } from 'mobx'
 import AccountModel from '../models/account'
 import RootStore from './root'
 
-import { getAccount, insertAccount } from '@/db'
+import { getAccount, insertAccount, removeAccount } from '@/db'
 import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH } from '@/utils/constants'
 
 export default class AccountStore {
@@ -73,6 +73,15 @@ export default class AccountStore {
       }
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  async removeAccountAsync(id: string): Promise<Error | void> {
+    try {
+      this._accountMap.delete(id)
+      await removeAccount(Number(id))
+    } catch (err) {
+      return err
     }
   }
 
