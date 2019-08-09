@@ -172,7 +172,10 @@ export class Import extends React.Component<IImportProps> {
       }
     }
     for (let i = 15; i > 1; i--) {
-      if (this.props.account.accountMap.get(String(1))!.balance === '0') {
+      if (
+        this.props.account.accountMap.get(String(i)) &&
+        this.props.account.accountMap.get(String(i))!.balance === '0'
+      ) {
         await this.props.account.removeAccountAsync(String(i))
       } else {
         break
