@@ -298,6 +298,23 @@ class VmContractStore {
     }
   }
 
+  async getLogs(blockHash: string, fromBlock: number, toBlock: number, addresses: string[], topics: string[][]) {
+    try {
+      console.log('vmcontract store getLogs..........')
+      const res = await this._store.dipperin.dr.vmContract.getLogs(blockHash, fromBlock, toBlock, addresses, topics)
+      console.log('getLogs', res)
+      return {
+        success: true,
+        info: res
+      }
+    } catch (e) {
+      return {
+        success: false,
+        info: e
+      }
+    }
+  }
+
   async confirmCallContractMethod(
     address: string,
     abi: string,
