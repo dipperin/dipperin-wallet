@@ -127,6 +127,14 @@ export class AccountInfo extends React.Component<Props> {
     }
   }
 
+  formatNumber = (num: number, w: number) => {
+    const m = 10 ** w
+    const b = Math.floor(num * m) / m
+    return b.toLocaleString('zh-Hans', {
+      maximumFractionDigits: w
+    })
+  }
+
   render() {
     const { classes, labels, changeAccount, account, root } = this.props
     // const { blockInfo } = wallet!
@@ -153,13 +161,13 @@ export class AccountInfo extends React.Component<Props> {
             {labels.account} {activeAccount.id}
           </p>
           <p>
-            {Number(activeAccount.balance).toLocaleString()}
+            {this.formatNumber(Number(activeAccount.balance), 6)}
             <span>&nbsp;&nbsp;DIP</span>
           </p>
           {Number(activeAccount.lockMoney) > 0 && (
             <p>
               <img src={WhiteLock} />
-              <span> &nbsp;{Number(activeAccount.lockMoney).toLocaleString()} &nbsp;DIP</span>
+              <span> &nbsp;{this.formatNumber(Number(activeAccount.lockMoney), 6)} &nbsp;DIP</span>
             </p>
           )}
           <p>{activeAccount.address}</p>

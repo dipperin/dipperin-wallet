@@ -1,5 +1,5 @@
 import BN from 'bignumber.js'
-import { action, observable, reaction, runInAction } from 'mobx'
+import { action, observable, reaction, runInAction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -46,10 +46,12 @@ export class Send extends React.Component<IProps> {
   gasPrice: string = '1'
   @observable
   estimateGas: string = '21000'
-
   @observable
   showDialog: boolean = false
-
+  @computed
+  get poundage() {
+    return Number(this.gasPrice) * Number(this.estimateGas)
+  }
   constructor(props: IProps) {
     super(props)
 
@@ -75,37 +77,15 @@ export class Send extends React.Component<IProps> {
     }
   }
 
-  // @action
-  // handleGetTxFee = () => {
-  //   const hexAddress = `0x${this.address.replace('0x', '')}`
-  //   if (!this.amount || !this.address) {
-  //     this.waitConfirm = false
-  //     return
-  //   }
-  //   const err = this.verifyGetTxFee(this.amount, this.address, this.props.account!.activeAccount.balanceUnit)
-  //   if (err) {
-  //     swal.fire(err, '', 'error')
-  //     this.waitConfirm = false
-  //     return
-  //   }
-  // const minTransactionFee = this.props.transaction!.getTransactionFee(hexAddress, this.amount, this.memo)
-
-  // if (minTransactionFee) {
-  //   this.minFee = minTransactionFee
-  //   if (!this.fee || this.fee < this.minFee) {
-  //     this.fee = this.minFee
-  //   }
-  //   this.waitConfirm = true
-  // }
-  // }
-
   handleGetEstimateGas = async () => {
     const hexAddress = `0x${this.address.replace('0x', '')}`
     const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
     console.log('estimateGas', res2)
     if (res2.success && res2.info && /^[0-9]*$/.test(res2.info)) {
       runInAction(() => {
-        this.estimateGas = res2.info!
+        if (res2.info! !== '0') {
+          this.estimateGas = res2.info!
+        }
         this.waitConfirm = true
       })
     }
@@ -118,10 +98,6 @@ export class Send extends React.Component<IProps> {
       await swal.fire(labels.swal.invalidAmount, '', 'error')
       return
     }
-    // if (!isValidAmount(this.fee) || this.fee < this.minFee) {
-    //   await swal.fire(labels.swal.invalidFee, '', 'error')
-    //   return
-    // }
     this.handleShowDialog()
   }
 
@@ -215,6 +191,19 @@ export class Send extends React.Component<IProps> {
     this.showDialog = true
   }
 
+  @action
+  handleAddGasPrice = () => {
+    this.gasPrice = String(Number(this.gasPrice) + 1)
+    console.log('gasPrice', this.gasPrice)
+  }
+
+  @action
+  handleSubGasPrice = () => {
+    if (Number(this.gasPrice) > 1) {
+      this.gasPrice = String(Number(this.gasPrice) - 1)
+    }
+  }
+
   render() {
     const { labels, classes } = this.props
     return (
@@ -238,10 +227,14 @@ export class Send extends React.Component<IProps> {
             />
           </FormControl>
           <FormControl fullWidth={true} margin="dense">
-            <InputLabel>{labels.gasPrice}</InputLabel>
-            <Input type="number" value={this.gasPrice} onChange={this.gasPriceChange} inputProps={{ step: 1 }} />
+            <InputLabel>{labels.fee}</InputLabel>
+            <Input type="text" value={`${Utils.fromUnit(String(this.poundage))} DIP`} disabled={true} />
+            <div className={classes.poundageChange}>
+              <span className={classes.poundageAdd} onClick={this.handleAddGasPrice} />
+              <span className={classes.poundageSub} onClick={this.handleSubGasPrice} />
+            </div>
           </FormControl>
-          <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p>
+          {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
             disabled={!this.waitConfirm || !this.gasPrice}
             variant="contained"
