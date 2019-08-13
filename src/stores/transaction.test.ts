@@ -35,9 +35,7 @@ describe('Transaction store', () => {
 
   it('getTransactionFee', () => {
     root.account.activeAccount.updateBalance('1000000000')
-    expect(transaction.getTransactionFee('0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37', '0.000001', '')).toBe(
-      '0.0000108'
-    )
+    expect(transaction.getTransactionFee('0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37', '0.000001', '')).toBe('0')
   })
 
   it('confirmTransaction', async () => {

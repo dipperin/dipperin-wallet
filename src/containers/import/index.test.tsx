@@ -87,9 +87,10 @@ describe('import', () => {
     im.mnemonic = 'unusual drastic patrol mansion fuel more obey acquire disagree head trip chat'
     im.password = '12345678'
     im.repeatPassword = '12345678'
+    im.props.wallet.save = jest.fn()
     im.handleConfirm(submitEvent)
     expect(mockCreate).toBeCalled()
-    expect(mockSave).toBeCalled()
+    expect(im.props.wallet.save).toHaveBeenCalled()
     // expect(mockPush).not.toBeCalled() // todo
   })
 })
