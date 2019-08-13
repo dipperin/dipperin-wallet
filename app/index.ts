@@ -67,6 +67,7 @@ const createMainWindow = () => {
     show: false,
     // useContentSize: true,
     width: 1080,
+    webPreferences: {webSecurity: false},
     icon: path.join(__dirname, 'icons/512.png')
     // transparent: true,
     // titleBarStyle: 'customButtonsOnHover'
@@ -86,6 +87,7 @@ const createMainWindow = () => {
       frame: false,
       useContentSize: true,
       modal: true,
+      webPreferences: {webSecurity: false},
       icon: path.join(__dirname, 'icons/512.png')
     })
 

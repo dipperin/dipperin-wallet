@@ -1,6 +1,6 @@
 {
   "name": "dipperin-wallet",
-  "version": "v1.0.2",
+  "version": "v1.1.0",
   "description": "Dipperin Offcial Wallet",
   "private": false,
   "license": "MIT",
@@ -237,7 +237,7 @@
     ]
   },
   "dipperin": {
-    "version": "1.0.2",
+    "version": "1.1.0",
     "server": "114.119.116.157:9000"
   },
   "babel": {

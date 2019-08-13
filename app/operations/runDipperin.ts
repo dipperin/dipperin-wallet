@@ -11,7 +11,7 @@ import dipperinPath from '../utils/dipperinPath'
 import handleError from './handleError'
 import { START_SUCCESS } from '../ipc';
 
-export const DEFAULT_NET = 'mercury'
+export const DEFAULT_NET = 'venus'
 
 const fsChmod = util.promisify(fs.chmod)
 const fsExists = util.promisify(fs.stat)
