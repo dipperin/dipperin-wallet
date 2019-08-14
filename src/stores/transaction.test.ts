@@ -48,7 +48,7 @@ describe('Transaction store', () => {
       '21000',
       '1'
     )
-    expect(res).toEqual(
+    expect(res).toBe(
       '0xf867e080960000b4293d60F051936beDecfaE1B85d5A46d377aF3780800a0182520880f844a0dc6bc1d05a181d9016ab0c1ddf7db2397063a6cfbe9d55cb512e20967ea58b6ea010225fa3e085119a95b280ec046bff70812f0920e8fed08faa2ca5de0bfd9a0b3a80'
     )
   })

@@ -78,3 +78,5 @@ export const getVmContract = jest.fn(async => [
     txHash: '0x43906f0ceeb5ad5ab9541967dca92550cb699cef4c5c591822b6ff3c02f6e6de'
   }
 ])
+
+export const insertVmContract = jest.fn()

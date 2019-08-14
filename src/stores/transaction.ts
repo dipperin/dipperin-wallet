@@ -113,8 +113,8 @@ class TransactionStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
     try {
+      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
       const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._store.dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
