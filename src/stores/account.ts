@@ -123,7 +123,7 @@ export default class AccountStore {
       this._store.wallet.activeAccountId = this.activeAccount.id
       // update tx & contract
       this._store.transaction.reload()
-      this._store.contract.reload()
+      // this._store.contract.reload()
     }
   }
 

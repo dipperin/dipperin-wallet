@@ -110,19 +110,15 @@ class TransactionStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-    // console.log('confirmTransaction.............')
     try {
-      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
       const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
-      // console.dir(transaction.toJS())
       const res = await this._store.dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
+      // console.log(transaction.transactionHash)
       if (!isString(res)) {
         const errRes = res
         return {
@@ -165,17 +161,13 @@ class TransactionStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-    // console.log('confirmTransaction.............')
     try {
       const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
-      // console.dir(transaction.toJS())
       const res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
       console.log('estimate running', { res })
       return {
@@ -183,7 +175,6 @@ class TransactionStore {
         info: Number(res).toString()
       }
     } catch (err) {
-      // console.error(String(err))
       if (err instanceof Errors.NoEnoughBalanceError) {
         return {
           success: false,
@@ -244,7 +235,6 @@ class TransactionStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): TransactionModel {

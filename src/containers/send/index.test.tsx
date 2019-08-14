@@ -119,50 +119,6 @@ describe('Containers: Send', () => {
     expect(instance.waitConfirm).toEqual(false)
   })
 
-  it('handleGetTxFee, Not enough balance', () => {
-    instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
-    instance.amount = '100000'
-
-    component
-      .find(Input)
-      .at(2)
-      .simulate('blur')
-
-    expect(mockSwalFire.mock.calls[0][0]).toEqual(labels.swal.insufficientFunds)
-  })
-
-  // it('handleGetTxFee, Correct', () => {
-  //   instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
-  //   instance.amount = '10'
-
-  //   component
-  //     .find(Input)
-  //     .at(2)
-  //     .simulate('blur')
-
-  //   expect(instance.fee).toEqual('0.0000111')
-  //   expect(instance.minFee).toEqual('0.0000111')
-  //   expect(instance.waitConfirm).toEqual(true)
-  // })
-
-  // it('feeChange', () => {
-  //   // const mockFeeChange = jest.spyOn(instance, 'feeChange')
-  //   instance.forceUpdate()
-  //   const mockEvent = {
-  //     target: {
-  //       value: '0.1'
-  //     }
-  //   }
-
-  //   component
-  //     .find(Input)
-  //     .at(3)
-  //     .simulate('change', mockEvent)
-  //   expect(mockFeeChange).toHaveBeenCalled()
-  //   expect(mockFeeChange.mock.calls[0][0]).toEqual(mockEvent)
-  //   // expect(instance.fee).toEqual('0.1')
-  // })
-
   it('handleSend, Enter an invalid amount', () => {
     const mockHandleSend = jest.spyOn(instance, 'handleSend')
     const preventDefault = jest.fn()

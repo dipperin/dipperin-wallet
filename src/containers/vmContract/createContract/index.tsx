@@ -203,16 +203,6 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      // const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
-      //   this.code,
-      //   this.abi,
-      //   this.gas,
-      //   this.gasPrice,
-      //   this.amount,
-      //   this.params.split(',').map(param => param.trim())
-      // )
-      // console.log('createContractEstimateGas', estimateGasRes)
-
       const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
