@@ -26,7 +26,7 @@ interface InputValue {
 // }
 
 @observer
-class FunctionCaller extends React.Component<Props> {
+export class FunctionCaller extends React.Component<Props> {
   @observable
   inputValue: InputValue = {}
   @observable

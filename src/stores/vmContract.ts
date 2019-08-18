@@ -31,6 +31,7 @@ class VmContractStore {
 
   private _dipperin: Dipperin
   // current contract (created & favorite)
+  // TODO: use two map to store contracts one for success, one for pending
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
 
