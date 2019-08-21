@@ -3,7 +3,7 @@ import { computed, observable, action } from 'mobx'
 import AccountModel from '../models/account'
 import RootStore from './root'
 
-import { getAccount, insertAccount } from '@/db'
+import { getAccount, insertAccount, removeAccount } from '@/db'
 import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH } from '@/utils/constants'
 
 export default class AccountStore {
@@ -76,6 +76,15 @@ export default class AccountStore {
     }
   }
 
+  async removeAccountAsync(id: string): Promise<Error | void> {
+    try {
+      this._accountMap.delete(id)
+      await removeAccount(Number(id))
+    } catch (err) {
+      return err
+    }
+  }
+
   /**
    * Add account
    * @param index
@@ -114,7 +123,7 @@ export default class AccountStore {
       this._store.wallet.activeAccountId = this.activeAccount.id
       // update tx & contract
       this._store.transaction.reload()
-      this._store.contract.reload()
+      // this._store.contract.reload()
     }
   }
 
@@ -176,6 +185,7 @@ export default class AccountStore {
   private async getAccountBalance(address: string): Promise<string> {
     try {
       const res = await this._store.dipperin.dr.getBalance(address)
+      // console.log('getAccountBalance', res)
       return res || '0'
     } catch (err) {
       return ''

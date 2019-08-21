@@ -1,4 +1,4 @@
-import { observable, action, reaction, runInAction } from 'mobx'
+import { observable, action, reaction } from 'mobx'
 import React, { Fragment } from 'react'
 import { inject, observer } from 'mobx-react'
 import { RouteComponentProps } from 'react-router'
@@ -63,20 +63,27 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (callContract) {
-      console.log(helper.Bytes.toString(callContract.contractAbi))
-      runInAction(() => {
-        this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
-      })
+      // console.log(helper.Bytes.toString(callContract.contractAbi))
+      this.abiChange(callContract.contractAbi)
+      // runInAction(() => {
+      //   this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
+      // })
     }
     reaction(
       () => this.props.match.params.address,
       (ad: string) => {
         const callContract1 = vmContract.contract.get(ad)
         if (callContract1) {
-          this.abi = JSON.parse(helper.Bytes.toString(callContract1.contractAbi)) as VmcontractAbi[]
+          this.abiChange(callContract1.contractAbi)
+          // this.abi = JSON.parse(helper.Bytes.toString(callContract1.contractAbi)) as VmcontractAbi[]
         }
       }
     )
+  }
+
+  @action
+  abiChange = (abiByte: string) => {
+    this.abi = JSON.parse(helper.Bytes.toString(abiByte)) as VmcontractAbi[]
   }
 
   @action
@@ -89,15 +96,21 @@ export class Call extends React.Component<IProps> {
     this.params = e.target.value
   }
 
+  /**
+   * @param e: React.ChangeEvent<{ value: string }>
+   */
   @action
-  gasChange = (e: React.ChangeEvent<{ value: string }>) => {
+  gasChange = e => {
     if (isInt(e.target.value) || e.target.value === '') {
       this.gas = e.target.value
     }
   }
 
+  /**
+   * e: React.ChangeEvent<{ value: string }
+   */
   @action
-  gasPriceChange = (e: React.ChangeEvent<{ value: string }>) => {
+  gasPriceChange = e => {
     if (isInt(e.target.value) || e.target.value === '') {
       this.gasPrice = e.target.value
     }
@@ -114,8 +127,9 @@ export class Call extends React.Component<IProps> {
         },
         vmContract
       } = this.props
-      const callContract = vmContract.contract.get(address)!
       if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
+        // TODO: change following two func into one in vmContract Store
+        const callContract = vmContract.contract.get(address)!
         const callRes = await vmContract.confirmConstantCallContractMethod(
           callContract.contractAddress,
           callContract.contractAbi,
@@ -142,29 +156,14 @@ export class Call extends React.Component<IProps> {
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
       const callContract = vmContract.contract.get(address)!
-      let callRes: CallRes
-      if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
-        callRes = await vmContract.confirmConstantCallContractMethod(
-          callContract.contractAddress,
-          callContract.contractAbi,
-          this.name,
-          this.gas,
-          this.gasPrice,
-          this.params.split(',').map(param => param.trim())
-        )
-
-        // console.log('constCall', constCallRes)
-      } else {
-        callRes = await vmContract.confirmCallContractMethod(
-          callContract.contractAddress,
-          callContract.contractAbi,
-          this.name,
-          this.gas,
-          this.gasPrice,
-          this.params.split(',').map(param => param.trim())
-        )
-      }
-
+      const callRes = await vmContract.confirmCallContractMethod(
+        callContract.contractAddress,
+        callContract.contractAbi,
+        this.name,
+        this.gas,
+        this.gasPrice,
+        this.params.split(',').map(param => param.trim())
+      )
       if (callRes.success) {
         await swal.fire({
           title: labels.callDialog.callSuccess,

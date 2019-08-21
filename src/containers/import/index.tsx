@@ -159,8 +159,8 @@ export class Import extends React.Component<IImportProps> {
     runInAction(() => {
       this.mnemonic = ''
     })
-    wallet.save()
 
+    wallet.save()
     for (let i = 0; i < 14; i++) {
       await this.props.account.addAccount()
     }
@@ -171,9 +171,17 @@ export class Import extends React.Component<IImportProps> {
         break
       }
     }
-    // this.props.account.addAccount()
-    this.props.account.showDbAccounts()
-    // next operate in reaction
+    for (let i = 15; i > 1; i--) {
+      if (
+        this.props.account.accountMap.get(String(i)) &&
+        this.props.account.accountMap.get(String(i))!.balance === '0'
+      ) {
+        await this.props.account.removeAccountAsync(String(i))
+      } else {
+        break
+      }
+    }
+    // this.props.account.showDbAccounts()
   }
 
   ToCreate = () => {

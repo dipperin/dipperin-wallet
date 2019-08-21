@@ -156,7 +156,7 @@ export class CreateContract extends React.Component<IProps> {
   }
 
   @action
-  paramsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  paramsChange = (e: React.ChangeEvent<{ value: string }>) => {
     this.params = e.target.value
   }
 
@@ -170,8 +170,6 @@ export class CreateContract extends React.Component<IProps> {
     const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
       this.code,
       this.abi,
-      this.gas,
-      this.gasPrice,
       this.amount,
       this.params.split(',').map(param => param.trim())
     )
@@ -203,16 +201,6 @@ export class CreateContract extends React.Component<IProps> {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      // const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
-      //   this.code,
-      //   this.abi,
-      //   this.gas,
-      //   this.gasPrice,
-      //   this.amount,
-      //   this.params.split(',').map(param => param.trim())
-      // )
-      // console.log('createContractEstimateGas', estimateGasRes)
-
       const contractRes = await this.props.vmContract!.confirmCreateContract(
         this.code,
         this.abi,
@@ -227,9 +215,10 @@ export class CreateContract extends React.Component<IProps> {
           type: 'success',
           timer: 1000
         })
-        runInAction(() => {
-          this.showDialog = false
-        })
+        this.handleCloseDialog()
+        // runInAction(() => {
+        //   this.showDialog = false
+        // })
         // this.switchToList()
       } else {
         this.handleCloseDialog()
@@ -285,11 +274,18 @@ export class CreateContract extends React.Component<IProps> {
   }
 
   addfile = () => {
-    this.inputABI!.click()
+    if (this.inputABI) {
+      this.inputABI.click()
+    }
+
+    // this.inputABI!.click()
   }
 
   addWasmFile = () => {
-    this.inputWasm!.click()
+    if (this.inputWasm) {
+      this.inputWasm.click()
+    }
+    // this.inputWasm!.click()
   }
 
   getAbi = async () => {

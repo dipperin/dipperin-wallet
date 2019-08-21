@@ -9,13 +9,14 @@ const styles = createStyles({
     margin: '0 auto',
     borderRadius: 6,
     background: '#fff',
-    padding: '30px 24px 30px'
+    padding: '28px 20px 30px'
     // overflow: 'auto'
   },
   return: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+    padding: '0 5px',
     // cursor: 'pointer',
     // marginTop: '32px',
     // marginBottom: '36px',

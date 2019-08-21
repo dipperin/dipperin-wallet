@@ -27,7 +27,8 @@ export const FIRST_ACCOUNT_ID = '1'
  */
 
 export const DEFAULT_HASH_LOCK = ''
-export const DEFAULT_CHAIN_ID = '0x01'
+// export const DEFAULT_CHAIN_ID = '0x01'
+export const DEFAULT_CHAIN_ID = '0x02'
 
 export const TRANSACTION_STATUS_PENDING = 'pending'
 export const TRANSACTION_STATUS_SUCCESS = 'success'
@@ -81,21 +82,26 @@ export const START_SUCCESS = 'startSucces'
  * node net
  */
 
-export const DEFAULT_NET = 'mercury'
+export const DEFAULT_NET = 'venus'
 
+export const VENUS = 'venus'
 export const MERCURY = 'mercury'
 export const TEST = 'test'
 export const LOCAL = 'local'
 
 export const REMOTE_TEST = 'remoteTest'
 export const REMOTE_MECURY = 'remoteMecury'
+export const REMOTE_VENUS = 'remoteVenus'
 
 /**
  * net/host obj
  */
 export const NET_HOST_OBJ = {
   [REMOTE_TEST]: 'http://172.16.5.201:3035',
-  [REMOTE_MECURY]: 'http://14.17.65.122:3035'
+  // [REMOTE_TEST]: 'http://172.16.5.15:8999',
+  // [REMOTE_MECURY]: 'http://14.17.65.122:3035'
+  [REMOTE_VENUS]: 'http://14.17.65.122:3035'
+  // [REMOTE_VENUS]: 'http://172.16.5.201:3035'
 }
 /**
  * timer event name

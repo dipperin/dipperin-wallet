@@ -31,6 +31,7 @@ class VmContractStore {
 
   private _dipperin: Dipperin
   // current contract (created & favorite)
+  // TODO: use two map to store contracts one for success, one for pending
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
 
@@ -49,6 +50,11 @@ class VmContractStore {
         this.load()
       }
     )
+  }
+
+  @action
+  updateDipperin(newDipperin: Dipperin) {
+    this._dipperin = newDipperin
   }
 
   @computed
@@ -70,7 +76,7 @@ class VmContractStore {
         contracts.push(contract)
       }
     })
-    console.log('contracts', contracts)
+    // console.log('contracts', contracts)
 
     return contracts.sort((a, b) => a.timestamp - b.timestamp)
   }
@@ -93,18 +99,13 @@ class VmContractStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-    // console.log('confirmTransaction.............')
     try {
-      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
       const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
-      // console.dir(transaction.toJS())
       const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       if (!isString(res)) {
         const errRes = res
@@ -148,13 +149,11 @@ class VmContractStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
     try {
-      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
+      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
       const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
       transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       let res
@@ -182,14 +181,7 @@ class VmContractStore {
     }
   }
 
-  async createContractEstimateGas(
-    code: string,
-    abi: string,
-    gas: string,
-    gasPrice: string,
-    amount: string,
-    params?: string[]
-  ): Promise<TxResponse> {
+  async createContractEstimateGas(code: string, abi: string, amount: string, params?: string[]): Promise<TxResponse> {
     try {
       const contract = new VmContractModel({
         contractCode: code,
@@ -198,11 +190,10 @@ class VmContractStore {
         owner: this._store.account.activeAccount.address
       })
 
-      const res2 = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
+      const res = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
 
-      return res2
+      return res
     } catch (err) {
-      console.error(String(err))
       return {
         success: false,
         info: String(err)
@@ -225,8 +216,8 @@ class VmContractStore {
         initParams: params,
         owner: this._store.account.activeAccount.address
       })
-      const callData = Array.prototype.slice.call(Buffer.from(contract.contractData.replace('0x', ''), 'hex'))
-      console.log('contractData', callData)
+      // const callData = Array.prototype.slice.call(Buffer.from(contract.contractData.replace('0x', ''), 'hex'))
+      // console.log('contractData', callData)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.transaction.confirmTransaction(
@@ -275,7 +266,7 @@ class VmContractStore {
     // console.log('contractData', contract.contractData)
     if (
       this._contract.has(address) &&
-      this._contract.get(contract.contractAddress)!.hasOwner(this._store.account.activeAccount.address)
+      this._contract.get(address)!.hasOwner(this._store.account.activeAccount.address)
     ) {
       return {
         success: false,
@@ -291,10 +282,27 @@ class VmContractStore {
       insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
-    console.log('after addContract', this._contract.get(address))
+    // console.log('after addContract', this._contract.get(address))
 
     return {
       success: true
+    }
+  }
+
+  async getLogs(blockHash: string, fromBlock: number, toBlock: number, addresses: string[], topics: string[][]) {
+    try {
+      // console.log('vmcontract store getLogs..........')
+      const res = await this._store.dipperin.dr.vmContract.getLogs(blockHash, fromBlock, toBlock, addresses, topics)
+      // console.log('getLogs', res)
+      return {
+        success: true,
+        info: res
+      }
+    } catch (e) {
+      return {
+        success: false,
+        info: e
+      }
     }
   }
 
@@ -358,7 +366,7 @@ class VmContractStore {
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
-    console.log('vmContractStore load', contractDb)
+    // console.log('vmContractStore load', contractDb)
     runInAction(() => {
       const removeList: string[] = []
       this.getContractsFromObj(contractDb).forEach(contract => {

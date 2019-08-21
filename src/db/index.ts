@@ -3,7 +3,7 @@ import Nedb from 'nedb'
 import { AccountObj } from '@/models/account'
 import { ContractObj } from '@/models/contract'
 import { WalletObj } from '@/models/wallet'
-import { OwnerAddressDb } from '@/stores/contract'
+// import { OwnerAddressDb } from '@/stores/contract'
 import {
   ACCOUNT_DB,
   CONTRACT_DB,
@@ -43,6 +43,15 @@ export const insertAccount = async (account: AccountObj[] | AccountObj) => {
   const db = getDB(ACCOUNT_DB)
   await new Promise(resolve => {
     db.insert(account, (_, res) => {
+      resolve(true)
+    })
+  })
+}
+
+export const removeAccount = async (id: number) => {
+  const db = getDB(ACCOUNT_DB)
+  await new Promise(resolve => {
+    db.remove({ id }, (_, res) => {
       resolve(true)
     })
   })
@@ -274,21 +283,21 @@ export const insertOwnerAddress = (
   db.insert({ accountAddress, contractAddress, ownerAddress, net })
 }
 
-export const getOwnerAddress = async (
-  accountAddress: string,
-  contractAddress: string,
-  net: string
-): Promise<OwnerAddressDb[]> => {
-  const db = getDB(OWNER_DB)
-  let ownerAddress: OwnerAddressDb[] = []
-  await new Promise(resolve => {
-    db.find({ accountAddress, contractAddress, net }, (_, res) => {
-      ownerAddress = res
-      resolve()
-    })
-  })
-  return ownerAddress
-}
+// export const getOwnerAddress = async (
+//   accountAddress: string,
+//   contractAddress: string,
+//   net: string
+// ): Promise<OwnerAddressDb[]> => {
+//   const db = getDB(OWNER_DB)
+//   let ownerAddress: OwnerAddressDb[] = []
+//   await new Promise(resolve => {
+//     db.find({ accountAddress, contractAddress, net }, (_, res) => {
+//       ownerAddress = res
+//       resolve()
+//     })
+//   })
+//   return ownerAddress
+// }
 
 export const resetDB = () => {
   getDB(ACCOUNT_DB).remove({}, { multi: true })

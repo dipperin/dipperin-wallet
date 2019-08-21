@@ -17,7 +17,7 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 @observer
-class PasswordConfirm extends React.Component<Props> {
+export class PasswordConfirm extends React.Component<Props> {
   @observable
   value: string = ''
 

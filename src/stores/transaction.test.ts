@@ -35,23 +35,39 @@ describe('Transaction store', () => {
 
   it('getTransactionFee', () => {
     root.account.activeAccount.updateBalance('1000000000')
-    expect(transaction.getTransactionFee('0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37', '0.000001', '')).toBe(
-      '0.0000108'
+    expect(transaction.getTransactionFee('0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37', '0.000001', '')).toBe('0')
+  })
+
+  it('getSignedTransactionData', async () => {
+    root.wallet.getPrivateKeyByPath = () => '0x1b2309e66874ea6bd35b7c7c6613b9c43a003076e273ce0dc8e36961a6d2877a'
+    root.account.activeAccount.updateBalance('100000000000000000000')
+    const res = await transaction.getSignedTransactionData(
+      '0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37',
+      '0.00000000000000001',
+      '',
+      '21000',
+      '1'
+    )
+    expect(res).toBe(
+      '0xf867e080960000b4293d60F051936beDecfaE1B85d5A46d377aF3780800a0182520880f844a0fbc079ced7305fdb9e13c074ebfaa325ef6307654840ba1b1149fc433f88393ca05d0e94cc5f414985f506a3833cba34d76ef326b1280e43696566d3100b2594323880'
     )
   })
 
   it('confirmTransaction', async () => {
+    root.wallet.getPrivateKeyByPath = () => '0x1b2309e66874ea6bd35b7c7c6613b9c43a003076e273ce0dc8e36961a6d2877a'
+    root.account.activeAccount.updateBalance('100000000000000000000')
     root.dipperin.dr.sendSignedTransaction = async () =>
-      '0xac3d228d5ca7f38271e32ca5d73f8ee50d33570b3549803100b3c5f1a394bc32'
+      '0x22ba8fd210afee8e957b32fb55fe4cd4eb0f59bc2a0f4787627fccd0122f4b04'
     const res = await transaction.confirmTransaction(
       '0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37',
-      '0.0001',
+      '0.00000000000000001',
       '',
-      '0.00001'
+      '21000',
+      '1'
     )
     expect(res).toEqual({
       success: true,
-      hash: '0xac3d228d5ca7f38271e32ca5d73f8ee50d33570b3549803100b3c5f1a394bc32'
+      hash: '0x22ba8fd210afee8e957b32fb55fe4cd4eb0f59bc2a0f4787627fccd0122f4b04'
     })
   })
 

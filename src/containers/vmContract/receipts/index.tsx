@@ -13,6 +13,7 @@ import WalletStore from '@/stores/wallet'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
+import { helper } from '@dipperin/dipperin.js'
 
 // components
 import ContractList from './contractList'
@@ -31,6 +32,17 @@ interface IProps extends WithStyles<typeof styles>, WrapProps {
 export class Receipts extends React.Component<IProps> {
   switchToList = () => {
     this.props.history.push('/main/vm_contract')
+  }
+
+  getLogs = () => {
+    console.log('getLogs ...............')
+    this.props.vmContract.getLogs(
+      '',
+      14613,
+      14620,
+      ['0x001487e42fbc7234714213a4dd3947cd1378cd28fa8c'],
+      [[helper.Hash.keccak256('Transfer')]]
+    )
   }
 
   render() {
@@ -61,6 +73,7 @@ export class Receipts extends React.Component<IProps> {
             <ContractList receipts={receipts} labels={labels} />
           </div>
         </div>
+        {/* <button onClick={this.getLogs}>test</button> */}
       </div>
     )
   }
