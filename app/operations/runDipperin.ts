@@ -11,7 +11,7 @@ import dipperinPath from '../utils/dipperinPath'
 import handleError from './handleError'
 import { START_SUCCESS } from '../ipc';
 
-export const DEFAULT_NET = 'mercury'
+export const DEFAULT_NET = 'venus'
 
 const fsChmod = util.promisify(fs.chmod)
 const fsExists = util.promisify(fs.stat)
@@ -24,8 +24,8 @@ const MAX_LOG_SIZE = 100 * 1024 * 1024
 export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
-  const chainDataDir = path.join(os.homedir(), `tmp/dipperin_apps/${getNodeEnv(net)}/wallet`)
-  const chainLogPath = `${chainDataDir}/dipperin.log`
+  const chainDataDir = path.join(os.homedir(), `tmp`,`dipperin_apps`,`${getNodeEnv(net)}`,`wallet`)
+  const chainLogPath = path.join(`${chainDataDir}`,`dipperin.log`)
 
   if (dipperin) {
     return

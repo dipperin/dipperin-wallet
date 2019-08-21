@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import log, { LevelOption } from 'electron-log'
 import { autoUpdater } from 'electron-updater'
+import path from "path"
 
 import packageJSON from '../../package.json'
 
@@ -23,7 +24,7 @@ const setEnv = (env: string) => {
 const setDataPath = (env: string) => {
   const appPath = app.getPath('appData')
 
-  const newUserDataPath = `${appPath}/dipperin_wallet_${env}`
+  const newUserDataPath = path.join(`${appPath}`, `dipperin_wallet_${env}`)
 
   // Set User data path
   app.setPath('userData', newUserDataPath)

@@ -15,7 +15,7 @@ interface Props extends WithStyles<typeof styles>, WrapProps {
 }
 
 @observer
-class MenuButton extends React.Component<Props> {
+export class MenuButton extends React.Component<Props> {
   @observable
   showMenu: boolean
   @observable

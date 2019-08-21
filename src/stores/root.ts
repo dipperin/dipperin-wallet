@@ -9,11 +9,11 @@ import Dipperin, { WebsocketProvider, Utils } from '@dipperin/dipperin.js'
 import { resetDB } from '@/db'
 
 import { getIsRemoteNode, getRemoteHost, getCurrentNet } from '@/utils/node'
-import ContractStore from './contract'
 import LoadingStore from './loading'
 import TimerStore from './timer'
 import TransactionStore from './transaction'
 import WalletStore from './wallet'
+import VmContractStore from './vmContract'
 
 interface Window {
   dipperin: any
@@ -27,7 +27,8 @@ class RootStore {
   transaction: TransactionStore
   loading: LoadingStore
   timer: TimerStore
-  contract: ContractStore
+  // contract: ContractStore
+  vmContract: VmContractStore
   dipperin: Dipperin
 
   private _subscribeBlock
@@ -43,7 +44,8 @@ class RootStore {
     this.wallet = new WalletStore(this)
     this.account = new AccountStore(this)
     this.transaction = new TransactionStore(this)
-    this.contract = new ContractStore(this)
+    // this.contract = new ContractStore(this)
+    this.vmContract = new VmContractStore(this)
     this.startCheckConnect()
     this.loadData()
 
@@ -129,7 +131,8 @@ class RootStore {
   async clear(isReset?: boolean) {
     this.account.clear()
     this.transaction.clear()
-    this.contract.clear()
+    // this.contract.clear()
+    this.vmContract.clear()
     if (isReset) {
       resetDB()
       this.wallet.clear()
@@ -166,7 +169,7 @@ class RootStore {
           extraData: Utils.decodeBase64(tx.extraData!)
         }))
         this.transaction.appendTransaction(e.data.address, txs)
-        this.contract.updateStatusFromSubscribe(txs)
+        // this.contract.updateStatusFromSubscribe(txs)
       }
     })
   }
@@ -183,7 +186,8 @@ class RootStore {
     }
     await this.account.load()
     await this.transaction.load()
-    await this.contract.load()
+    // await this.contract.load()
+    await this.vmContract.load()
     this.startUpdate()
   }
 
@@ -197,7 +201,8 @@ class RootStore {
     this.wallet.startUpdate()
     this.account.startUpdate()
     this.transaction.startUpdate()
-    this.contract.startUpdate()
+    // this.contract.startUpdate()
+    this.vmContract.startUpdate()
     this.startSubscribe()
   }
 

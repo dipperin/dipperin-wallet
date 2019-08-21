@@ -30,10 +30,17 @@ const dashboardRoutes: DashboardRoutes[] = [
     icon: wallet,
     iconActive: walletActive
   },
+  // {
+  //   path: '/main/contract',
+  //   sidebarName: 'contract',
+  //   navbarName: 'Contract',
+  //   icon: contract,
+  //   iconActive: contractActive
+  // },
   {
-    path: '/main/contract',
-    sidebarName: 'contract',
-    navbarName: 'Contract',
+    path: '/main/vm_contract',
+    sidebarName: 'vmContract',
+    navbarName: 'VM Contract',
     icon: contract,
     iconActive: contractActive
   },

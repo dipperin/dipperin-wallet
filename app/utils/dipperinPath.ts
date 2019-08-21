@@ -1,7 +1,8 @@
 import { app } from 'electron'
+import path from 'path'
 
 // Get dipperin path
-const dipperinPath = () => `${app.getPath('userData')}/dipperin${getOs() === 'windows' ? '.exe' : ''}`
+const dipperinPath = () => path.join(`${app.getPath('userData')}`, `dipperin${getOs() === 'windows' ? '.exe' : ''}`)
 
 export const getOs = () => {
     switch (process.platform) {

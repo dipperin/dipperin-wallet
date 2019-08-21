@@ -3,7 +3,7 @@ import Nedb from 'nedb'
 import { AccountObj } from '@/models/account'
 import { ContractObj } from '@/models/contract'
 import { WalletObj } from '@/models/wallet'
-import { OwnerAddressDb } from '@/stores/contract'
+// import { OwnerAddressDb } from '@/stores/contract'
 import {
   ACCOUNT_DB,
   CONTRACT_DB,
@@ -12,10 +12,12 @@ import {
   OWNER_DB,
   TRANSACTION_DB,
   TRANSACTION_STATUS_SUCCESS,
-  WALLET_DB
+  WALLET_DB,
+  VM_CONTRACT_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
+import { VmContractObj } from '@/models/vmContract'
 
 const getDB = (type: string): Nedb => {
   const { remote } = require('electron')
@@ -37,9 +39,22 @@ export const getAccount = async (): Promise<AccountObj[]> => {
   return account
 }
 
-export const insertAccount = (account: AccountObj[] | AccountObj) => {
+export const insertAccount = async (account: AccountObj[] | AccountObj) => {
   const db = getDB(ACCOUNT_DB)
-  db.insert(account)
+  await new Promise(resolve => {
+    db.insert(account, (_, res) => {
+      resolve(true)
+    })
+  })
+}
+
+export const removeAccount = async (id: number) => {
+  const db = getDB(ACCOUNT_DB)
+  await new Promise(resolve => {
+    db.remove({ id }, (_, res) => {
+      resolve(true)
+    })
+  })
 }
 
 export const getTx = async (address: string, net: string = DEFAULT_NET): Promise<TransactionInterface[]> => {
@@ -169,6 +184,36 @@ export const updateErrTimes = (walletId: number, unlockErrTimes: number = 0) => 
 }
 
 /**
+ * vm contract
+ */
+
+export const insertVmContract = (contract: VmContractObj, net: string = DEFAULT_NET) => {
+  const db = getDB(VM_CONTRACT_DB)
+  db.update({ txHash: contract.txHash }, { $set: { ...contract, net } }, { upsert: true })
+}
+
+export const updateVmContractStatus = (
+  txHash: string,
+  status: string,
+  contractAddress: string,
+  net: string = DEFAULT_NET
+) => {
+  const db = getDB(VM_CONTRACT_DB)
+  db.update({ txHash, net }, { $set: { status, contractAddress } }, { multi: true })
+}
+
+export const getVmContract = async (net: string = DEFAULT_NET): Promise<VmContractObj[]> => {
+  const db = getDB(VM_CONTRACT_DB)
+  const contracts = (await new Promise(resolve => {
+    db.find({ net }, (err, res) => {
+      resolve(res)
+    })
+  })) as VmContractObj[]
+
+  return contracts
+}
+
+/**
  * contract
  */
 export const insertContract = (contract: ContractObj, net: string = DEFAULT_NET) => {
@@ -238,21 +283,21 @@ export const insertOwnerAddress = (
   db.insert({ accountAddress, contractAddress, ownerAddress, net })
 }
 
-export const getOwnerAddress = async (
-  accountAddress: string,
-  contractAddress: string,
-  net: string
-): Promise<OwnerAddressDb[]> => {
-  const db = getDB(OWNER_DB)
-  let ownerAddress: OwnerAddressDb[] = []
-  await new Promise(resolve => {
-    db.find({ accountAddress, contractAddress, net }, (_, res) => {
-      ownerAddress = res
-      resolve()
-    })
-  })
-  return ownerAddress
-}
+// export const getOwnerAddress = async (
+//   accountAddress: string,
+//   contractAddress: string,
+//   net: string
+// ): Promise<OwnerAddressDb[]> => {
+//   const db = getDB(OWNER_DB)
+//   let ownerAddress: OwnerAddressDb[] = []
+//   await new Promise(resolve => {
+//     db.find({ accountAddress, contractAddress, net }, (_, res) => {
+//       ownerAddress = res
+//       resolve()
+//     })
+//   })
+//   return ownerAddress
+// }
 
 export const resetDB = () => {
   getDB(ACCOUNT_DB).remove({}, { multi: true })
@@ -261,4 +306,5 @@ export const resetDB = () => {
   getDB(CONTRACT_DB).remove({}, { multi: true })
   getDB(FAVORITE_CONTRACT).remove({}, { multi: true })
   getDB(OWNER_DB).remove({}, { multi: true })
+  getDB(VM_CONTRACT_DB).remove({}, { multi: true })
 }

@@ -24,7 +24,7 @@ interface Props extends WithStyles<typeof style>, WrapProps {
 }
 
 @observer
-class Sidebar extends React.Component<Props> {
+export class Sidebar extends React.Component<Props> {
   backToHome = () => {
     this.props.history.push('/')
   }
@@ -33,6 +33,7 @@ class Sidebar extends React.Component<Props> {
     switch (true) {
       case Boolean(pathname.match('/wallet')):
       case Boolean(pathname.match('/contract')):
+      case Boolean(pathname.match('/vm_contract')):
       case Boolean(pathname.match('/setting')):
         return false
       default:

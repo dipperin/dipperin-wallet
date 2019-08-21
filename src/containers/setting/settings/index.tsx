@@ -33,7 +33,7 @@ import { Button, Fab, WithStyles, withStyles, Tooltip } from '@material-ui/core'
 
 import { I18nCollectionWallet } from '@/i18n/i18n'
 import RootStore from '@/stores/root'
-import { DEFAULT_NET, MERCURY, TEST, LOCAL, REMOTE_TEST, REMOTE_MECURY } from '@/utils/constants'
+import { DEFAULT_NET, VENUS, TEST, LOCAL, REMOTE_TEST, REMOTE_VENUS } from '@/utils/constants'
 import SwitchButton from '@/components/switchButton'
 
 import styles from './settingStyle'
@@ -181,7 +181,7 @@ export class Setting extends React.Component<Props> {
       // stop local node
       sendStopNode()
       // default select REMOTE_MECURY
-      this.selectRemote(REMOTE_MECURY)
+      this.selectRemote(REMOTE_VENUS)
       this.props.root!.reconnect()
     } else {
       this.selectLocal()
@@ -212,7 +212,7 @@ export class Setting extends React.Component<Props> {
     // update isRemote in settings
     setIsRemoteNode(false)
     // default select MERCURY
-    this.netEnv = MERCURY
+    this.netEnv = VENUS
     // update net in settings
     setCurrentNet(this.netEnv)
     sendStartNode()
@@ -315,7 +315,7 @@ export class Setting extends React.Component<Props> {
             <p className={classes.title}>{isRemoteNode ? labels.net.remoteTitle : labels.net.title}</p>
             {isRemoteNode ? (
               <div className={classes.netWrap}>
-                {[REMOTE_MECURY, REMOTE_TEST].map(net => {
+                {[REMOTE_VENUS, REMOTE_TEST].map(net => {
                   return (
                     <Fab
                       className={classNames(classes.netBtn, { [classes.netBtnActive]: this.netEnv === net })}
@@ -330,7 +330,7 @@ export class Setting extends React.Component<Props> {
               </div>
             ) : (
               <div className={classes.netWrap}>
-                {[MERCURY, TEST, LOCAL].map(net => {
+                {[VENUS, TEST, LOCAL].map(net => {
                   if (!isAlpha && net === TEST) {
                     return
                   }

@@ -38,6 +38,14 @@ export class BigAccount extends React.Component<BigAccountProps> {
     document.body.removeChild(input)
   }
 
+  formatNumber = (num: number, w: number) => {
+    const m = 10 ** w
+    const b = Math.floor(num * m) / m
+    return b.toLocaleString('zh-Hans', {
+      maximumFractionDigits: w
+    })
+  }
+
   render() {
     const { classes, account, activeId, labels } = this.props
     return (
@@ -46,7 +54,9 @@ export class BigAccount extends React.Component<BigAccountProps> {
           {labels.account} {account.id}
         </p>
         <div className={classNames(classes.bigId, { ['small-font']: String(account.id).length > 2 })}>{account.id}</div>
-        <p className={classes.bigBalance}>{account.balance}</p>
+        <p className={classes.bigBalance} title={account.balance}>
+          {this.formatNumber(Number(account.balance), 6)}
+        </p>
         <p className={classes.bigDip}>DIP</p>
         <p className={classes.bigAddress}>{account.address}</p>
         <Button className={classes.copy} onClick={this.copyAddress.bind(this, account.address)}>

@@ -12,11 +12,13 @@ describe('import', () => {
   const root = mockRootBuilder(true)
   const mockWallet = root.wallet
   const mockLoading = root.loading
+  const mockAccount = root.account
   const MockChangeLanguage = jest.fn()
   const component = shallow(
     <StyleImport
       wallet={mockWallet}
       loading={mockLoading}
+      account={mockAccount}
       language={'zh-CN'}
       changeLanguage={MockChangeLanguage}
       labels={i18n['zh-CN'].wallet.import}
@@ -30,7 +32,7 @@ describe('import', () => {
     .instance() as Import
   const mockSave = jest.spyOn(mockWallet, 'save')
   // const mockPush = jest.spyOn(mockRouterProps.history, 'push')
-  const mockCreate = jest.spyOn(mockWallet, 'create')
+
   it('render', () => {
     expect(
       component
@@ -78,16 +80,20 @@ describe('import', () => {
     expect(mockSave).not.toBeCalled()
   })
 
-  it('handleConfirm verified', () => {
+  it('handleConfirm verified', async () => {
     const submitEvent = {
       preventDefault: () => null
     }
     im.mnemonic = 'unusual drastic patrol mansion fuel more obey acquire disagree head trip chat'
     im.password = '12345678'
     im.repeatPassword = '12345678'
-    im.handleConfirm(submitEvent)
+    const mockCreate = jest.fn(async () => {
+      return
+    })
+    mockWallet.create = mockCreate
+    const res = await im.handleConfirm(submitEvent)
     expect(mockCreate).toBeCalled()
-    expect(mockSave).toBeCalled()
-    // expect(mockPush).not.toBeCalled() // todo
+    expect(im.mnemonic).toBe('')
+    expect(res).toBe(undefined)
   })
 })

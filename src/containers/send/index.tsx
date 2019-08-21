@@ -1,5 +1,5 @@
-import BN from 'bignumber.js'
-import { action, observable, reaction } from 'mobx'
+// import BN from 'bignumber.js'
+import { action, observable, reaction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -43,59 +43,65 @@ export class Send extends React.Component<IProps> {
   @observable
   waitConfirm: boolean = false
   @observable
-  fee: string = ''
+  gasPrice: string = '1'
   @observable
-  minFee: string = ''
-
+  estimateGas: string = '21000'
   @observable
   showDialog: boolean = false
-
+  @computed
+  get poundage() {
+    return Number(this.gasPrice) * Number(this.estimateGas)
+  }
   constructor(props: IProps) {
     super(props)
 
     reaction(() => props.account!.activeAccount, this.initState)
   }
 
-  verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
-    const { labels } = this.props
-    const hexAddress = `0x${address.replace('0x', '')}`
-    if (!Utils.isAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    if (Utils.isContractAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    const amountUnit = new BN(Utils.toUnit(amount))
-    const bnUnit = new BN(balance)
-
-    if (bnUnit.lt(amountUnit, 10)) {
-      return labels.swal.insufficientFunds
+  @action
+  setEstimateGas = (newGas: string | undefined) => {
+    // console.log('setEstimateGas', newGas)
+    if (newGas && /^[0-9]*$/.test(newGas) && Number(newGas) >= 21000) {
+      this.estimateGas = newGas
     }
   }
 
   @action
-  handleGetTxFee = () => {
-    const hexAddress = `0x${this.address.replace('0x', '')}`
-    if (!this.amount || !this.address) {
-      this.waitConfirm = false
-      return
-    }
-    const err = this.verifyGetTxFee(this.amount, this.address, this.props.account!.activeAccount.balanceUnit)
-    if (err) {
-      swal.fire(err, '', 'error')
-      this.waitConfirm = false
-      return
-    }
-    const minTransactionFee = this.props.transaction!.getTransactionFee(hexAddress, this.amount, this.memo)
+  setWaitConfirm = (flag: boolean) => {
+    this.waitConfirm = flag
+  }
 
-    if (minTransactionFee) {
-      this.minFee = minTransactionFee
-      if (!this.fee || this.fee < this.minFee) {
-        this.fee = this.minFee
-      }
-      this.waitConfirm = true
+  @action
+  setShowDialog = (flag: boolean) => {
+    this.showDialog = flag
+  }
+
+  // verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
+  //   const { labels } = this.props
+  //   const hexAddress = `0x${address.replace('0x', '')}`
+  //   if (!Utils.isAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   if (Utils.isContractAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   const amountUnit = new BN(Utils.toUnit(amount))
+  //   const bnUnit = new BN(balance)
+
+  //   if (bnUnit.lt(amountUnit, 10)) {
+  //     return labels.swal.insufficientFunds
+  //   }
+  // }
+
+  handleGetEstimateGas = async () => {
+    const hexAddress = `0x${this.address.replace('0x', '')}`
+    const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
+    // console.log('estimateGas', res2)
+    if (res2.success) {
+      this.setEstimateGas(res2.info)
+      this.setWaitConfirm(true)
     }
   }
 
@@ -106,22 +112,24 @@ export class Send extends React.Component<IProps> {
       await swal.fire(labels.swal.invalidAmount, '', 'error')
       return
     }
-    if (!isValidAmount(this.fee) || this.fee < this.minFee) {
-      await swal.fire(labels.swal.invalidFee, '', 'error')
-      return
-    }
     this.handleShowDialog()
   }
 
-  @action
   handleCloseDialog = () => {
-    this.showDialog = false
+    this.setShowDialog(false)
   }
 
   send = async () => {
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
-    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, this.fee)
+    let gas
+    if (this.estimateGas && /^[0-9]*$/.test(this.estimateGas)) {
+      gas = String(Number(this.estimateGas) * 2)
+    } else {
+      gas = '120000'
+    }
+    // const gas: string = String(Number(this.estimateGas)! * 2) | '120000'
+    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
     if (res.success) {
       this.handleCloseDialog()
       this.initState()
@@ -161,11 +169,11 @@ export class Send extends React.Component<IProps> {
   @action
   initState = () => {
     this.waitConfirm = false
-    this.fee = ''
+    this.gasPrice = '1'
     this.address = ''
     this.memo = ''
     this.amount = ''
-    this.minFee = ''
+    this.estimateGas = '21000'
   }
 
   @action
@@ -176,24 +184,37 @@ export class Send extends React.Component<IProps> {
   @action
   amountChange = (e: React.ChangeEvent<{ value: string }>) => {
     this.amount = e.target.value.toString()
-    this.handleGetTxFee()
+    // this.handleGetTxFee()
   }
 
   @action
   memoChange = (e: React.ChangeEvent<{ value: string }>) => {
     this.memo = e.target.value
-    this.handleGetTxFee()
+    // this.handleGetTxFee()
   }
 
   @action
-  feeChange = (e: React.ChangeEvent<{ value: string }>) => {
-    this.fee = e.target.value
-    this.handleGetTxFee()
+  gasPriceChange = (e: React.ChangeEvent<{ value: string }>) => {
+    this.gasPrice = e.target.value
+    // this.handleGetTxFee()
   }
 
   @action
   handleShowDialog = () => {
     this.showDialog = true
+  }
+
+  @action
+  handleAddGasPrice = () => {
+    this.gasPrice = String(Number(this.gasPrice) + 1)
+    // console.log('gasPrice', this.gasPrice)
+  }
+
+  @action
+  handleSubGasPrice = () => {
+    if (Number(this.gasPrice) > 1) {
+      this.gasPrice = String(Number(this.gasPrice) - 1)
+    }
   }
 
   render() {
@@ -203,36 +224,32 @@ export class Send extends React.Component<IProps> {
         <form onSubmit={this.handleSend}>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.to}</InputLabel>
-            <Input value={this.address} onChange={this.addressChange} onBlur={this.handleGetTxFee} />
+            <Input value={this.address} onChange={this.addressChange} onBlur={this.handleGetEstimateGas} />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.amount}</InputLabel>
-            <Input type="number" value={this.amount} onChange={this.amountChange} onBlur={this.handleGetTxFee} />
+            <Input type="number" value={this.amount} onChange={this.amountChange} onBlur={this.handleGetEstimateGas} />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.note}</InputLabel>
             <Input
               value={this.memo}
               onChange={this.memoChange}
-              onBlur={this.handleGetTxFee}
+              onBlur={this.handleGetEstimateGas}
               inputProps={{ maxLength: 200 }}
             />
           </FormControl>
           <FormControl fullWidth={true} margin="dense">
             <InputLabel>{labels.fee}</InputLabel>
-            <Input
-              type="number"
-              value={this.fee}
-              onChange={this.feeChange}
-              inputProps={{
-                min: this.minFee,
-                step: 0.000000001
-              }}
-            />
+            <Input type="text" value={`${Utils.fromUnit(String(this.poundage))} DIP`} disabled={true} />
+            <div className={classes.poundageChange}>
+              <span className={classes.poundageAdd} onClick={this.handleAddGasPrice} />
+              <span className={classes.poundageSub} onClick={this.handleSubGasPrice} />
+            </div>
           </FormControl>
-          <p className={classes.min}>{this.minFee ? `${labels.moreThan} ${this.minFee}` : ''}</p>
+          {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
-            disabled={!this.waitConfirm || !this.fee || this.fee < this.minFee}
+            disabled={!this.waitConfirm || !this.gasPrice}
             variant="contained"
             color="primary"
             className={classes.confirmButton}

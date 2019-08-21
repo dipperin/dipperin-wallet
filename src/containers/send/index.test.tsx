@@ -6,7 +6,7 @@ import mockRootBuilder from '@/tests/mocks/store'
 import mockSwalFire from '@/tests/mocks/swal'
 import { mockStyleClasses } from '@/tests/utils'
 import { Input } from '@material-ui/core'
-import { Utils } from '@dipperin/dipperin.js'
+// import { Utils } from '@dipperin/dipperin.js'
 
 import { Send } from './index'
 import styles from './sendStyle'
@@ -38,27 +38,27 @@ describe('Containers: Send', () => {
     mockSwalFire.mockClear()
   })
 
-  it('verifyGetTxFee, Give a invalid account address', () => {
-    expect(instance.verifyGetTxFee('10000', '0x1432423', '100')).toEqual(labels.swal.invalidAddress)
-  })
+  // it('verifyGetTxFee, Give a invalid account address', () => {
+  //   expect(instance.verifyGetTxFee('10000', '0x1432423', '100')).toEqual(labels.swal.invalidAddress)
+  // })
 
-  it('verifyGetTxFee, Give a contract address', () => {
-    expect(instance.verifyGetTxFee('10000', '0x00109328d55ccb3fce531f199382339f0e576ee840b2', '10000')).toEqual(
-      labels.swal.invalidAddress
-    )
-  })
+  // it('verifyGetTxFee, Give a contract address', () => {
+  //   expect(instance.verifyGetTxFee('10000', '0x00109328d55ccb3fce531f199382339f0e576ee840b2', '10000')).toEqual(
+  //     labels.swal.invalidAddress
+  //   )
+  // })
 
-  it('verifyGetTxFee, Not enough balance', () => {
-    expect(instance.verifyGetTxFee('10000', '0x00009328d55ccb3fce531f199382339f0e576ee840b2', '100')).toEqual(
-      labels.swal.insufficientFunds
-    )
-  })
+  // it('verifyGetTxFee, Not enough balance', () => {
+  //   expect(instance.verifyGetTxFee('10000', '0x00009328d55ccb3fce531f199382339f0e576ee840b2', '100')).toEqual(
+  //     labels.swal.insufficientFunds
+  //   )
+  // })
 
-  it('verifyGetTxFee, Correct', () => {
-    expect(
-      instance.verifyGetTxFee('10000', '0x00009328d55ccb3fce531f199382339f0e576ee840b2', Utils.toUnit('10000'))
-    ).toEqual(undefined)
-  })
+  // it('verifyGetTxFee, Correct', () => {
+  //   expect(
+  //     instance.verifyGetTxFee('10000', '0x00009328d55ccb3fce531f199382339f0e576ee840b2', Utils.toUnit('10000'))
+  //   ).toEqual(undefined)
+  // })
 
   it('addressChange', () => {
     const mockAddressChange = jest.spyOn(instance, 'addressChange')
@@ -119,58 +119,14 @@ describe('Containers: Send', () => {
     expect(instance.waitConfirm).toEqual(false)
   })
 
-  it('handleGetTxFee, Not enough balance', () => {
-    instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
-    instance.amount = '100000'
-
-    component
-      .find(Input)
-      .at(2)
-      .simulate('blur')
-
-    expect(mockSwalFire.mock.calls[0][0]).toEqual(labels.swal.insufficientFunds)
-  })
-
-  it('handleGetTxFee, Correct', () => {
-    instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
-    instance.amount = '10'
-
-    component
-      .find(Input)
-      .at(2)
-      .simulate('blur')
-
-    expect(instance.fee).toEqual('0.0000111')
-    expect(instance.minFee).toEqual('0.0000111')
-    expect(instance.waitConfirm).toEqual(true)
-  })
-
-  it('feeChange', () => {
-    const mockFeeChange = jest.spyOn(instance, 'feeChange')
-    instance.forceUpdate()
-    const mockEvent = {
-      target: {
-        value: '0.1'
-      }
-    }
-
-    component
-      .find(Input)
-      .at(3)
-      .simulate('change', mockEvent)
-    expect(mockFeeChange).toHaveBeenCalled()
-    expect(mockFeeChange.mock.calls[0][0]).toEqual(mockEvent)
-    expect(instance.fee).toEqual('0.1')
-  })
-
   it('handleSend, Enter an invalid amount', () => {
     const mockHandleSend = jest.spyOn(instance, 'handleSend')
     const preventDefault = jest.fn()
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10f'
-    instance.minFee = '0.01'
-    instance.fee = '0.1'
+    // instance.minFee = '0.01'
+    // instance.fee = '0.1'
     instance.waitConfirm = true
     component
       .find('form')
@@ -189,8 +145,8 @@ describe('Containers: Send', () => {
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10'
-    instance.minFee = '0.01'
-    instance.fee = '0.1f'
+    instance.gasPrice = '1'
+    // instance.fee = '0.1f'
     instance.waitConfirm = true
     component
       .find('form')
@@ -200,7 +156,7 @@ describe('Containers: Send', () => {
       })
     expect(preventDefault).toHaveBeenCalled()
     expect(mockHandleSend).toHaveBeenCalled()
-    expect(mockSwalFire.mock.calls[0][0]).toEqual(labels.swal.invalidFee)
+    // expect(mockSwalFire.mock.calls[0][0]).toEqual(labels.swal.invalidFee)
   })
 
   it('handleSend, Correct', () => {
@@ -209,8 +165,8 @@ describe('Containers: Send', () => {
     instance.forceUpdate()
     instance.address = '0x00009328d55ccb3fce531f199382339f0e576ee840b2'
     instance.amount = '10'
-    instance.minFee = '0.01'
-    instance.fee = '0.1'
+    // instance.minFee = '0.01'
+    // instance.fee = '0.1'
     instance.waitConfirm = true
     component
       .find('form')
