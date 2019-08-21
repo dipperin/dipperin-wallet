@@ -271,6 +271,7 @@ export class CreateContract extends React.Component<IProps> {
   genParams = () => {
     this.params = Object.values(this.paramsValue).join(',')
     this.showDetailParams = false
+    this.getContractGas()
   }
 
   addfile = () => {
