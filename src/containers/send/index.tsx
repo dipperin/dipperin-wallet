@@ -1,5 +1,5 @@
-import BN from 'bignumber.js'
-import { action, observable, reaction, runInAction, computed } from 'mobx'
+// import BN from 'bignumber.js'
+import { action, observable, reaction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -58,36 +58,50 @@ export class Send extends React.Component<IProps> {
     reaction(() => props.account!.activeAccount, this.initState)
   }
 
-  verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
-    const { labels } = this.props
-    const hexAddress = `0x${address.replace('0x', '')}`
-    if (!Utils.isAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    if (Utils.isContractAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    const amountUnit = new BN(Utils.toUnit(amount))
-    const bnUnit = new BN(balance)
-
-    if (bnUnit.lt(amountUnit, 10)) {
-      return labels.swal.insufficientFunds
+  @action
+  setEstimateGas = (newGas: string | undefined) => {
+    // console.log('setEstimateGas', newGas)
+    if (newGas && /^[0-9]*$/.test(newGas) && Number(newGas) >= 21000) {
+      this.estimateGas = newGas
     }
   }
+
+  @action
+  setWaitConfirm = (flag: boolean) => {
+    this.waitConfirm = flag
+  }
+
+  @action
+  setShowDialog = (flag: boolean) => {
+    this.showDialog = flag
+  }
+
+  // verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
+  //   const { labels } = this.props
+  //   const hexAddress = `0x${address.replace('0x', '')}`
+  //   if (!Utils.isAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   if (Utils.isContractAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   const amountUnit = new BN(Utils.toUnit(amount))
+  //   const bnUnit = new BN(balance)
+
+  //   if (bnUnit.lt(amountUnit, 10)) {
+  //     return labels.swal.insufficientFunds
+  //   }
+  // }
 
   handleGetEstimateGas = async () => {
     const hexAddress = `0x${this.address.replace('0x', '')}`
     const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
-    console.log('estimateGas', res2)
-    if (res2.success && res2.info && /^[0-9]*$/.test(res2.info)) {
-      runInAction(() => {
-        if (res2.info! !== '0') {
-          this.estimateGas = res2.info!
-        }
-        this.waitConfirm = true
-      })
+    // console.log('estimateGas', res2)
+    if (res2.success) {
+      this.setEstimateGas(res2.info)
+      this.setWaitConfirm(true)
     }
   }
 
@@ -101,9 +115,8 @@ export class Send extends React.Component<IProps> {
     this.handleShowDialog()
   }
 
-  @action
   handleCloseDialog = () => {
-    this.showDialog = false
+    this.setShowDialog(false)
   }
 
   send = async () => {
@@ -156,11 +169,11 @@ export class Send extends React.Component<IProps> {
   @action
   initState = () => {
     this.waitConfirm = false
-    this.gasPrice = ''
+    this.gasPrice = '1'
     this.address = ''
     this.memo = ''
     this.amount = ''
-    this.estimateGas = '1'
+    this.estimateGas = '21000'
   }
 
   @action
@@ -194,7 +207,7 @@ export class Send extends React.Component<IProps> {
   @action
   handleAddGasPrice = () => {
     this.gasPrice = String(Number(this.gasPrice) + 1)
-    console.log('gasPrice', this.gasPrice)
+    // console.log('gasPrice', this.gasPrice)
   }
 
   @action

@@ -24,7 +24,7 @@ interface Props extends WithStyles<typeof style>, WrapProps {
 }
 
 @observer
-class Sidebar extends React.Component<Props> {
+export class Sidebar extends React.Component<Props> {
   backToHome = () => {
     this.props.history.push('/')
   }
