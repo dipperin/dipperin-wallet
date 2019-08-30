@@ -63,11 +63,7 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (callContract) {
-      // console.log(helper.Bytes.toString(callContract.contractAbi))
       this.abiChange(callContract.contractAbi)
-      // runInAction(() => {
-      //   this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
-      // })
     }
     reaction(
       () => this.props.match.params.address,
@@ -75,7 +71,6 @@ export class Call extends React.Component<IProps> {
         const callContract1 = vmContract.contract.get(ad)
         if (callContract1) {
           this.abiChange(callContract1.contractAbi)
-          // this.abi = JSON.parse(helper.Bytes.toString(callContract1.contractAbi)) as VmcontractAbi[]
         }
       }
     )
@@ -203,16 +198,6 @@ export class Call extends React.Component<IProps> {
   @action
   handleShowDialog = () => {
     this.showDialog = true
-  }
-
-  onClose = () => {
-    const {
-      history,
-      history: {
-        location: { pathname }
-      }
-    } = this.props
-    history.push(pathname.split('/call')[0])
   }
 
   render() {
