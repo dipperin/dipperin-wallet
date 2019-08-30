@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React, { Fragment } from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -48,6 +48,7 @@ export class CreateContract extends React.Component<IProps> {
    */
 
   // REGISTER_STRING_INPUT = ['code','abi','amount','gas','gasPrice','param']
+  // * consider set the state into private
   @observable
   stringField: Map<string, string> = new Map()
   @observable
@@ -56,6 +57,16 @@ export class CreateContract extends React.Component<IProps> {
   constructor(props) {
     super(props)
     this.initState()
+  }
+
+  @computed
+  get jsonAbi() {
+    const abiString = this.stringField.get('abi')
+    if (abiString) {
+      return JSON.parse(helper.Bytes.toString(abiString))
+    } else {
+      return []
+    }
   }
 
   @action
@@ -68,11 +79,6 @@ export class CreateContract extends React.Component<IProps> {
   setFlags = (key: string, value: boolean) => {
     this.flags.set(key, value)
   }
-
-  // handleChangeTextInput(key: string, e: React.ChangeEvent<{ value: string }>) {
-  //   const value = e.target.value
-  //   this.setStringField(key, value)
-  // }
 
   /**
    * call the function when start and leave
@@ -92,6 +98,14 @@ export class CreateContract extends React.Component<IProps> {
     this.setFlags('showDetailParams', false)
   }
 
+  handleJumpToCreated = () => {
+    this.setFlags('isCreated', true)
+  }
+
+  handleJumpToFavorite = () => {
+    this.setFlags('isCreated', false)
+  }
+
   handleChangeCode = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       if (e.target.files[0].name.split('.').reverse()[0] !== 'wasm') {
@@ -109,14 +123,6 @@ export class CreateContract extends React.Component<IProps> {
         this.setStringField('code', code)
       }
     }
-  }
-
-  handleJumpToCreated = () => {
-    this.setFlags('isCreated', true)
-  }
-
-  handleJumpToFavorite = () => {
-    this.setFlags('isCreated', false)
   }
 
   handleChangeAbi = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +145,15 @@ export class CreateContract extends React.Component<IProps> {
     }
   }
 
+  handleChangeParams = (e: React.ChangeEvent<{ value: string }>) => {
+    this.setStringField('params', e.target.value)
+  }
+
+  handleToggleDetailParam = () => {
+    const newFlag = !this.flags.get('showDetailParams')
+    this.setFlags('showDetailParams', newFlag)
+  }
+
   handleChangeGas = (e: React.ChangeEvent<{ value: string }>) => {
     if (isInt(e.target.value) || e.target.value === '') {
       this.setStringField('gas', e.target.value)
@@ -157,15 +172,6 @@ export class CreateContract extends React.Component<IProps> {
     if (/^[0-9a-fA-F]{0,44}$/.test(pureAddress)) {
       this.setStringField('contractAddress', address)
     }
-  }
-
-  handleChangeParams = (e: React.ChangeEvent<{ value: string }>) => {
-    this.setStringField('params', e.target.value)
-  }
-
-  handleToggleDetailParam = () => {
-    const newFlag = !this.flags.get('showDetailParams')
-    this.setFlags('showDetailParams', newFlag)
   }
 
   getContractGas = async () => {
@@ -262,17 +268,12 @@ export class CreateContract extends React.Component<IProps> {
     }
   }
 
-  // @action
   handleCloseDialog = () => {
     this.setFlags('showDialog', false)
   }
 
   handleShowDialog = () => {
     this.setFlags('showDialog', true)
-  }
-
-  switchToList = () => {
-    this.props.history.push('/main/vm_contract/list')
   }
 
   handleOnShowDetailParams = () => {
@@ -311,18 +312,14 @@ export class CreateContract extends React.Component<IProps> {
 
   render() {
     const { classes, labels } = this.props
-    let abis
     let initFunc: VmcontractAbi | undefined
     let placeholder: string | '' = ''
-    const abiString = this.stringField.get('abi')
-    if (abiString) {
-      abis = JSON.parse(helper.Bytes.toString(abiString))
-      if (abis instanceof Array) {
-        initFunc = (abis.find(abi => abi.name === 'init' && abi.type === 'function') as unknown) as VmcontractAbi
-        // console.log(initFunc)
-        if (initFunc.inputs) {
-          placeholder = initFunc.inputs.map(input => `${input.type} ${input.name}`).join(',')
-        }
+    const abis = this.jsonAbi
+    if (abis.length) {
+      initFunc = (abis.find(abi => abi.name === 'init' && abi.type === 'function') as unknown) as VmcontractAbi
+      // console.log(initFunc)
+      if (initFunc.inputs) {
+        placeholder = initFunc.inputs.map(input => `${input.type} ${input.name}`).join(',')
       }
     }
 

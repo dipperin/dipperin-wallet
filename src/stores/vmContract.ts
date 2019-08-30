@@ -32,6 +32,10 @@ class VmContractStore {
   private _dipperin: Dipperin
   // current contract (created & favorite)
   // TODO: use two map to store contracts one for success, one for pending
+  // key is contract txHash
+  @observable
+  private _pendingContract: Map<string, VmContractModel> = new Map()
+
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
 
@@ -66,24 +70,40 @@ class VmContractStore {
     const accountAddress = this._store.account.activeAccount.address
 
     this._contract.forEach((contract: VmContractModel) => {
-      let owners: string[]
-      if (contract.owner instanceof Array) {
-        owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
-      } else {
-        owners = [contract.owner.toLocaleLowerCase()]
-      }
+      const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
       }
     })
     // console.log('contracts', contracts)
-
     return contracts.sort((a, b) => a.timestamp - b.timestamp)
+  }
+
+  @computed
+  get pendingContracts(): VmContractModel[] {
+    const pendingContracts: VmContractModel[] = []
+    if (!this._store.account.activeAccount) {
+      return pendingContracts
+    }
+    const accountAddress = this._store.account.activeAccount.address
+
+    this._pendingContract.forEach((contract: VmContractModel) => {
+      const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
+      if (owners.includes(accountAddress.toLocaleLowerCase())) {
+        pendingContracts.push(contract)
+      }
+    })
+
+    return pendingContracts.sort((a, b) => a.timestamp - b.timestamp)
   }
 
   // current address contract
   get contract() {
     return this._contract
+  }
+
+  get pendingContract() {
+    return this._pendingContract
   }
 
   get receipts() {
@@ -201,6 +221,15 @@ class VmContractStore {
     }
   }
 
+  /**
+   *
+   * @param code string from wasm
+   * @param abi string from json abi
+   * @param gas gaslimeit
+   * @param gasPrice
+   * @param amount transaction value
+   * @param params init params string
+   */
   async confirmCreateContract(
     code: string,
     abi: string,
@@ -234,7 +263,9 @@ class VmContractStore {
       if (res.success) {
         contract.txHash = res.hash as string
         runInAction(() => {
-          this._contract.set(contract.txHash, contract)
+          console.log('_pendingContract add contract', contract.txHash)
+          this._pendingContract.set(contract.txHash, contract)
+          // this._contract.set(contract.txHash, contract)
         })
         // insert to all contract
         insertVmContract(contract.toJS(), getCurrentNet())
@@ -368,19 +399,26 @@ class VmContractStore {
     const contractDb = await getVmContract(getCurrentNet())
     // console.log('vmContractStore load', contractDb)
     runInAction(() => {
-      const removeList: string[] = []
+      // const removeList: string[] = []
       this.getContractsFromObj(contractDb).forEach(contract => {
-        this._contract.set(contract.contractAddress, contract)
-        if (this._contract.has(contract.txHash)) {
-          removeList.push(contract.txHash)
+        if (contract.contractAddress) {
+          this._contract.set(contract.contractAddress, contract)
+        } else if (contract.txHash) {
+          this._pendingContract.set(contract.txHash, contract)
         }
+
+        // if (this._contract.has(contract.txHash)) {
+        //   removeList.push(contract.txHash)
+        // }
       })
-      removeList.forEach(txHash => this._contract.delete(txHash))
+      // removeList.forEach(txHash => this._contract.delete(txHash))
     })
   }
 
+  @action
   clear() {
     this._contract.clear()
+    this._pendingContract.clear()
   }
 
   reload() {
@@ -419,7 +457,7 @@ class VmContractStore {
 
   updateContractStatus() {
     // const newContracts: VmContractModel[] = []
-    this._contract.forEach(contract => {
+    this._pendingContract.forEach(contract => {
       if (!contract.isSuccess && !contract.isOverLongTime(getNowTimestamp())) {
         this._store.dipperin.dr.vmContract
           .getContractByHash(contract.txHash)
@@ -427,6 +465,7 @@ class VmContractStore {
             if (!res) {
               if (contract.isOverTime(getNowTimestamp())) {
                 contract.setFail()
+                // ? why fail tx has contractAddress
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,
@@ -440,6 +479,10 @@ class VmContractStore {
               if (res) {
                 contract.contractAddress = res
                 contract.setSuccess()
+                runInAction(() => {
+                  this._contract.set(contract.contractAddress, contract)
+                  this._pendingContract.delete(contract.txHash)
+                })
                 console.log('update contract status.....................')
                 // update contract in db
                 updateVmContractStatus(
