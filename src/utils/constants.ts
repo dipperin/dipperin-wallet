@@ -51,6 +51,7 @@ export const CONTRACT_DB = 'contract'
 export const VM_CONTRACT_DB = 'vmContrat'
 export const FAVORITE_CONTRACT = 'favoriteContract'
 export const OWNER_DB = 'owner'
+export const RECEIPT_DB = 'receipt'
 
 /**
  * Worker

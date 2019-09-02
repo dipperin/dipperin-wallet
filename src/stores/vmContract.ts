@@ -1,7 +1,7 @@
 import { computed, observable, reaction, runInAction, action } from 'mobx'
 import { isString } from 'lodash'
 
-import { insertVmContract, getVmContract, updateVmContractStatus } from '@/db'
+import { insertVmContract, getVmContract, updateVmContractStatus, getReceipt, insertReceipt } from '@/db'
 import {
   DEFAULT_CHAIN_ID,
   TRANSACTION_STATUS_FAIL,
@@ -289,7 +289,8 @@ class VmContractStore {
       const res = await this._store.transaction.confirmTransaction(address, '0', callData, gas, gasPrice)
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
-        this._contractTxsMap.set(address, [...txs, res.info as string])
+        this._contractTxsMap.set(address, [...txs, res.hash as string])
+        console.log('new tx', this._contractTxsMap.get(address)![0])
         return generateTxResponse(true, res.hash)
       } else {
         return generateTxResponse(false, res.info)
@@ -329,6 +330,17 @@ class VmContractStore {
         }
       })
     })
+    const receipts = await getReceipt(getCurrentNet())
+    console.log(receipts)
+    runInAction(() => {
+      receipts.forEach(receipt => {
+        const preReceipts = this._receipts.get(receipt.address as string) || []
+        if (!preReceipts.find(item => item.transactionHash === receipt.transactionHash)) {
+          preReceipts.push(receipt)
+          this._receipts.set(receipt.address as string, preReceipts)
+        }
+      })
+    })
   }
 
   @action
@@ -344,6 +356,7 @@ class VmContractStore {
 
   getContractReceipt() {
     this._contractTxsMap.forEach(async (txs, address) => {
+      console.log('removeTxs1')
       const removeTxs = await Promise.all(
         txs.map(async tx => {
           try {
@@ -352,6 +365,7 @@ class VmContractStore {
               const preReceipts = this._receipts.get(address) || []
               preReceipts.push(res)
               this._receipts.set(address, preReceipts)
+              insertReceipt(res, address)
               return tx
             }
             return
@@ -360,6 +374,7 @@ class VmContractStore {
           }
         })
       )
+      console.log('removeTxs2', removeTxs)
       const newTxs = txs.filter(tx => !removeTxs.find(t => tx === t))
       this._contractTxsMap.set(address, newTxs)
     })

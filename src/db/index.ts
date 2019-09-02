@@ -3,6 +3,7 @@ import Nedb from 'nedb'
 import { AccountObj } from '@/models/account'
 import { ContractObj } from '@/models/contract'
 import { WalletObj } from '@/models/wallet'
+import ReceiptModel from '@/models/receipt'
 // import { OwnerAddressDb } from '@/stores/contract'
 import {
   ACCOUNT_DB,
@@ -13,11 +14,13 @@ import {
   TRANSACTION_DB,
   TRANSACTION_STATUS_SUCCESS,
   WALLET_DB,
-  VM_CONTRACT_DB
+  VM_CONTRACT_DB,
+  RECEIPT_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
 import { VmContractObj } from '@/models/vmContract'
+import { reject } from 'q'
 
 const getDB = (type: string): Nedb => {
   const { remote } = require('electron')
@@ -281,6 +284,29 @@ export const insertOwnerAddress = (
 ) => {
   const db = getDB(OWNER_DB)
   db.insert({ accountAddress, contractAddress, ownerAddress, net })
+}
+
+/**
+ * receipt
+ */
+export const insertReceipt = (receipt: ReceiptModel, address: string, net: string = DEFAULT_NET) => {
+  const db = getDB(RECEIPT_DB)
+  db.update({ txHash: receipt.transactionHash }, { $set: { ...receipt, address, net } }, { upsert: true })
+}
+
+export const getReceipt = async (net: string = DEFAULT_NET): Promise<ReceiptModel[]> => {
+  const db = getDB(RECEIPT_DB)
+  const receipts = (await new Promise(resolve => {
+    db.find({ net }, (err, res) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })) as ReceiptModel[]
+
+  return receipts
 }
 
 // export const getOwnerAddress = async (
