@@ -30,12 +30,10 @@ class VmContractStore {
   private _store: RootStore
 
   private _dipperin: Dipperin
-  // current contract (created & favorite)
-  // TODO: use two map to store contracts one for success, one for pending
   // key is contract txHash
   @observable
   private _pendingContract: Map<string, VmContractModel> = new Map()
-
+  // current contract (created & favorite)
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
 
@@ -64,36 +62,36 @@ class VmContractStore {
   @computed
   get contracts(): VmContractModel[] {
     const contracts: VmContractModel[] = []
+    // if activeAccount does not exist
     if (!this._store.account.activeAccount) {
       return contracts
     }
-    const accountAddress = this._store.account.activeAccount.address
 
+    const accountAddress = this._store.account.activeAccount.address
     this._contract.forEach((contract: VmContractModel) => {
       const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
       }
     })
-    // console.log('contracts', contracts)
     return contracts.sort((a, b) => a.timestamp - b.timestamp)
   }
 
   @computed
   get pendingContracts(): VmContractModel[] {
     const pendingContracts: VmContractModel[] = []
+    // if activeAccount does not exist
     if (!this._store.account.activeAccount) {
       return pendingContracts
     }
-    const accountAddress = this._store.account.activeAccount.address
 
+    const accountAddress = this._store.account.activeAccount.address
     this._pendingContract.forEach((contract: VmContractModel) => {
       const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         pendingContracts.push(contract)
       }
     })
-
     return pendingContracts.sort((a, b) => a.timestamp - b.timestamp)
   }
 
@@ -152,12 +150,12 @@ class VmContractStore {
       }
     } catch (err) {
       // console.error(String(err))
-      if (err instanceof Errors.NoEnoughBalanceError) {
-        return {
-          success: false,
-          info: err.message
-        }
-      }
+      // if (err instanceof Errors.NoEnoughBalanceError) {
+      //   return {
+      //     success: false,
+      //     info: err.message
+      //   }
+      // }
       return {
         success: false,
         info: String(err)
