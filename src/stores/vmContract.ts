@@ -10,7 +10,8 @@ import {
 } from '@/utils/constants'
 
 import VmContractModel, { VmContractObj } from '../models/vmContract'
-import { getCurrentNet } from '../utils/node'
+import { getCurrentNet } from '@/utils/node'
+import { generateTxResponse } from '@/utils/errors'
 import { getNowTimestamp } from '@/utils'
 
 import RootStore from './root'
@@ -46,6 +47,7 @@ class VmContractStore {
   constructor(store: RootStore) {
     this._store = store
     this._dipperin = new Dipperin(HTTPHOST)
+    // TODO: try to remove this part by changing rely function
     reaction(
       () => this._store.account.activeAccount,
       () => {
@@ -127,10 +129,7 @@ class VmContractStore {
       const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       if (!isString(res)) {
         const errRes = res
-        return {
-          success: false,
-          info: errRes.error ? errRes.error.message : 'Something wrong!'
-        }
+        return generateTxResponse(false, errRes.error)
       }
       if (res === transaction.transactionHash) {
         // Append Transaction
@@ -138,28 +137,12 @@ class VmContractStore {
         this._store.transaction.appendTransaction(activeAccountAddress, [transaction.toJS()])
         // Plus account nonce
         this._store.account.activeAccount.plusNonce()
-        return {
-          success: true,
-          hash: transaction.transactionHash
-        }
+        return generateTxResponse(true, transaction.transactionHash)
       } else {
-        return {
-          success: false,
-          info: 'Something wrong!'
-        }
+        return generateTxResponse(false)
       }
     } catch (err) {
-      // console.error(String(err))
-      // if (err instanceof Errors.NoEnoughBalanceError) {
-      //   return {
-      //     success: false,
-      //     info: err.message
-      //   }
-      // }
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -180,22 +163,13 @@ class VmContractStore {
       } else {
         res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
       }
-      return {
-        success: true,
-        info: Number(res).toString()
-      }
+      return generateTxResponse(true, Number(res).toString())
     } catch (err) {
       // console.error(String(err))
       if (err instanceof Errors.NoEnoughBalanceError) {
-        return {
-          success: false,
-          info: err.message
-        }
+        return generateTxResponse(false, err.message)
       }
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -212,22 +186,10 @@ class VmContractStore {
 
       return res
     } catch (err) {
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
-  /**
-   *
-   * @param code string from wasm
-   * @param abi string from json abi
-   * @param gas gaslimeit
-   * @param gasPrice
-   * @param amount transaction value
-   * @param params init params string
-   */
   async confirmCreateContract(
     code: string,
     abi: string,
@@ -259,29 +221,18 @@ class VmContractStore {
       }
 
       if (res.success) {
-        contract.txHash = res.hash as string
+        contract.txHash = res.info as string
         runInAction(() => {
-          console.log('_pendingContract add contract', contract.txHash)
           this._pendingContract.set(contract.txHash, contract)
-          // this._contract.set(contract.txHash, contract)
         })
         // insert to all contract
         insertVmContract(contract.toJS(), getCurrentNet())
-        return {
-          success: true
-        }
+        return generateTxResponse(true)
       } else {
-        return {
-          success: false,
-          info: res.info
-        }
+        return generateTxResponse(false, res.info)
       }
     } catch (err) {
-      console.error(String(err))
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -297,10 +248,7 @@ class VmContractStore {
       this._contract.has(address) &&
       this._contract.get(address)!.hasOwner(this._store.account.activeAccount.address)
     ) {
-      return {
-        success: false,
-        info: 'The Contract has already existed!'
-      }
+      return generateTxResponse(false, 'The Contract has already existed!')
     } else if (this._contract.has(contract.contractAddress)) {
       this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
       insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
@@ -313,9 +261,7 @@ class VmContractStore {
     // insert to all contract
     // console.log('after addContract', this._contract.get(address))
 
-    return {
-      success: true
-    }
+    return generateTxResponse(true)
   }
 
   async getLogs(blockHash: string, fromBlock: number, toBlock: number, addresses: string[], topics: string[][]) {
@@ -323,15 +269,9 @@ class VmContractStore {
       // console.log('vmcontract store getLogs..........')
       const res = await this._store.dipperin.dr.vmContract.getLogs(blockHash, fromBlock, toBlock, addresses, topics)
       // console.log('getLogs', res)
-      return {
-        success: true,
-        info: res
-      }
+      return generateTxResponse(true, res)
     } catch (e) {
-      return {
-        success: false,
-        info: e
-      }
+      return generateTxResponse(false, e)
     }
   }
 
@@ -349,22 +289,13 @@ class VmContractStore {
       const res = await this._store.transaction.confirmTransaction(address, '0', callData, gas, gasPrice)
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
-        this._contractTxsMap.set(address, [...txs, res.hash as string])
-        return {
-          success: true,
-          info: res.hash
-        }
+        this._contractTxsMap.set(address, [...txs, res.info as string])
+        return generateTxResponse(true, res.hash)
       } else {
-        return {
-          success: false,
-          info: res.info
-        }
+        return generateTxResponse(false, res.info)
       }
     } catch (err) {
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -380,36 +311,23 @@ class VmContractStore {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
-      return {
-        success: true,
-        info: res
-      }
+      return generateTxResponse(true, res as string)
     } catch (err) {
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
-    // console.log('vmContractStore load', contractDb)
     runInAction(() => {
-      // const removeList: string[] = []
       this.getContractsFromObj(contractDb).forEach(contract => {
         if (contract.contractAddress) {
           this._contract.set(contract.contractAddress, contract)
         } else if (contract.txHash) {
           this._pendingContract.set(contract.txHash, contract)
         }
-
-        // if (this._contract.has(contract.txHash)) {
-        //   removeList.push(contract.txHash)
-        // }
       })
-      // removeList.forEach(txHash => this._contract.delete(txHash))
     })
   }
 
@@ -481,7 +399,7 @@ class VmContractStore {
                   this._contract.set(contract.contractAddress, contract)
                   this._pendingContract.delete(contract.txHash)
                 })
-                console.log('update contract status.....................')
+                // console.log('update contract status.....................')
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,

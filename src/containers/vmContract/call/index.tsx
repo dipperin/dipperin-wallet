@@ -133,7 +133,7 @@ export class Call extends React.Component<IProps> {
           this.gasPrice,
           this.params.split(',').map(param => param.trim())
         )
-        return callRes
+        return callRes as CallRes
       }
     } else {
       this.handleShowDialog()
@@ -167,7 +167,7 @@ export class Call extends React.Component<IProps> {
         })
         this.handleCloseDialog()
         console.log('after swal fire', callRes)
-        return callRes
+        return callRes as CallRes
       } else {
         this.handleCloseDialog()
         await swal.fire({

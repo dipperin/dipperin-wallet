@@ -26,14 +26,29 @@ export const TxResponseInfo = {
   [TxResponseCode.unknownError]: 'Something wrong!'
 }
 
-export const generateTxResponse = (ifsuccess: boolean, errCode?: number) => {
+interface TxResponse {
+  success: boolean
+  info?: string
+  hash?: string
+}
+
+export const generateTxResponse = (ifsuccess: boolean, info?: { message: string } | string | undefined): TxResponse => {
   if (ifsuccess) {
-    return { success: true }
+    return { success: true, info: info as string }
   }
-  if (errCode) {
-    return { success: false, code: errCode, info: TxResponseInfo[errCode] }
+  if (info) {
+    let errInfo: string
+    if (typeof info === 'string') {
+      errInfo = info
+    } else if (typeof info.message === 'string') {
+      errInfo = info.message
+    } else {
+      errInfo = String(info)
+    }
+    // const errInfo = typeof(info) === "string" ? info : info.message
+    return { success: false, info: errInfo }
   }
-  return { success: false, code: TxResponseCode.unknownError, info: TxResponseInfo[TxResponseCode.unknownError] }
+  return { success: false, info: TxResponseInfo[TxResponseCode.unknownError] }
 }
 
 export default {

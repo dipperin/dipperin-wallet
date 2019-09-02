@@ -14,11 +14,23 @@ describe('VmContract store', () => {
   it('load', async () => {
     await vmContract.load()
     expect(vmContract.contract.size).toBe(1)
+    expect(vmContract.pendingContract.size).toBe(1)
   })
 
   it('contracts', async () => {
     await vmContract.load()
     expect(vmContract.contracts.length).toBe(1)
+  })
+
+  it('pendingContracts', async () => {
+    await vmContract.load()
+    expect(vmContract.pendingContracts.length).toBe(1)
+  })
+
+  it('startUpdate', () => {
+    root.timer.on = jest.fn()
+    vmContract.startUpdate()
+    expect(root.timer.on).toHaveBeenCalled()
   })
 
   it('confirmTransaction', async () => {
@@ -127,4 +139,8 @@ describe('VmContract store', () => {
     vmContract.reload()
     expect(vmContract.contract.size).toBe(0)
   })
+
+  // it('getContractReceipt', ()=>{
+
+  // })
 })
