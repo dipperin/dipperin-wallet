@@ -169,12 +169,47 @@ export default class AccountStore {
     if (id) {
       const selectAccount = this._accountMap.get(id)
       if (selectAccount) {
-        selectAccount.updateNonce(await this.getAccountNonce(selectAccount.address))
+        const nonceOnChain = await this.getAccountNonce(selectAccount.address)
+        if (this.verifyAccountNonce(selectAccount.address, nonceOnChain)) {
+          console.log(`chain nonce is`, nonceOnChain, `account nonce is`, selectAccount.nonce, `verify true`)
+          selectAccount.updateNonce(nonceOnChain)
+        }
       }
     } else {
       for (const account of this._accountMap.values()) {
-        account.updateNonce(await this.getAccountNonce(account.address))
+        const nonceOnChain = await this.getAccountNonce(account.address)
+        if (this.verifyAccountNonce(account.address, nonceOnChain)) {
+          console.log(`chain nonce is`, nonceOnChain, `account nonce is`, account.nonce, `verify true`)
+          account.updateNonce(nonceOnChain)
+        }
       }
+    }
+  }
+
+  /**
+   * verifys the nonce should be updated
+   * @param address
+   * @param nonce
+   */
+  verifyAccountNonce(address: string, nonce: string): boolean {
+    const txs = this._store.transaction.transactionsMap.get(address)!.slice()
+    const nonceNumber = Number(nonce)
+    const now = new Date().valueOf()
+    if (txs) {
+      txs.sort((a, b) => Number(b.nonce) - Number(a.nonce))
+      for (const tx of txs) {
+        console.log('verifyAccountNonce', tx.nonce)
+        if (!tx.isOverLongTime(now)) {
+          if (Number(tx.nonce) >= nonceNumber) {
+            return false
+          } else {
+            return true
+          }
+        }
+      }
+      return true
+    } else {
+      return true
     }
   }
 
