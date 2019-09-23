@@ -90,18 +90,23 @@ export const MERCURY = 'mercury'
 export const TEST = 'test'
 export const LOCAL = 'local'
 
-export const REMOTE_TEST = 'remoteTest'
-export const REMOTE_MECURY = 'remoteMecury'
-export const REMOTE_VENUS = 'remoteVenus'
+export const REMOTE_NET = {
+  [VENUS]: 'remoteVenus',
+  [TEST]: 'remoteTest'
+}
+
+// export const REMOTE_TEST = 'remoteTest'
+// export const REMOTE_MECURY = 'remoteMecury'
+// export const REMOTE_VENUS = 'remoteVenus'
 
 /**
  * net/host obj
  */
 export const NET_HOST_OBJ = {
-  [REMOTE_TEST]: 'http://172.16.5.201:3035',
+  [TEST]: 'http://172.16.5.201:3035',
   // [REMOTE_TEST]: 'http://172.16.5.15:8999',
   // [REMOTE_MECURY]: 'http://14.17.65.122:3035'
-  [REMOTE_VENUS]: 'http://14.17.65.122:3035'
+  [VENUS]: 'http://14.17.65.122:3035'
   // [REMOTE_VENUS]: 'http://172.16.5.201:3035'
 }
 /**
