@@ -201,9 +201,27 @@ export class CreateContract extends React.Component<IProps> {
     this.setStringField(param, e.target.value)
   }
 
+  validateParams = () => {
+    const label = this.props.labels.createSwal
+    // validates params' length
+    const params = (this.stringField.get('params') || '').split(',')
+    const initFunc = (this.jsonAbi.find(
+      abi => abi.name === 'init' && abi.type === 'function'
+    ) as unknown) as VmcontractAbi
+    if (params.length !== initFunc.inputs.length) {
+      throw new Error(label.paramsLengthErr)
+    }
+    // TODO: validates parameters' type
+  }
+
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
-    this.handleShowDialog()
+    try {
+      this.handleShowDialog()
+    } catch (e) {
+      const label = this.props.labels.createSwal
+      swal.fire(label.createErr, e.message, 'error')
+    }
   }
 
   dialogConfirm = async (password: string) => {
