@@ -50,7 +50,7 @@ describe('contractList', () => {
   it('jumpToCall', () => {
     const mockHistoryPush = jest.fn()
     mockRouterProps.history.push = mockHistoryPush
-    instance.jumpToCall('0x01', '0x02')
+    instance.jumpToCall('0x01')
     expect(mockHistoryPush).toHaveBeenCalled()
   })
 

@@ -99,10 +99,4 @@ describe('setting', () => {
   it('handleShowDialog', () => {
     instance.handleShowDialog()
   })
-
-  it('onClose', () => {
-    mockRouterProps.history.push = jest.fn()
-    instance.onClose()
-    expect(mockRouterProps.history.push).toHaveBeenCalled()
-  })
 })

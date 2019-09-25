@@ -4,7 +4,7 @@ import AccountModel from '../models/account'
 import RootStore from './root'
 
 import { getAccount, insertAccount, removeAccount } from '@/db'
-import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH } from '@/utils/constants'
+import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH, TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
 
 export default class AccountStore {
   private _store: RootStore
@@ -169,12 +169,48 @@ export default class AccountStore {
     if (id) {
       const selectAccount = this._accountMap.get(id)
       if (selectAccount) {
-        selectAccount.updateNonce(await this.getAccountNonce(selectAccount.address))
+        const nonceOnChain = await this.getAccountNonce(selectAccount.address)
+        if (this.verifyAccountNonce(selectAccount.address, nonceOnChain)) {
+          // console.log(`chain nonce is`, nonceOnChain, `account nonce is`, selectAccount.nonce, `verify true`)
+          selectAccount.updateNonce(nonceOnChain)
+        }
       }
     } else {
       for (const account of this._accountMap.values()) {
-        account.updateNonce(await this.getAccountNonce(account.address))
+        const nonceOnChain = await this.getAccountNonce(account.address)
+        if (this.verifyAccountNonce(account.address, nonceOnChain)) {
+          // console.log(`chain nonce is`, nonceOnChain, `account nonce is`, account.nonce, `verify true`)
+          account.updateNonce(nonceOnChain)
+        }
       }
+    }
+  }
+
+  /**
+   * verifys the nonce should be updated
+   * @param address
+   * @param nonce
+   */
+  verifyAccountNonce(address: string, nonce: string): boolean {
+    const txs = (this._store.transaction.transactionsMap.get(address) || []).filter(tx => tx.from === address).slice()
+    const nonceNumber = Number(nonce)
+    const now = new Date().valueOf()
+    // console.log('===============verifying==========', address, nonce)
+    if (txs) {
+      txs.sort((a, b) => Number(b.nonce) - Number(a.nonce))
+      for (const tx of txs) {
+        // console.log('verifyAccountNonce', tx.nonce)
+        if (!tx.isOverLongTime(now) && !(tx.isEnded && tx.status !== TRANSACTION_STATUS_SUCCESS)) {
+          if (Number(tx.nonce) >= nonceNumber) {
+            return false
+          } else {
+            return true
+          }
+        }
+      }
+      return true
+    } else {
+      return true
     }
   }
 
@@ -195,16 +231,6 @@ export default class AccountStore {
   private async getAddressLockMoney(address: string): Promise<string> {
     try {
       const res = await this._store.dipperin.dr.getLockedMoney(address)
-      return res || '0'
-    } catch (err) {
-      return ''
-    }
-  }
-
-  private async getAddressLockMoney(address: string): Promise<string> {
-    try {
-      const res = await this._store.dipperin.dr.getLockedMoney(address)
-      console.log('getAddressLockMoney', res)
       return res || '0'
     } catch (err) {
       return ''

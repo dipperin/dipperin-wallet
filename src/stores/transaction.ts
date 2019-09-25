@@ -22,7 +22,7 @@ class TransactionStore {
   private _store: RootStore
 
   @observable
-  private _transactionsMap: Map<string, TransactionModel[]>
+  private _transactionsMap: Map<string, TransactionModel[]> // key is address
 
   constructor(store: RootStore) {
     this._store = store

@@ -63,11 +63,7 @@ export class Call extends React.Component<IProps> {
     } = this.props
     const callContract = vmContract.contract.get(address)
     if (callContract) {
-      // console.log(helper.Bytes.toString(callContract.contractAbi))
       this.abiChange(callContract.contractAbi)
-      // runInAction(() => {
-      //   this.abi = JSON.parse(helper.Bytes.toString(callContract.contractAbi)) as VmcontractAbi[]
-      // })
     }
     reaction(
       () => this.props.match.params.address,
@@ -75,7 +71,6 @@ export class Call extends React.Component<IProps> {
         const callContract1 = vmContract.contract.get(ad)
         if (callContract1) {
           this.abiChange(callContract1.contractAbi)
-          // this.abi = JSON.parse(helper.Bytes.toString(callContract1.contractAbi)) as VmcontractAbi[]
         }
       }
     )
@@ -138,7 +133,7 @@ export class Call extends React.Component<IProps> {
           this.gasPrice,
           this.params.split(',').map(param => param.trim())
         )
-        return callRes
+        return callRes as CallRes
       }
     } else {
       this.handleShowDialog()
@@ -172,7 +167,7 @@ export class Call extends React.Component<IProps> {
         })
         this.handleCloseDialog()
         console.log('after swal fire', callRes)
-        return callRes
+        return callRes as CallRes
       } else {
         this.handleCloseDialog()
         await swal.fire({
@@ -203,16 +198,6 @@ export class Call extends React.Component<IProps> {
   @action
   handleShowDialog = () => {
     this.showDialog = true
-  }
-
-  onClose = () => {
-    const {
-      history,
-      history: {
-        location: { pathname }
-      }
-    } = this.props
-    history.push(pathname.split('/call')[0])
   }
 
   render() {

@@ -14,11 +14,23 @@ describe('VmContract store', () => {
   it('load', async () => {
     await vmContract.load()
     expect(vmContract.contract.size).toBe(1)
+    expect(vmContract.pendingContract.size).toBe(1)
   })
 
   it('contracts', async () => {
     await vmContract.load()
     expect(vmContract.contracts.length).toBe(1)
+  })
+
+  it('pendingContracts', async () => {
+    await vmContract.load()
+    expect(vmContract.pendingContracts.length).toBe(1)
+  })
+
+  it('startUpdate', () => {
+    root.timer.on = jest.fn()
+    vmContract.startUpdate()
+    expect(root.timer.on).toHaveBeenCalled()
   })
 
   it('confirmTransaction', async () => {
@@ -36,7 +48,7 @@ describe('VmContract store', () => {
     )
     expect(res).toEqual({
       success: true,
-      hash: '0x22ba8fd210afee8e957b32fb55fe4cd4eb0f59bc2a0f4787627fccd0122f4b04'
+      info: '0x22ba8fd210afee8e957b32fb55fe4cd4eb0f59bc2a0f4787627fccd0122f4b04'
     })
   })
 
@@ -73,7 +85,7 @@ describe('VmContract store', () => {
 
   it('confirmCreateContract', async () => {
     root.transaction.confirmTransaction = jest.fn(async () => {
-      return { success: true, hash: '0x00000000' }
+      return { success: true, info: '0x00000000' }
     })
     const res = await vmContract.confirmCreateContract(mockCode, mockAbi, '40000000', '1', '0', ['l', 'l', '1000'])
     expect(res).toEqual({ success: true })
@@ -98,7 +110,7 @@ describe('VmContract store', () => {
 
   it('confirmCallContractMethod', async () => {
     root.transaction.confirmTransaction = jest.fn(async () => {
-      return { success: true, hash: '0xf099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9' }
+      return { success: true, info: '0xf099cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9' }
     })
     const res = await vmContract.confirmCallContractMethod(
       '0x001487e42fbc7234714213a4dd3947cd1378cd28fa8c',
@@ -127,4 +139,8 @@ describe('VmContract store', () => {
     vmContract.reload()
     expect(vmContract.contract.size).toBe(0)
   })
+
+  // it('getContractReceipt', ()=>{
+
+  // })
 })
