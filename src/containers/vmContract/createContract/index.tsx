@@ -23,7 +23,8 @@ import SelectedFile from '@/images/select-file-ed.png'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
-import { helper, Utils } from '@dipperin/dipperin.js'
+import { helper } from '@dipperin/dipperin.js'
+import { isVmContractAddress } from '@/utils'
 
 interface WrapProps extends RouteComponentProps<{}> {
   account?: AccountStore
@@ -50,7 +51,7 @@ export class CreateContract extends React.Component<IProps> {
   // REGISTER_STRING_INPUT = ['code','abi','amount','gas','gasPrice','param']
   // * consider set the state into private
   @observable
-  stringField: Map<string, string> = new Map()
+  private stringField: Map<string, string> = new Map()
   @observable
   flags: Map<string, boolean> = new Map()
 
@@ -78,6 +79,14 @@ export class CreateContract extends React.Component<IProps> {
   @action
   setFlags = (key: string, value: boolean) => {
     this.flags.set(key, value)
+  }
+
+  getStringField = (key: string): string => {
+    return this.stringField.get(key) || ''
+  }
+
+  getFlag = (key: string): boolean => {
+    return Boolean(this.flags.get(key))
   }
 
   /**
@@ -176,8 +185,8 @@ export class CreateContract extends React.Component<IProps> {
 
   getContractGas = async () => {
     // TODO: add validator for every input of createContractEstimateGas
-    const code = this.stringField.get('code') || ''
-    const abi = this.stringField.get('abi') || ''
+    const code = this.getStringField('code')
+    const abi = this.getStringField('abi')
     const amount = '0'
     const params = this.stringField
       .get('params')!
@@ -229,13 +238,12 @@ export class CreateContract extends React.Component<IProps> {
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
       // TODO: add validator for every input of createContractEstimateGas
-      const code = this.stringField.get('code') || ''
-      const abi = this.stringField.get('abi') || ''
-      const gas = this.stringField.get('gas') || ''
-      const gasPrice = this.stringField.get('gasPrice') || ''
+      const code = this.getStringField('code')
+      const abi = this.getStringField('abi')
+      const gas = this.getStringField('gas')
+      const gasPrice = this.getStringField('gasPrice')
       const amount = '0'
-      const params = this.stringField
-        .get('params')!
+      const params = this.getStringField('params')
         .split(',')
         .map(param => param.trim())
       const contractRes = await this.props.vmContract!.confirmCreateContract(code, abi, gas, gasPrice, amount, params)
@@ -268,8 +276,8 @@ export class CreateContract extends React.Component<IProps> {
   handleAddContract = async (e: React.MouseEvent) => {
     e.preventDefault()
     const { labels } = this.props
-    const abi = this.stringField.get('abi') || ''
-    const contractAddress = this.stringField.get('contractAddress') || ''
+    const abi = this.getStringField('abi')
+    const contractAddress = this.getStringField('contractAddress')
     const contractRes = this.props.vmContract!.addContract(abi, contractAddress)
     if (contractRes.success) {
       await swal.fire({
@@ -318,8 +326,8 @@ export class CreateContract extends React.Component<IProps> {
   }
 
   getAbi = async () => {
-    const contractAddress = this.stringField.get('contractAddress') || ''
-    if (Utils.isContractAddress(contractAddress)) {
+    const contractAddress = this.getStringField('contractAddress')
+    if (isVmContractAddress(contractAddress)) {
       const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))

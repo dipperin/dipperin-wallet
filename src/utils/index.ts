@@ -50,12 +50,32 @@ export const formatUTCTime = (time: string) => {
   return format(date, 'YYYY-MM-DD HH:mm:ss A+UTC')
 }
 
+const VMCONTRACT_ADDRESS_PREFIX = '0014'
+/**
+ * Checks if the given string is an contract address
+ * @param address the given HEX address
+ */
+export const isVmContractAddress = (address: string): boolean => {
+  if (address.replace('0x', '').length !== 44) {
+    return false
+  }
+  const prefix = address.replace('0x', '').slice(0, 4)
+  switch (prefix) {
+    case VMCONTRACT_ADDRESS_PREFIX:
+      return true
+    default:
+      return false
+  }
+}
+
 export const isAlpha = version => version.includes('alpha')
 
 export const isURL = url => {
-  return /^((ht|f)tps?)(ws?):\/\/(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/.test(
-    url
+  const regEx = new RegExp(
+    /^((ht|f)tps?)(ws?):\/\/(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
   )
+  return regEx.test(url)
+  // return /^((ht|f)tps?)(ws?):\/\/(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/.test(url)
 }
 
 export const getContractAmount = (extraData): string => {
