@@ -192,7 +192,7 @@ export default class AccountStore {
    * @param nonce
    */
   verifyAccountNonce(address: string, nonce: string): boolean {
-    const txs = this._store.transaction.transactionsMap.get(address)!.slice()
+    const txs = (this._store.transaction.transactionsMap.get(address) || []).slice()
     const nonceNumber = Number(nonce)
     const now = new Date().valueOf()
     // console.log('===============verifying==========', address, nonce)

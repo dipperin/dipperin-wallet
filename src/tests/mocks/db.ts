@@ -91,3 +91,5 @@ export const getVmContract = jest.fn(async => [
 ])
 
 export const insertVmContract = jest.fn()
+
+export const getReceipt = jest.fn(async => [])

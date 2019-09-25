@@ -291,7 +291,7 @@ class VmContractStore {
         const txs = this._contractTxsMap.get(address) || []
         this._contractTxsMap.set(address, [...txs, res.hash as string])
         console.log('new tx', this._contractTxsMap.get(address)![0])
-        return generateTxResponse(true, res.hash)
+        return generateTxResponse(true, res.info)
       } else {
         return generateTxResponse(false, res.info)
       }
@@ -331,7 +331,7 @@ class VmContractStore {
       })
     })
     const receipts = await getReceipt(getCurrentNet())
-    console.log(receipts)
+    // console.log(receipts)
     runInAction(() => {
       receipts.forEach(receipt => {
         const preReceipts = this._receipts.get(receipt.address as string) || []
