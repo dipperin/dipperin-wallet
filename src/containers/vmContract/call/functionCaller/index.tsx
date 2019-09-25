@@ -137,10 +137,6 @@ export class FunctionCaller extends React.Component<Props> {
             </div>
           </div>
         )}
-        {/* <div className={classes.resultBox}>
-          <div>Result:</div>
-          <div>content</div>
-        </div> */}
       </div>
     )
   }

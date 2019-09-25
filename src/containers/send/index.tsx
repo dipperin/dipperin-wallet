@@ -15,6 +15,7 @@ import { isValidAmount } from '@/utils'
 import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/styles'
 import { Utils } from '@dipperin/dipperin.js'
+import BN from 'bignumber.js'
 
 import styles from './sendStyle'
 
@@ -105,14 +106,49 @@ export class Send extends React.Component<IProps> {
     }
   }
 
-  handleSend = async (e: React.FormEvent) => {
-    const { labels } = this.props
-    e.preventDefault()
-    if (!isValidAmount(this.amount)) {
-      await swal.fire(labels.swal.invalidAmount, '', 'error')
-      return
+  validateAddress = (address: string) => {
+    if (!Utils.isAddress(address)) {
+      const label = this.props.labels
+      throw new Error(label.swal.invalidAddress)
     }
-    this.handleShowDialog()
+  }
+
+  validateAmount = (amount: string) => {
+    if (!isValidAmount(amount)) {
+      const label = this.props.labels
+      throw new Error(label.swal.invalidAmount)
+    }
+  }
+
+  validateBalance = () => {
+    const label = this.props.labels
+    const balance = this.props.account!.activeAccount.balance
+    // console.log(balance)
+    const amountUnit = new BN(this.amount)
+    const bnUnit = new BN(balance)
+
+    if (bnUnit.lt(amountUnit, 10)) {
+      throw new Error(label.swal.insufficientFunds)
+
+    }
+  }
+
+  handleSend = async (e: React.FormEvent) => {
+    // const { labels } = this.props
+    e.preventDefault()
+    try {
+      this.validateAddress(this.address)
+      this.validateAmount(this.amount)
+      this.validateBalance()
+      this.handleShowDialog()
+    } catch (e) {
+      swal.fire(e.message, '', 'error')
+    }
+    // if (!isValidAmount(this.amount)) {
+    //   await swal.fire(labels.swal.invalidAmount, '', 'error')
+    //   return
+    // }
+    // this.handleShowDialog()
   }
 
   handleCloseDialog = () => {
@@ -249,7 +285,7 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
-            disabled={!this.waitConfirm || !this.gasPrice}
+            disabled={!this.address || !this.amount}
             variant="contained"
             color="primary"
             className={classes.confirmButton}

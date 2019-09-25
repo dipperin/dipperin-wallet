@@ -115,7 +115,7 @@ describe('setting', () => {
 
   it('selectLocal', () => {
     instance.selectLocal()
-    expect(instance.netEnv).toBe('venus')
+    expect(instance.netEnv).toBe('test')
   })
 
   // it('setMiner', async () => {

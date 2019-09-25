@@ -313,6 +313,7 @@ export const zhCN = {
         createErr: '创建合约出错',
         incorrectPassword: '密码错误',
         decimalLength: '精度不能超过18',
+        paramsLengthErr: '输入参数数量错误',
         feeMax: '手续费不足'
       },
       labs: {
@@ -747,6 +748,7 @@ export const enUS: I18nCollection = {
         createErr: 'Create contract error',
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
+        paramsLengthErr: 'Number of input parameter is wrong',
         feeMax: 'Fee is less than the minimum fee'
       },
       labs: {

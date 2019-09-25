@@ -20,7 +20,7 @@ class ContractModel {
   @observable
   private _txHash: string
   @observable
-  private _owner: string | string[]
+  private _owner: string[]
 
   @observable
   private _contractData: string
@@ -30,7 +30,11 @@ class ContractModel {
   }
 
   constructor(options: VmContractOptions) {
-    this._owner = options.owner
+    if (options.owner instanceof Array) {
+      this._owner = options.owner
+    } else {
+      this._owner = [options.owner]
+    }
 
     this._status = options.status || TRANSACTION_STATUS_PENDING
 
@@ -134,11 +138,7 @@ class ContractModel {
   }
 
   hasOwner = (address: string) => {
-    if (this._owner instanceof Array) {
-      return this._owner.includes(address)
-    } else {
-      return this._owner.toLocaleLowerCase() === address.toLocaleLowerCase()
-    }
+    return this._owner.includes(address)
   }
 
   toJS(): VmContractObj {
@@ -169,7 +169,7 @@ interface VmContractOptions {
 }
 
 export interface VmContractObj {
-  owner: string | string[]
+  owner: string[]
   contractAddress: string
   contractAbi: string
   status: string
