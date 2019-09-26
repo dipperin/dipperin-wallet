@@ -174,12 +174,7 @@ describe('CreateContract', () => {
     root.vmContract.addContract = jest.fn(() => {
       return { success: true }
     })
-    const mocke = {
-      preventDefault: () => {
-        return
-      }
-    } as React.MouseEvent
-    instance.handleAddContract(mocke)
+    instance.handleAddContract()
     expect(mockSwalFire).toHaveBeenCalled()
   })
 
