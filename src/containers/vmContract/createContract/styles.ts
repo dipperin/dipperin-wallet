@@ -62,6 +62,7 @@ const styles = createStyles({
     fontSize: 12,
     width: '100%',
     height: '30px',
+    position: 'relative',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',

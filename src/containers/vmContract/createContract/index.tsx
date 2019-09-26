@@ -225,11 +225,16 @@ export class CreateContract extends React.Component<IProps> {
 
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      this.handleShowDialog()
-    } catch (e) {
-      const label = this.props.labels.createSwal
-      swal.fire(label.createErr, e.message, 'error')
+    if (this.flags.get('isCreated')) {
+      try {
+        this.validateParams()
+        this.handleShowDialog()
+      } catch (e) {
+        const label = this.props.labels.createSwal
+        swal.fire(label.createErr, e.message, 'error')
+      }
+    } else {
+      this.handleAddContract()
     }
   }
 
@@ -273,8 +278,9 @@ export class CreateContract extends React.Component<IProps> {
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
 
-  handleAddContract = async (e: React.MouseEvent) => {
-    e.preventDefault()
+  handleAddContract = async () => {
+    // e: React.MouseEvent
+    // e.preventDefault()
     const { labels } = this.props
     const abi = this.getStringField('abi')
     const contractAddress = this.getStringField('contractAddress')
@@ -387,9 +393,9 @@ export class CreateContract extends React.Component<IProps> {
                   <img src={this.stringField.get('inputABIPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
-                  required={false}
+                  required={true}
                   onChange={this.handleChangeAbi}
                   ref={input => {
                     this.inputABI = input
@@ -409,7 +415,7 @@ export class CreateContract extends React.Component<IProps> {
                   <img src={this.stringField.get('inputWasmPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
                   required={true}
                   onChange={this.handleChangeCode}
@@ -508,7 +514,7 @@ export class CreateContract extends React.Component<IProps> {
                   onBlur={this.getAbi}
                 />
               </div>
-              <Button variant="contained" color="primary" className={classes.button} onClick={this.handleAddContract}>
+              <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.add}
               </Button>
             </Fragment>
