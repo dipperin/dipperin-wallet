@@ -82,9 +82,9 @@ export class Login extends React.Component<ILoginProps> {
     this.password = e.target.value
   }
 
-  confirm = async e => {
+  confirm = async () => {
     const { labels } = this.props
-    e.preventDefault()
+    // e.preventDefault()
     if (!this.password) {
       swal.fire({
         type: 'error',
@@ -115,9 +115,9 @@ export class Login extends React.Component<ILoginProps> {
 
   confirmCallBack = _.debounce(this.confirm, 1000)
 
-  handleConfirm = e => {
+  handleConfirm = (e: React.FormEvent) => {
     e.preventDefault()
-    this.confirmCallBack(e)
+    this.confirmCallBack()
   }
 
   // reset wallet
