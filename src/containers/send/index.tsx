@@ -1,5 +1,5 @@
 // import BN from 'bignumber.js'
-import { action, observable, reaction, computed } from 'mobx'
+import { action, observable, reaction, computed, runInAction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ import { I18nCollectionTransaction } from '@/i18n/i18n'
 import AccountStore from '@/stores/account'
 import TransactionStore from '@/stores/transaction'
 import WalletStore from '@/stores/wallet'
-import { isValidAmount } from '@/utils'
+import { isValidAmount, formatAmount } from '@/utils'
 import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/styles'
 import { Utils } from '@dipperin/dipperin.js'
@@ -97,13 +97,24 @@ export class Send extends React.Component<IProps> {
   // }
 
   handleGetEstimateGas = async () => {
+    runInAction(() => {
+      this.amount = formatAmount(this.amount)
+      console.log(this.amount)
+    })
     const hexAddress = `0x${this.address.replace('0x', '')}`
-    const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
-    // console.log('estimateGas', res2)
-    if (res2.success) {
-      this.setEstimateGas(res2.info)
-      this.setWaitConfirm(true)
+    try {
+      this.validateAddress(hexAddress)
+      this.validateAmount(this.amount)
+      const res = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
+      if (res.success) {
+        this.setEstimateGas(res.info)
+        this.setWaitConfirm(true)
+      }
+    } catch (e) {
+      console.log(e)
     }
+
+    // console.log('estimateGas', res2)
   }
 
   validateAddress = (address: string) => {
