@@ -314,6 +314,8 @@ export const zhCN = {
         incorrectPassword: '密码错误',
         decimalLength: '精度不能超过18',
         paramsLengthErr: '输入参数数量错误',
+        contractAddressErr: '合约地址错误',
+        getAbi: '获取ABI失败',
         feeMax: '手续费不足'
       },
       labs: {
@@ -749,6 +751,8 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
         paramsLengthErr: 'Number of input parameter is wrong',
+        contractAddressErr: 'The contract address is wrong',
+        getAbi: 'Get ABI error',
         feeMax: 'Fee is less than the minimum fee'
       },
       labs: {
