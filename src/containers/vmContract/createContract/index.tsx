@@ -278,23 +278,50 @@ export class CreateContract extends React.Component<IProps> {
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
 
+  validateContractAddress = (address: string) => {
+    const { labels } = this.props
+    if (!isVmContractAddress(address)) {
+      throw new Error(labels.createSwal.contractAddressErr)
+    }
+  }
+
   handleAddContract = async () => {
     // e: React.MouseEvent
     // e.preventDefault()
     const { labels } = this.props
-    const abi = this.getStringField('abi')
-    const contractAddress = this.getStringField('contractAddress')
-    const contractRes = this.props.vmContract!.addContract(abi, contractAddress)
-    if (contractRes.success) {
-      await swal.fire({
-        title: labels.createSwal.createSuccess,
-        type: 'success',
-        timer: 1000
-      })
-    } else {
+    try {
+      const contractAddress = this.getStringField('contractAddress')
+      this.validateContractAddress(contractAddress)
+      const abi = this.getStringField('abi')
+      if (abi.length === 0) {
+        await this.getAbi()
+      }
+      if (abi.length === 0) {
+        swal.fire({
+          title: labels.createSwal.createErr,
+          text: labels.createSwal.getAbi,
+          type: 'error'
+        })
+        return
+      }
+      const contractRes = await this.props.vmContract!.addContract(abi, contractAddress)
+      if (contractRes.success) {
+        await swal.fire({
+          title: labels.createSwal.createSuccess,
+          type: 'success',
+          timer: 1000
+        })
+      } else {
+        swal.fire({
+          title: labels.createSwal.createErr,
+          text: contractRes.info,
+          type: 'error'
+        })
+      }
+    } catch (e) {
       swal.fire({
         title: labels.createSwal.createErr,
-        text: contractRes.info,
+        text: e.message,
         type: 'error'
       })
     }
@@ -337,6 +364,7 @@ export class CreateContract extends React.Component<IProps> {
       const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
+        console.log(`getAbi`, abi)
         this.setStringField('abi', abi)
       }
     }

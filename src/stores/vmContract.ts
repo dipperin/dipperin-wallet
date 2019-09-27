@@ -236,7 +236,7 @@ class VmContractStore {
     }
   }
 
-  addContract(abi: string, address: string): TxResponse {
+  async addContract(abi: string, address: string): Promise<TxResponse> {
     const contract = new VmContractModel({
       contractAbi: abi,
       contractAddress: address,
@@ -249,14 +249,14 @@ class VmContractStore {
       this._contract.get(address)!.hasOwner(this._store.account.activeAccount.address)
     ) {
       return generateTxResponse(false, 'The Contract has already existed!')
-    } else if (this._contract.has(contract.contractAddress)) {
+    } else if (this._contract.has(address)) {
       this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
-      insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
+      await insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
     } else {
       runInAction(() => {
         this._contract.set(contract.contractAddress, contract)
       })
-      insertVmContract(contract.toJS(), getCurrentNet())
+      await insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
     // console.log('after addContract', this._contract.get(address))

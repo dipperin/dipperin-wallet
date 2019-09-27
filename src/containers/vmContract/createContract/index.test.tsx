@@ -171,7 +171,7 @@ describe('CreateContract', () => {
   })
 
   it('handleAddContract', async () => {
-    root.vmContract.addContract = jest.fn(() => {
+    root.vmContract.addContract = jest.fn(async () => {
       return { success: true }
     })
     instance.handleAddContract()
