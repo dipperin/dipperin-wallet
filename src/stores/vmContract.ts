@@ -3,7 +3,7 @@ import { isString } from 'lodash'
 
 import { insertVmContract, getVmContract, updateVmContractStatus, getReceipt, insertReceipt } from '@/db'
 import {
-  DEFAULT_CHAIN_ID,
+  // DEFAULT_CHAIN_ID,
   TRANSACTION_STATUS_FAIL,
   TRANSACTION_STATUS_SUCCESS,
   VM_CONTRACT_ADDRESS
@@ -122,10 +122,11 @@ class VmContractStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       if (!isString(res)) {
         const errRes = res
@@ -153,10 +154,11 @@ class VmContractStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
@@ -311,6 +313,7 @@ class VmContractStore {
     try {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+        .transactionHash
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
       return generateTxResponse(true, res as string)
     } catch (err) {

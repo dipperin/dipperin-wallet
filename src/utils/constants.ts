@@ -90,6 +90,12 @@ export const MERCURY = 'mercury'
 export const TEST = 'test'
 export const LOCAL = 'local'
 
+export const CHAIN_ID_DIC = {
+  [VENUS]: '0x02',
+  [TEST]: '0x1770',
+  [LOCAL]: '0x1771'
+}
+
 export const REMOTE_NET = {
   [VENUS]: 'remoteVenus',
   [TEST]: 'remoteTest'
