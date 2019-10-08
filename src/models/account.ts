@@ -2,11 +2,17 @@ import { observable, computed, runInAction, action } from 'mobx'
 import { Utils } from '@dipperin/dipperin.js'
 import BigNumber from 'bignumber.js'
 
+export enum AccountType {
+  hd,
+  privateKey
+}
 export default class AccountModel {
   private _address: string
   private _nonce: string
   private _id: string
   private _path: string
+  private _type: number = AccountType.hd
+  private _privateKey: string = ''
 
   @observable
   private _balance: BigNumber = new BigNumber(0)
@@ -48,6 +54,11 @@ export default class AccountModel {
   @computed
   get nonce() {
     return this._nonce
+  }
+
+  @computed
+  get type() {
+    return this._type
   }
 
   @computed
@@ -100,6 +111,28 @@ export default class AccountModel {
   @action
   plusNonce() {
     this._nonce = new BigNumber(this._nonce).plus(1).toString(10)
+  }
+
+  @action
+  updatePrivateKey(key: string) {
+    // TODO: use dipperin.js utils
+    if (/^[0-9a-f]{64}$/.test(key.replace('0x', ''))) {
+      this._privateKey = key
+    } else {
+      throw new Error('Invalid Private Key!')
+    }
+  }
+
+  @computed
+  get privateKey() {
+    return this._privateKey
+  }
+
+  @action
+  updateAccountType(type: number) {
+    if (type in AccountType) {
+      this._type = type
+    }
   }
 
   /**
