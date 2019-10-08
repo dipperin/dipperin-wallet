@@ -7,7 +7,8 @@ import {
   DEFAULT_CHAIN_ID,
   DEFAULT_HASH_LOCK,
   TRANSACTION_STATUS_FAIL,
-  TRANSACTION_STATUS_SUCCESS
+  TRANSACTION_STATUS_SUCCESS,
+  CHAIN_ID_DIC
 } from '@/utils/constants'
 import { RespTransaction } from '@/workers/block.worker'
 import { Utils } from '@dipperin/dipperin.js'
@@ -99,11 +100,19 @@ class TransactionStore {
     }
   }
 
-  getSignedTransactionData(address: string, amount: string, memo: string, gas?: string, gasPrice?: string): string {
+  getSignedTransactionData(
+    address: string,
+    amount: string,
+    memo: string,
+    gas?: string,
+    gasPrice?: string
+  ): TransactionModel {
     const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
     const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
-    transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-    return transaction.signedTransactionData
+    const net = getCurrentNet()
+    const chainId = net in CHAIN_ID_DIC ? CHAIN_ID_DIC[net] : DEFAULT_CHAIN_ID
+    transaction.signTranaction(privateKey, chainId)
+    return transaction
   }
 
   async confirmTransaction(
@@ -113,10 +122,11 @@ class TransactionStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
+    const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._store.dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       // console.log(transaction.transactionHash)
       if (!isString(res)) {
@@ -164,10 +174,12 @@ class TransactionStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
+
     try {
-      const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
       console.log('estimate running', { res })
       return {
