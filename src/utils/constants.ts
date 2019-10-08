@@ -92,8 +92,8 @@ export const LOCAL = 'local'
 
 export const CHAIN_ID_DIC = {
   [VENUS]: '0x02',
-  [TEST]: '0x1770',
-  [LOCAL]: '0x1771'
+  [TEST]: '0x640',
+  [LOCAL]: '0x641'
 }
 
 export const REMOTE_NET = {
