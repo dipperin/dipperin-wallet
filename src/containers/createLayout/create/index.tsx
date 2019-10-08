@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -39,6 +39,24 @@ export class Create extends React.Component<ICreateProps> {
   @action
   repeatPasswordInput = e => {
     this.repeatPassword = e.target.value
+  }
+
+  @computed
+  get passwordStrength() {
+    let result = 0
+    if (/[a-z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[A-Z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[0-9]/.test(this.password)) {
+      result += 1
+    }
+    if (/[`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]/.test(this.password)) {
+      result += 1
+    }
+    return result
   }
 
   verifyPassword = (

@@ -1,7 +1,7 @@
 import BIP39 from 'bip39'
 import i18next from 'i18next'
 import classNames from 'classnames'
-import { observable, reaction, action, runInAction } from 'mobx'
+import { observable, reaction, action, runInAction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -87,6 +87,24 @@ export class Import extends React.Component<IImportProps> {
   @action
   passwordInput = e => {
     this.password = e.target.value
+  }
+
+  @computed
+  get passwordStrength() {
+    let result = 0
+    if (/[a-z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[A-Z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[0-9]/.test(this.password)) {
+      result += 1
+    }
+    if (/[`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]/.test(this.password)) {
+      result += 1
+    }
+    return result
   }
 
   @action
@@ -233,6 +251,7 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <InputLabel>{labels.setPassword}</InputLabel>
               <Input type="password" value={this.password} onChange={this.passwordInput} />
+              {/* <div style={{ position: 'absolute', right: 0, bottom: 0 }}>{this.passwordStrength}</div> */}
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
               <InputLabel>{labels.repeatPassword}</InputLabel>
