@@ -282,6 +282,18 @@ export class Setting extends React.Component<Props> {
     this.progress = progress
   }
 
+  handleGeneratePrivateKey = () => {
+    swal.fire({
+      type: 'success',
+      title: '导出秘钥',
+      text: this.props.account!.exportPrivateKey
+    })
+  }
+
+  handleConsoleEncry = () => {
+    console.log(this.props.wallet!.hdAccount)
+  }
+
   render() {
     const {
       labels,
@@ -361,6 +373,14 @@ export class Setting extends React.Component<Props> {
               <div>
                 <p>{labels.about.label.version}:</p>
                 <p>{PackageJson.version}</p>
+              </div>
+              <div>
+                <Button variant="contained" onClick={this.handleGeneratePrivateKey}>
+                  生成秘钥
+                </Button>
+                <Button variant="contained" onClick={this.handleConsoleEncry}>
+                  打印秘钥
+                </Button>
               </div>
               {/* <div>
                 <p>{t('about.label.copyright')}:</p>

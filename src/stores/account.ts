@@ -272,6 +272,19 @@ export default class AccountStore {
   private getSafeAccountIndex(): string {
     return (this._accountMap.size + 1).toString()
   }
+
+  /**
+   * @example get the activeAccount's privateKey by the following steps
+   * ```ts
+   * accountStore.exportPrivateKey()
+   * => ''
+   * ```
+   */
+  @computed
+  get exportPrivateKey() {
+    const privateKey = this._store.wallet.getPrivateKeyByPath(this.activeAccount.path)
+    return privateKey
+  }
 }
 
 // animal enter candy frame garbage thought whip obvious artefact mean tuition pepper
