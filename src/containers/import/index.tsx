@@ -14,10 +14,13 @@ import LoadingStore from '@/stores/loading'
 import WalletStore from '@/stores/wallet'
 import { isValidPassword } from '@/utils'
 import settings from '@/utils/settings'
-import { Button, Fab, FormControl, Input, InputLabel } from '@material-ui/core'
+import { Button, FormControl } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import Add from '../../images/add-icon.png'
+import Curtain from '@/images/curtain.png'
+// import En from '@/images/en.png'
+// import Cn from '@/images/cn.png'
 import styles from './importStyle'
 import { I18nCollectionWallet } from '@/i18n/i18n'
 
@@ -235,40 +238,91 @@ export class Import extends React.Component<IImportProps> {
     ]
     return (
       <div className={classes.import}>
+        <img src={Curtain} />
         <div className={classes.globalWrap}>
-          <Fab className={classes.global} onClick={this.handleChangeLang}>
-            <span>{labels.langAb}</span>
-          </Fab>
-          <p>{labels.lang}</p>
+          <Button
+            className={classNames({
+              [classes.langBtn]: true,
+              [classes.langCn]: isChinese,
+              [classes.langEn]: !isChinese
+            })}
+            onClick={this.handleChangeLang}
+          />
         </div>
         <form className={classes.form} onSubmit={this.handleConfirm}>
           <p className={classes.title}>{labels.title}</p>
           <div data-tour={'first'}>
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.mnemonic}</InputLabel>
-              <Input value={this.mnemonic} onChange={this.mnemonicInput} />
+              <label className={classes.inputLabel}>{labels.mnemonic}</label>
+              <textarea
+                className={classNames([classes.textInput, classes.mnemonicInput])}
+                value={this.mnemonic}
+                onChange={this.mnemonicInput}
+              />
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.setPassword}</InputLabel>
-              <Input type="password" value={this.password} onChange={this.passwordInput} />
+              <label className={classes.inputLabel}>{labels.setPassword}</label>
+              <input
+                className={classNames([classes.textInput, classes.pswInput])}
+                type="password"
+                value={this.password}
+                onChange={this.passwordInput}
+              />
               {/* <div style={{ position: 'absolute', right: 0, bottom: 0 }}>{this.passwordStrength}</div> */}
             </FormControl>
+            {this.password && (
+              <div className={classes.pswStr}>
+                <div className={classes.rankbar}>
+                  <div className={classes.weakPswActive} />
+                  <div className={this.passwordStrength > 1 ? classes.mediumPswActive : classes.mediumPsw} />
+                  <div className={this.passwordStrength > 3 ? classes.strongPswActive : classes.strongPsw} />
+                </div>
+                <div className={classes.rankbar}>
+                  <span className={classes.weakText}>{labels.weak}</span>
+                  <span className={this.passwordStrength > 1 ? classes.mediumText : classes.strengthTextDefault}>
+                    {labels.medium}
+                  </span>
+                  <span className={this.passwordStrength > 3 ? classes.strongText : classes.strengthTextDefault}>
+                    {labels.strong}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.repeatPassword}</InputLabel>
-              <Input type="password" value={this.repeatPassword} onChange={this.repeatPasswordInput} />
+              <label className={classes.inputLabel}>{labels.repeatPassword}</label>
+              <input
+                className={classNames([classes.textInput, classes.pswInput])}
+                type="password"
+                value={this.repeatPassword}
+                onChange={this.repeatPasswordInput}
+              />
             </FormControl>
             <Button disabled={disable} variant="contained" color="primary" className={classes.button} type="submit">
               {labels.recovery}
             </Button>
           </div>
+          <div className={classes.create} data-tour={'second'}>
+            <Button className={classes.addBtn} variant="contained" color="primary" onClick={this.ToCreate}>
+              {/* <img src={Add} alt="" data-tour={'second'} /> */}
+              <p className={classNames({ ['cn']: isChinese })}>
+                <span className={classes.addIcon}>+</span>
+                {labels.create}
+              </p>
+            </Button>
+
+            {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
+          </div>
         </form>
-        <div className={classes.create}>
-          <Button className={classes.addBtn} onClick={this.ToCreate}>
-            <img src={Add} alt="" data-tour={'second'} />
-          </Button>
-          <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
-          {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
-        </div>
+        {false && (
+          <div className={classes.create}>
+            <Button className={classes.addBtn} onClick={this.ToCreate}>
+              <img src={Add} alt="" data-tour={'second'} />
+            </Button>
+            <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
+            {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
+          </div>
+        )}
         <Tour
           steps={steps}
           isOpen={this.showTour}
