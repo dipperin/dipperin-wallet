@@ -52,7 +52,10 @@ export const zhCN = {
       tour: {
         create: '如果您还没有钱包，点击这里去创建钱包！',
         import: '如果您已有钱包，在这里输入助记词并设置您的密码来恢复钱包！'
-      }
+      },
+      weak: '弱',
+      medium: '中',
+      strong: '强'
     },
     sidebar: {
       wallet: '钱包',
@@ -488,7 +491,10 @@ export const enUS: I18nCollection = {
       tour: {
         create: `If you don't already have a wallet, click here to create one!`,
         import: 'If you already have a wallet, enter a mnemonic here and set your password to restore the wallet!'
-      }
+      },
+      weak: 'week',
+      medium: 'medium',
+      strong: 'strong'
     },
     sidebar: {
       wallet: 'Wallet',
