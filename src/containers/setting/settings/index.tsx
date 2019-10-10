@@ -5,10 +5,14 @@ import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
+import _ from 'lodash'
 
 import PackageJson from '@/../package.json'
 import Loading from '@/components/loading'
 import Accounts from '@/containers/accounts'
+import PasswordConfirm from '@/components/passwordConfirm'
+import DialogConfirm from '@/components/privateConfirm'
+
 // import Help from '@/images/setting-help.png'
 // import Reset from '@/images/setting-reset.png'
 // import Update from '@/images/setting-update.png'
@@ -59,6 +63,12 @@ export class Setting extends React.Component<Props> {
   netEnv: string = DEFAULT_NET
   @observable
   progress: number = 0.005
+  @observable
+  showDialog: boolean = false
+  @observable
+  showPrivateKey: boolean = false
+  @observable
+  privateKey: string = ''
 
   constructor(props: Props) {
     super(props)
@@ -103,6 +113,19 @@ export class Setting extends React.Component<Props> {
   @action
   handleClose = () => {
     this.showAccounts = false
+  }
+
+  @action
+  setShowDialog = (flag: boolean) => {
+    this.showDialog = flag
+  }
+
+  handleCloseDialog = () => {
+    this.setShowDialog(false)
+  }
+
+  handleShowDialog = () => {
+    this.setShowDialog(true)
   }
 
   handleReset = async () => {
@@ -282,16 +305,41 @@ export class Setting extends React.Component<Props> {
     this.progress = progress
   }
 
-  handleGeneratePrivateKey = () => {
-    swal.fire({
-      type: 'success',
-      title: '导出秘钥',
-      text: this.props.account!.exportPrivateKey
-    })
-  }
-
   handleConsoleEncry = () => {
     console.log(this.props.wallet!.hdAccount)
+  }
+
+  @action
+  setPrivateKay = (key: string) => {
+    this.privateKey = key
+  }
+
+  handleGeneratePrivateKey = async (password: string) => {
+    this.handleCloseDialog()
+    const res = await this.props.wallet!.checkPassword(password)
+    let pri = ''
+    if (res) {
+      pri = this.props.account!.exportPrivateKey(password)
+      this.setPrivateKay(pri)
+      console.log(pri)
+      this.handleShowPrivateKey()
+    }
+  }
+
+  handleDialogConfirm = _.debounce(this.handleGeneratePrivateKey, 1000)
+
+  @action
+  setShowPrivateKey(flag: boolean) {
+    this.showPrivateKey = flag
+  }
+
+  handleShowPrivateKey = () => {
+    this.setShowPrivateKey(true)
+  }
+
+  handleClosePrivateKey = () => {
+    this.setPrivateKay('')
+    this.setShowPrivateKey(false)
   }
 
   render() {
@@ -308,6 +356,7 @@ export class Setting extends React.Component<Props> {
     if (!activeAccount) {
       return null
     }
+
     return (
       <div>
         <div className={classes.setting}>
@@ -322,6 +371,11 @@ export class Setting extends React.Component<Props> {
               <img src={Help} alt="" />
               {t('btn.help')}
             </Button> */}
+            <div className={classes.version}>
+              <p>
+                {labels.about.label.version} : {PackageJson.version}
+              </p>
+            </div>
           </div>
           <div className={classes.right}>
             <Tooltip title={isRemoteNode ? labels.net.closeRemote : labels.net.connectRemote}>
@@ -364,23 +418,19 @@ export class Setting extends React.Component<Props> {
                 })}
               </div>
             )}
-            <p className={classes.title}>{labels.about.title}</p>
+            <p className={classes.title}>{labels.walletManagement}</p>
             <div className={classes.aboutInfo}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>
               </div> */}
               <div>
-                <p>{labels.about.label.version}:</p>
-                <p>{PackageJson.version}</p>
-              </div>
-              <div>
-                <Button variant="contained" onClick={this.handleGeneratePrivateKey}>
-                  生成秘钥
-                </Button>
-                <Button variant="contained" onClick={this.handleConsoleEncry}>
+                <Fab className={classNames(classes.netBtn)} variant="extended" onClick={this.handleShowDialog}>
+                  <span>{labels.exportPrivateKey}</span>
+                </Fab>
+                {/* <Button variant="contained" onClick={this.handleConsoleEncry}>
                   打印秘钥
-                </Button>
+                </Button> */}
               </div>
               {/* <div>
                 <p>{t('about.label.copyright')}:</p>
@@ -425,6 +475,18 @@ export class Setting extends React.Component<Props> {
         </div>
         {this.showAccounts && <Accounts handleClose={this.handleClose} history={this.props.history} />}
         {this.loading && <Loading title={labels.loading} progress={this.progress} />}
+        {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
+        {this.showPrivateKey && (
+          <DialogConfirm
+            onClose={this.handleClosePrivateKey}
+            prk={this.privateKey}
+            title={labels.privateKey.title}
+            label={labels.privateKey.label}
+            note={labels.privateKey.notes}
+            btnText={labels.privateKey.confirm}
+            swal={labels.swal.copySuccess}
+          />
+        )}
       </div>
     )
   }

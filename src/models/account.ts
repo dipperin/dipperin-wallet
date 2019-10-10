@@ -61,6 +61,14 @@ export default class AccountModel {
     return this._type
   }
 
+  isHDWallet() {
+    return this._type === AccountType.hd
+  }
+
+  isPrivateKey() {
+    return this._type === AccountType.privateKey
+  }
+
   @computed
   get balance() {
     return Utils.fromUnit(this._balance.toString(10))
