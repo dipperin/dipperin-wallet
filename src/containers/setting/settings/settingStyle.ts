@@ -40,6 +40,13 @@ const styles = createStyles({
     fontSize: 18,
     fontWeight: 'bold'
   },
+  version: {
+    position: 'absolute',
+    bottom: '16px',
+    '& p': {
+      fontSize: 500
+    }
+  },
   netWrap: {
     display: 'flex',
     marginBottom: 20
@@ -260,6 +267,35 @@ const styles = createStyles({
     color: '#666',
     fontSize: 14,
     cursor: 'pointer'
+  },
+  dialogTitleModal: {
+    textAlign: 'center'
+  },
+  dialogContentModal: {
+    width: 310
+  },
+  dialogBtnsModal: {
+    justifyContent: 'space-evenly'
+  },
+  buttonModal: {
+    display: 'block',
+    margin: '15px auto',
+    width: '262px',
+    height: '36px',
+    textTransform: 'none',
+    fontSize: '16px',
+    ...materialButton,
+    '& span': {
+      fontWeight: 'bold'
+    }
+  },
+  formModal: {
+    position: 'relative'
+  },
+  closeModal: {
+    position: 'absolute',
+    right: -26,
+    top: 6
   }
 })
 

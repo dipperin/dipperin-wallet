@@ -109,7 +109,14 @@ export const zhCN = {
       },
       connectFail: '未连接到节点',
       loading: '更新中',
-
+      walletManagement: '钱包管理',
+      exportPrivateKey: '导出秘钥',
+      privateKey: {
+        title: '私钥显示',
+        label: '这是你的私钥（点击复制）',
+        notes: '注意：请保管好这个私钥。任何人拥有了你的私钥都可以窃取你帐户中的所有资产。',
+        confirm: '确认'
+      },
       swal: {
         updateSuccess: '更新成功!',
         cancel: '取消',
@@ -118,7 +125,8 @@ export const zhCN = {
           '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
         warn: '警告',
         startUpdate: '开始更新?',
-        documentTitle: 'Dipperin 钱包'
+        documentTitle: 'Dipperin 钱包',
+        copySuccess: '复制成功'
       }
     }
   },
@@ -548,7 +556,15 @@ export const enUS: I18nCollection = {
       },
       connectFail: `can't connect to dipperin node`,
       loading: 'Loading',
-
+      walletManagement: 'Wallet Management',
+      exportPrivateKey: 'Private Key Export',
+      privateKey: {
+        title: 'Show Private Keys',
+        label: "It's your private key(click to copy)",
+        notes:
+          'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+        confirm: 'Done'
+      },
       swal: {
         updateSuccess: 'update success',
         cancel: 'Cancel',
@@ -557,7 +573,8 @@ export const enUS: I18nCollection = {
           'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
         warn: 'Warning',
         startUpdate: 'Start update',
-        documentTitle: 'Dipperin Wallet'
+        documentTitle: 'Dipperin Wallet',
+        copySuccess: 'Copy Success'
       }
     }
   },

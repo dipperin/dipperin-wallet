@@ -280,10 +280,14 @@ export default class AccountStore {
    * => ''
    * ```
    */
-  @computed
-  get exportPrivateKey() {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this.activeAccount.path)
-    return privateKey
+  exportPrivateKey(password: string) {
+    if (this.activeAccount.isHDWallet()) {
+      const privateKey = this._store.wallet.getPrivateKeyByPath(this.activeAccount.path)
+      return privateKey
+    } else if (this.activeAccount.isPrivateKey()) {
+      return this.activeAccount.privateKey
+    }
+    return ''
   }
 }
 
