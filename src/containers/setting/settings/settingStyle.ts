@@ -44,7 +44,7 @@ const styles = createStyles({
     position: 'absolute',
     bottom: '16px',
     '& p': {
-      fontSize: 500
+      fontSize: 12
     }
   },
   netWrap: {
