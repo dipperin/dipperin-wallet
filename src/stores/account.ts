@@ -1,7 +1,8 @@
 import { computed, observable, action } from 'mobx'
 
-import AccountModel from '../models/account'
+import AccountModel, { AccountType, Opt } from '../models/account'
 import RootStore from './root'
+import { Accounts, EncryptResult, helper } from '@dipperin/dipperin.js'
 
 import { getAccount, insertAccount, removeAccount } from '@/db'
 import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH, TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
@@ -96,6 +97,21 @@ export default class AccountStore {
     const address = this._store.wallet.getAccountByPath(newPath).address
     // Add new account
     const newAccount = this.newAccount(newIndex, newPath, address)
+    // Save account
+    this._accountMap.set(newIndex, newAccount)
+    // add to db
+    await insertAccount(newAccount.toJS())
+    this.changeActiveAccount(newAccount.id)
+    this.updateAccountsBalance(newAccount.id)
+    this.updateAccountsNonce(newAccount.id)
+  }
+
+  @action
+  importPrivateKey = async (privateKey: string) => {
+    const newIndex = this.getSafeAccountIndex()
+    const address = helper.Account.fromPrivate(privateKey)
+    // Add new account
+    const newAccount = this.importAccount(newIndex, address, privateKey)
     // Save account
     this._accountMap.set(newIndex, newAccount)
     // add to db
@@ -266,11 +282,30 @@ export default class AccountStore {
     return new AccountModel(id, path, address)
   }
 
+  private importAccount(id: string, address: string, privateKey: string): AccountModel {
+    const newPath = `${ACCOUNTS_PATH}/${0}`
+    const opt: Opt = {
+      type: AccountType.privateKey,
+      encryptKey: Accounts.encrypt(privateKey, this._store.wallet.getPrivateKeyByPath(newPath))
+    }
+    const newAccount = new AccountModel(id, newPath, address, opt)
+    return newAccount
+  }
+
   /**
    * Get safe account Index
    */
   private getSafeAccountIndex(): string {
-    return (this._accountMap.size + 1).toString()
+    let maxId = 1
+    for (const account of this._accountMap.values()) {
+      if (account.isHDWallet()) {
+        const id = Number(account.path.split('/').slice(-1))
+        if (id > maxId) {
+          maxId = id
+        }
+      }
+    }
+    return (maxId + 1).toString()
   }
 
   /**
@@ -285,7 +320,9 @@ export default class AccountStore {
       const privateKey = this._store.wallet.getPrivateKeyByPath(this.activeAccount.path)
       return privateKey
     } else if (this.activeAccount.isPrivateKey()) {
-      return this.activeAccount.privateKey
+      const path = this.activeAccount.path
+      const prv0 = this._store.wallet.getPrivateKeyByPath(path)
+      return Accounts.decrypt(this.activeAccount.encrypt as EncryptResult, prv0).seed
     }
     return ''
   }

@@ -236,7 +236,10 @@ export const zhCN = {
       add: '添加账户',
       account: '账户',
       copySuccess: '复制成功!',
-      currentAccount: CurrentAccountCN
+      currentAccount: CurrentAccountCN,
+      privateKeyImport: '私钥导入',
+      label: '请输入您的秘钥',
+      title: '秘钥导入'
     },
     account: {
       transfer: '转账',
@@ -685,7 +688,10 @@ export const enUS: I18nCollection = {
       add: 'Add account',
       account: 'Account',
       copySuccess: 'Replicating Success!',
-      currentAccount: CurrentAccountUS
+      currentAccount: CurrentAccountUS,
+      privateKeyImport: 'Private Key Import',
+      label: 'Paste your private key string here',
+      title: 'Enter Private Key'
     },
     account: {
       transfer: 'Transfer',
