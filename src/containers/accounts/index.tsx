@@ -14,6 +14,7 @@ import AccountModel from '@/models/account'
 import { I18nCollectionAccount } from '@/i18n/i18n'
 import SmallAccountList from './components/smallAccountList'
 import BigAccountList from './components/bigAccountList'
+import PrivateConfirm from '@/components/privateKeyImport'
 
 import Close from '@/images/close.png'
 import Left from '@/images/left.png'
@@ -44,6 +45,8 @@ export class Accounts extends React.Component<Props> {
   smallListLeft: number = 0
   @observable
   smallListPage: number = 1
+  @observable
+  showPrivateKeyModal = false
 
   constructor(props: Props) {
     super(props)
@@ -59,6 +62,19 @@ export class Accounts extends React.Component<Props> {
         this.changeAccount(id)
       }
     )
+  }
+
+  @action
+  setPrivateKeyModal = (flag: boolean) => {
+    this.showPrivateKeyModal = flag
+  }
+
+  handleShowPrivateKey = () => {
+    this.setPrivateKeyModal(true)
+  }
+
+  handleClosePrivateKey = () => {
+    this.setPrivateKeyModal(false)
   }
 
   /**
@@ -96,7 +112,16 @@ export class Accounts extends React.Component<Props> {
     } catch (err) {
       this.props.history.push('/login')
     }
-    await this.props.account!.showDbAccounts()
+    // await this.props.account!.showDbAccounts()
+  }
+
+  importPrivateKey = async (privateKey: string) => {
+    try {
+      this.props.account!.importPrivateKey(privateKey)
+    } catch (err) {
+      this.props.history.push('/login')
+    }
+    // await this.props.account!.showDbAccounts()
   }
 
   handleChangeActiveAccount = (id: string) => {
@@ -217,10 +242,20 @@ export class Accounts extends React.Component<Props> {
     return (
       <div className={classes.changeAccount}>
         <div className={classes.shadow}>
-          <Button variant="contained" className={classNames(classes.add, 'tour-add')} onClick={this.addAccount}>
-            <AddIcon className={classes.btnIcon} />
-            {labels.add}
-          </Button>
+          <div className={classes.importBtnBox}>
+            <Button variant="contained" className={classNames(classes.add, 'tour-add')} onClick={this.addAccount}>
+              <AddIcon className={classes.btnIcon} />
+              {labels.add}
+            </Button>
+            <Button
+              variant="contained"
+              className={classNames(classes.add, 'tour-add')}
+              onClick={this.handleShowPrivateKey}
+            >
+              {labels.privateKeyImport}
+            </Button>
+          </div>
+
           <Button className={classes.close} onClick={handleClose}>
             <img src={Close} alt="close" draggable={false} />
           </Button>
@@ -258,6 +293,16 @@ export class Accounts extends React.Component<Props> {
             </div>
           </div>
         </div>
+        {this.showPrivateKeyModal && (
+          <PrivateConfirm
+            onClose={this.handleClosePrivateKey}
+            onConfirm={this.importPrivateKey}
+            title={labels.title}
+            label={labels.label}
+            btnText={'Confirm'}
+            swal={'success'}
+          />
+        )}
       </div>
     )
   }
