@@ -264,8 +264,8 @@ export const zhCN = {
   contract: {
     contract: {
       selectFile: '请选择一个文件',
-      errorAbiFile: '这不是一个abi文件',
-      errorWasmFile: '这不是一个Wasm文件',
+      errorAbiFile: '这不是一个ABI文件',
+      errorWasmFile: '这不是一个WASM文件',
       add: '添加',
       call: '调用',
       favoriteContract: '收藏合约',
@@ -716,8 +716,8 @@ export const enUS: I18nCollection = {
   contract: {
     contract: {
       selectFile: 'Please select a file',
-      errorAbiFile: 'Error abi File',
-      errorWasmFile: 'Error Wasm File',
+      errorAbiFile: 'Error ABI File',
+      errorWasmFile: 'Error WASM File',
       add: 'Add',
       call: 'Call',
       favoriteContract: 'favorite contract',
