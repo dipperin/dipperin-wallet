@@ -55,7 +55,9 @@ export const zhCN = {
       },
       weak: '弱',
       medium: '中',
-      strong: '强'
+      strong: '强',
+      note:
+        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
     },
     sidebar: {
       wallet: '钱包',
@@ -509,7 +511,9 @@ export const enUS: I18nCollection = {
       },
       weak: 'week',
       medium: 'medium',
-      strong: 'strong'
+      strong: 'strong',
+      note:
+        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
     },
     sidebar: {
       wallet: 'Wallet',
