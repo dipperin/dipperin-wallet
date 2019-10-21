@@ -49,12 +49,12 @@ const styles = createStyles({
     background: '#F2F3F7',
     borderRadius: 4,
     padding: '5px 13px',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 400
   },
   mnemonicInput: {
     width: 320,
-    height: 74
+    height: 80
   },
   pswInput: {
     width: 320,
