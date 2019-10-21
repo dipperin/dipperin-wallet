@@ -292,18 +292,29 @@ export class CreateContract extends React.Component<IProps> {
     try {
       const contractAddress = this.getStringField('contractAddress')
       this.validateContractAddress(contractAddress)
-      const abi = this.getStringField('abi')
+      // FIXME: the abi should belong to the contract address
+      const abi = this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`)
       if (abi.length === 0) {
-        await this.getAbi()
+        try {
+          await this.getAbi()
+          await this.handleAddContract()
+        } catch (e) {
+          swal.fire({
+            title: labels.createSwal.createErr,
+            text: labels.createSwal.getAbi,
+            type: 'error'
+          })
+          return
+        }
       }
-      if (abi.length === 0) {
-        swal.fire({
-          title: labels.createSwal.createErr,
-          text: labels.createSwal.getAbi,
-          type: 'error'
-        })
-        return
-      }
+      // if (abi.length === 0) {
+      //   swal.fire({
+      //     title: labels.createSwal.createErr,
+      //     text: labels.createSwal.getAbi,
+      //     type: 'error'
+      //   })
+      //   return
+      // }
       const contractRes = await this.props.vmContract!.addContract(abi, contractAddress)
       if (contractRes.success) {
         await swal.fire({
@@ -365,7 +376,7 @@ export class CreateContract extends React.Component<IProps> {
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
         console.log(`getAbi`, abi)
-        this.setStringField('abi', abi)
+        this.setStringField(`abi:${contractAddress.toLocaleLowerCase()}`, abi)
       }
     }
   }
