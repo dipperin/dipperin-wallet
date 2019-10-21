@@ -14,6 +14,7 @@ interface Props extends WithStyles<typeof styles> {
   title: string
   label: string
   btnText: string
+  cancelText?: string
   // prk: string
   swal: string
   note?: string
@@ -29,24 +30,6 @@ export class DialogConfirm extends React.Component<Props> {
   handleChangePassword = (e: React.ChangeEvent<{ value: string }>) => {
     this.value = e.target.value
   }
-
-  // copyAddress = (e: React.MouseEvent<HTMLButtonElement>): void => {
-  //   e.stopPropagation()
-  //   const input = document.createElement('input')
-  //   document.body.appendChild(input)
-  //   input.setAttribute('value', this.props.prk)
-  //   input.select()
-  //   if (document.execCommand('copy')) {
-  //     document.execCommand('copy')
-  //     swal.fire({
-  //       showCloseButton: false,
-  //       type: 'success',
-  //       timer: 1500,
-  //       title: this.props.swal
-  //     })
-  //   }
-  //   document.body.removeChild(input)
-  // }
 
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,14 +51,25 @@ export class DialogConfirm extends React.Component<Props> {
             {title}
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
-            <p>{label}</p>
+            <p className={classes.label}>{label}</p>
             <textarea className={classes.private} value={this.value} onChange={this.handleChangePassword} />
             {note && <p className={classes.note}>{note}</p>}
           </DialogContent>
-          <Button onClick={onClose} variant="contained" color="default" className={classes.button}>
+          <Button
+            onClick={onClose}
+            style={{ marginLeft: '24px' }}
+            variant="contained"
+            color="default"
+            className={classes.button}
+          >
             {btnText}
           </Button>
-          <Button variant="contained" color="primary" className={classes.button} type="submit">
+          <Button
+            variant="contained"
+            style={{ background: '#528DD0', float: 'right', marginRight: '24px' }}
+            className={classes.button}
+            type="submit"
+          >
             {btnText}
           </Button>
         </form>
