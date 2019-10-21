@@ -6,7 +6,8 @@ const styles = createStyles({
     textAlign: 'center'
   },
   dialogContent: {
-    width: 310
+    width: 310,
+    paddingBottom: 16
   },
   dialogBtns: {
     justifyContent: 'space-evenly'
@@ -14,6 +15,7 @@ const styles = createStyles({
   label: {
     color: '#838899',
     fontSize: '10px',
+    marginBottom: '5px',
     cursor: 'pointer'
   },
   private: {
@@ -32,19 +34,20 @@ const styles = createStyles({
     fontSize: '10px'
   },
   button: {
-    display: 'block',
-    margin: '0 auto 15px',
-    width: '262px',
+    margin: '0 auto 21px',
+    width: '118px',
     height: '36px',
     textTransform: 'none',
     fontSize: '16px',
+    color: '#fff',
     ...materialButton,
     '& span': {
       fontWeight: 'bold'
     }
   },
   form: {
-    position: 'relative'
+    position: 'relative',
+    width: 310
   },
   close: {
     position: 'absolute',
