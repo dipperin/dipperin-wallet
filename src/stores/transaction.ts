@@ -144,7 +144,7 @@ class TransactionStore {
         this._store.account.activeAccount.plusNonce()
         return {
           success: true,
-          hash: transaction.transactionHash
+          info: transaction.transactionHash
         }
       } else {
         return {
