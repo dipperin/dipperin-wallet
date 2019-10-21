@@ -4,8 +4,9 @@ import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
+import classNames from 'classnames'
 
-import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
+import { Button, FormControl } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import WalletStore from '../../../stores/wallet'
@@ -102,7 +103,7 @@ export class Create extends React.Component<ICreateProps> {
       classes,
       location: { pathname }
     } = this.props
-    const disable = !this.password || !this.repeatPassword || this.password !== this.repeatPassword
+    // const disable = !this.password || !this.repeatPassword || this.password !== this.repeatPassword
     return (
       <div className={classes.create}>
         <div className={classes.back} onClick={this.goBack}>
@@ -112,14 +113,52 @@ export class Create extends React.Component<ICreateProps> {
         <form onSubmit={this.handleConfirm}>
           <p className={classes.title}>{labels.title}</p>
           <FormControl fullWidth={true} className={classes.item}>
+            <label className={classes.inputLabel}>{labels.setPassword}</label>
+            <input
+              className={classNames([classes.textInput, classes.pswInput])}
+              type="password"
+              value={this.password}
+              onChange={this.passwordInput}
+            />
+            {/* <div style={{ position: 'absolute', right: 0, bottom: 0 }}>{this.passwordStrength}</div> */}
+          </FormControl>
+          {this.password && (
+            <div className={classes.pswStr}>
+              <div className={classes.rankbar}>
+                <div className={classes.weakPswActive} />
+                <div className={this.passwordStrength > 1 ? classes.mediumPswActive : classes.mediumPsw} />
+                <div className={this.passwordStrength > 3 ? classes.strongPswActive : classes.strongPsw} />
+              </div>
+              <div className={classes.rankbar}>
+                <span className={classes.weakText}>{labels.weak}</span>
+                <span className={this.passwordStrength > 1 ? classes.mediumText : classes.strengthTextDefault}>
+                  {labels.medium}
+                </span>
+                <span className={this.passwordStrength > 3 ? classes.strongText : classes.strengthTextDefault}>
+                  {labels.strong}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <FormControl fullWidth={true} className={classes.item}>
+            <label className={classes.inputLabel}>{labels.repeatPassword}</label>
+            <input
+              className={classNames([classes.textInput, classes.pswInput])}
+              type="password"
+              value={this.repeatPassword}
+              onChange={this.repeatPasswordInput}
+            />
+          </FormControl>
+          {/* <FormControl fullWidth={true} className={classes.item}>
             <InputLabel>{labels.setPassword}</InputLabel>
             <Input type="password" required={true} value={this.password} onChange={this.passwordInput} />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item}>
             <InputLabel>{labels.repeatPassword}</InputLabel>
             <Input type="password" required={true} value={this.repeatPassword} onChange={this.repeatPasswordInput} />
-          </FormControl>
-          <Button disabled={disable} variant="contained" color="primary" className={classes.button} type="submit">
+          </FormControl> */}
+          <Button variant="contained" className={classes.button} type="submit">
             {labels.confirm}
           </Button>
         </form>

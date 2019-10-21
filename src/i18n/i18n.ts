@@ -142,7 +142,10 @@ export const zhCN = {
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致！',
         confirm: '确定'
-      }
+      },
+      weak: '弱',
+      medium: '中',
+      strong: '强'
     },
     backup: {
       return: '返回',
@@ -594,7 +597,10 @@ export const enUS: I18nCollection = {
         invalidPassword: 'Invalid password',
         diffPassword: 'The first password is not equal to the second password!',
         confirm: 'OK'
-      }
+      },
+      weak: 'week',
+      medium: 'medium',
+      strong: 'strong'
     },
     backup: {
       return: 'Return',

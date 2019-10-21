@@ -247,7 +247,9 @@ export class Import extends React.Component<IImportProps> {
               [classes.langEn]: !isChinese
             })}
             onClick={this.handleChangeLang}
-          />
+          >
+            ''
+          </Button>
         </div>
         <form className={classes.form} onSubmit={this.handleConfirm}>
           <p className={classes.title}>{labels.title}</p>
