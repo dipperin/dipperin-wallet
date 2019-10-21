@@ -165,6 +165,49 @@ export class Send extends React.Component<IProps> {
     this.setShowDialog(false)
   }
 
+  // mock transaction.confirmTransaction timeout
+  // mockTimeout = (
+  //   address: string,
+  //   amount: string,
+  //   memo: string,
+  //   gas: string,
+  //   gasPrice: string
+  // ): Promise<{ success: boolean; info?: string }> => {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       resolve({
+  //         success: true,
+  //         info:
+  //           '0x' +
+  //           Buffer.alloc(44)
+  //             .fill('a')
+  //             .toString()
+  //       })
+  //     }, 3000)
+  //   })
+  // }
+
+  wrappedConfirmTransaction = (
+    address: string,
+    amount: string,
+    memo: string,
+    gas: string,
+    gasPrice: string
+  ): Promise<{ success: boolean; info?: string }> => {
+    return new Promise((resolve, reject) => {
+      const timeoutTimer = setTimeout(() => {
+        reject(this.props.labels.swal.timeout)
+      }, 3000)
+      this.props
+        .transaction!.confirmTransaction(address, amount, memo, gas, gasPrice)
+        .then(res => {
+          clearTimeout(timeoutTimer)
+          resolve(res)
+        })
+        .catch(e => reject(e))
+    })
+  }
+
   send = async () => {
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
@@ -172,25 +215,34 @@ export class Send extends React.Component<IProps> {
     if (this.estimateGas && /^[0-9]*$/.test(this.estimateGas)) {
       gas = String(Number(this.estimateGas) * 2)
     } else {
-      gas = '120000'
+      gas = '21000'
     }
     // const gas: string = String(Number(this.estimateGas)! * 2) | '120000'
-    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
-    if (res.success) {
-      this.handleCloseDialog()
-      this.initState()
-      await swal.fire({
-        text: labels.swal.success,
-        type: 'success',
-        confirmButtonText: labels.swal.confirm,
-        timer: 1000
-      })
-      this.props.transaction!.updateTransactionType()
-    } else {
-      this.handleCloseDialog()
+    try {
+      const res = await this.wrappedConfirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
+      if (res.success) {
+        this.handleCloseDialog()
+        this.initState()
+        await swal.fire({
+          text: labels.swal.success,
+          type: 'success',
+          confirmButtonText: labels.swal.confirm,
+          timer: 1000
+        })
+        this.props.transaction!.updateTransactionType()
+      } else {
+        this.handleCloseDialog()
+        await swal.fire({
+          title: labels.swal.fail,
+          text: res.info,
+          type: 'error',
+          confirmButtonText: labels.swal.confirm
+        })
+      }
+    } catch (e) {
       await swal.fire({
         title: labels.swal.fail,
-        text: res.info,
+        text: e,
         type: 'error',
         confirmButtonText: labels.swal.confirm
       })
