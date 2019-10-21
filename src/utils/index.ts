@@ -50,22 +50,24 @@ export const formatUTCTime = (time: string) => {
   return format(date, 'YYYY-MM-DD HH:mm:ss A+UTC')
 }
 
-const VMCONTRACT_ADDRESS_PREFIX = '0014'
+// const VMCONTRACT_ADDRESS_PREFIX = '0014'
 /**
  * Checks if the given string is an contract address
  * @param address the given HEX address
  */
 export const isVmContractAddress = (address: string): boolean => {
-  if (address.replace('0x', '').length !== 44) {
-    return false
-  }
-  const prefix = address.replace('0x', '').slice(0, 4)
-  switch (prefix) {
-    case VMCONTRACT_ADDRESS_PREFIX:
-      return true
-    default:
-      return false
-  }
+  return /^(0x)?(0014)[0-9a-fA-F]{40}$/i.test(address)
+
+  // if (address.replace('0x', '').length !== 44) {
+  //   return false
+  // }
+  // const prefix = address.replace('0x', '').slice(0, 4)
+  // switch (prefix) {
+  //   case VMCONTRACT_ADDRESS_PREFIX:
+  //     return true
+  //   default:
+  //     return false
+  // }
 }
 
 export const isAlpha = version => version.includes('alpha')
