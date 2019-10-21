@@ -224,7 +224,9 @@ export class Send extends React.Component<IProps> {
 
   @action
   addressChange = (e: React.ChangeEvent<{ value: string }>) => {
-    this.address = e.target.value
+    if (/^(0x)?[0-9a-f]{0,44}$/i.test(e.target.value.toLowerCase())) {
+      this.address = e.target.value
+    }
   }
 
   @action
