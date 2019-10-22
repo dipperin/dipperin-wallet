@@ -399,7 +399,7 @@ export class CreateContract extends React.Component<IProps> {
     return (
       <Fragment>
         <div className={classes.tab}>
-          <div className={classes.tabLeft} data-tour="created-btn">
+          <div className={classes.tabLeft}>
             <Button
               onClick={this.handleJumpToCreated}
               variant="contained"
@@ -408,7 +408,7 @@ export class CreateContract extends React.Component<IProps> {
               {labels.created}
             </Button>
           </div>
-          <div className={classes.tabRight} data-tour="receive-btn">
+          <div className={classes.tabRight}>
             <Button
               onClick={this.handleJumpToFavorite}
               variant="contained"
