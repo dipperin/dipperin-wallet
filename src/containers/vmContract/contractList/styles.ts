@@ -46,12 +46,17 @@ const styles = createStyles({
     width: '128px',
     position: 'absolute',
     left: '195px',
-    top: '150px',
+    top: '190px',
+    '& img': {
+      display: 'block',
+      margin: '0 auto 20px',
+      transform: 'translateX(4px)'
+    },
     '& span': {
       textAlign: 'center',
       display: 'block',
       color: 'rgba(197,197,199,1)',
-      transform: 'translateY(-20px)',
+      // transform: 'translateY(-20px)',
       fontSize: '14px'
     }
   },
