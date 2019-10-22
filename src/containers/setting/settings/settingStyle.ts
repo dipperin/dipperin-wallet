@@ -117,7 +117,7 @@ const styles = createStyles({
     '&:hover': {
       background: '#fff',
       '& span': {
-        color: '#3450C5'
+        color: '#528DD0'
       }
     },
     '& span': {
