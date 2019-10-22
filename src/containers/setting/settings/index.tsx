@@ -69,6 +69,8 @@ export class Setting extends React.Component<Props> {
   showPrivateKey: boolean = false
   @observable
   privateKey: string = ''
+  @observable
+  showTip: boolean = true
 
   constructor(props: Props) {
     super(props)
@@ -342,6 +344,11 @@ export class Setting extends React.Component<Props> {
     this.setShowPrivateKey(false)
   }
 
+  @action
+  handleCLoseTip = () => {
+    this.showTip = false
+  }
+
   render() {
     const {
       labels,
@@ -418,15 +425,31 @@ export class Setting extends React.Component<Props> {
                 })}
               </div>
             )}
-            <p className={classes.title}>{labels.walletManagement}</p>
-            <div className={classes.aboutInfo}>
+            {this.showTip && (
+              <div className={classes.tip}>
+                <span className={classes.hornIcon} />
+                <span className={classes.tipContent}>连接本地节点需要同步区块，需要等待同步至最新才能发送交易</span>
+                <span className={classes.tipClose} onClick={this.handleCLoseTip}>
+                  ×
+                </span>
+              </div>
+            )}
+            <p className={classes.title} style={{ position: 'absolute', top: '150px' }}>
+              {labels.walletManagement}
+            </p>
+            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '190px' }}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>
               </div> */}
               <div>
-                <Fab className={classNames(classes.netBtn)} variant="extended" onClick={this.handleShowDialog}>
-                  <span>{labels.exportPrivateKey}</span>
+                <Fab
+                  className={classNames(classes.netBtn)}
+                  variant="extended"
+                  style={{ width: 140 }}
+                  onClick={this.handleShowDialog}
+                >
+                  <span style={{ textTransform: 'none' }}>{labels.exportPrivateKey}</span>
                 </Fab>
                 {/* <Button variant="contained" onClick={this.handleConsoleEncry}>
                   打印秘钥
