@@ -311,8 +311,7 @@ const styles = createStyles({
     boxSizing: 'border-box',
     padding: '0 9px',
     borderRadius: '8px',
-    lineHeight: '16px',
-    marginBottom: '20px'
+    lineHeight: '16px'
   },
   hornIcon: {
     display: 'inline-block',
