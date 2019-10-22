@@ -4,6 +4,7 @@ import Update from '@/images/setting-update.png'
 import Reset from '@/images/setting-reset.png'
 import ResetActive from '@/images/reset-active.png'
 import UpdateActive from '@/images/update-active.png'
+import Horn from '@/images/horn.png'
 
 const styles = createStyles({
   setting: {
@@ -49,15 +50,17 @@ const styles = createStyles({
   },
   netWrap: {
     display: 'flex',
-    marginBottom: 20
+    marginBottom: 0
   },
   netBtn: {
-    margin: '0 20px 20px 0',
+    margin: '0 20px 10px 0',
     width: 140,
     height: 24,
     background: '#fff',
     minHeight: 0,
     minWidth: 0,
+    border: '1px solid rgba(120,139,179,1)',
+    boxShadow: 'none',
     '& span': {
       fontSize: 12,
       color: grayColor,
@@ -65,7 +68,8 @@ const styles = createStyles({
     }
   },
   netBtnActive: {
-    background: '#3450C5',
+    background: '#528DD0',
+    border: 'none',
     '&:hover': {
       background: '#3450C5'
     },
@@ -298,6 +302,41 @@ const styles = createStyles({
     position: 'absolute',
     right: -26,
     top: 6
+  },
+  tip: {
+    width: '100%',
+    height: '16px',
+    color: '#838899',
+    background: 'rgba(230,230,230,1)',
+    boxSizing: 'border-box',
+    padding: '0 9px',
+    borderRadius: '8px',
+    lineHeight: '16px',
+    marginBottom: '20px'
+  },
+  hornIcon: {
+    display: 'inline-block',
+    transform: 'translateY(1px)',
+    width: 12,
+    height: 10,
+    background: `url(${Horn})`
+    // float: 'left',
+  },
+  tipContent: {
+    // float: 'left',
+    height: '16px',
+    fontSize: '11px',
+    marginLeft: '6px'
+  },
+  tipClose: {
+    float: 'right',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    height: '16px',
+    color: 'rgba(10,10,10,1)',
+    '&:hover': {
+      cursor: 'pointer'
+    }
   }
 })
 
