@@ -292,7 +292,6 @@ export class CreateContract extends React.Component<IProps> {
     try {
       const contractAddress = this.getStringField('contractAddress')
       this.validateContractAddress(contractAddress)
-      // FIXME: the abi should belong to the contract address
       const abi = this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`)
       if (abi.length === 0) {
         try {
@@ -533,8 +532,12 @@ export class CreateContract extends React.Component<IProps> {
                 />
               </div>
               <div className={classes.inputRow}>
-                <span>{labels.estimateGas}</span>
-                <span>{this.stringField.get('estimateGas')}</span>
+                <span style={{ width: 80, fontSize: 10 }}>{labels.estimateGas}</span>
+                <span style={{ width: 220, fontSize: 10 }}>
+                  {this.stringField.get('estimateGas')
+                    ? Number(this.stringField.get('estimateGas')).toLocaleString()
+                    : ''}
+                </span>
               </div>
 
               <Button variant="contained" color="primary" className={classes.button} type="submit">
