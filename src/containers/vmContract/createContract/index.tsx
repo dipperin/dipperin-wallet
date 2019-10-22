@@ -297,7 +297,9 @@ export class CreateContract extends React.Component<IProps> {
       if (abi.length === 0) {
         try {
           await this.getAbi()
-          await this.handleAddContract()
+          if (this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`).length === 0) {
+            throw new Error()
+          }
         } catch (e) {
           swal.fire({
             title: labels.createSwal.createErr,
@@ -550,7 +552,7 @@ export class CreateContract extends React.Component<IProps> {
                   value={this.stringField.get('contractAddress') || ''}
                   required={true}
                   onChange={this.handleChangeContractAddress}
-                  onBlur={this.getAbi}
+                  // onBlur={this.getAbi}
                 />
               </div>
               <Button variant="contained" color="primary" className={classes.button} type="submit">
