@@ -102,11 +102,13 @@ const styles = createStyles({
     boxShadow: 'none',
     ...materialButton,
     '& .btn-img': {
-      marginRight: 10,
-      width: 20,
-      height: 20,
+      marginRight: 8,
+      width: 16,
+      height: 16,
       backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover'
+      backgroundSize: 'cover',
+      position: 'relative',
+      top: '-2px'
     },
     '&:hover': {
       background: '#fff',
@@ -126,7 +128,7 @@ const styles = createStyles({
   },
   updateNodeButton: {
     bottom: 10,
-    right: 200,
+    right: 153,
     '& .btn-img': {
       backgroundImage: `url(${Update}) `
     },
@@ -138,7 +140,7 @@ const styles = createStyles({
   },
   resetButton: {
     bottom: 10,
-    right: 10,
+    right: 20,
     '& .btn-img': {
       backgroundImage: `url(${Reset}) `
     },
