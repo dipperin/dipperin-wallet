@@ -26,26 +26,45 @@ export class DialogConfirm extends React.Component<Props> {
   // value: string = ''
 
   // @action
-  // handleChangePassword = (e: React.ChangeEvent<{ value: string }>) => {
+  // handleChangePassword = (e: React.ChangeEvent<{ value: string }>) => {0x01419eb10513cfa9a2bf371df4f57b3edd8646dbe17b862ab1aeb429e0db1fc8
   //   this.value = e.target.value
   // }
 
-  copyAddress = (e: React.MouseEvent<HTMLButtonElement>): void => {
+  priInstance: HTMLTextAreaElement
+
+  copyAddress = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    const input = document.createElement('input')
-    document.body.appendChild(input)
-    input.setAttribute('value', this.props.prk)
-    input.select()
-    if (document.execCommand('copy')) {
-      document.execCommand('copy')
-      swal.fire({
-        showCloseButton: false,
-        type: 'success',
-        timer: 1500,
-        title: this.props.swal
-      })
+    if (this.priInstance) {
+      this.priInstance.select()
+      if (document.execCommand('copy')) {
+        document.execCommand('copy')
+        await swal.fire({
+          showCloseButton: false,
+          type: 'success',
+          timer: 1500,
+          title: this.props.swal
+        })
+      }
     }
-    document.body.removeChild(input)
+
+    // const input = document.createElement('input')
+    // document.body.appendChild(input)
+    // input.setAttribute('value', this.props.prk)
+    // // input.setAttribute('id', 'private')
+    // // input.setAttribute('style', 'width:0;height:0;outline:none;border:none;position:absolute')
+    // input.select()
+    // const response = document.execCommand('copy')
+    // console.log('response result', response)
+    // if (document.execCommand('copy')) {
+    //   document.execCommand('copy')
+    //   await swal.fire({
+    //     showCloseButton: false,
+    //     type: 'success',
+    //     timer: 1500,
+    //     title: this.props.swal
+    //   })
+    // }
+    // document.body.removeChild(input)
   }
 
   // handleConfirm = e => {
@@ -53,9 +72,13 @@ export class DialogConfirm extends React.Component<Props> {
   //   this.props.onConfirm(this.value)
   // }
 
+  handleTextareaRef = (instance: HTMLTextAreaElement) => {
+    this.priInstance = instance
+  }
+
   render() {
     const { classes, onClose, title, label, btnText, note, prk } = this.props
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <Dialog open={true} onClose={onClose} aria-labelledby="form-dialog-title">
         <form onSubmit={onClose} className={classes.form}>
@@ -64,17 +87,19 @@ export class DialogConfirm extends React.Component<Props> {
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
             <p>
-              <Button onClick={this.copyAddress} className={classes.label}>
+              <span onClick={this.copyAddress} className={classes.label}>
                 {label}
-              </Button>
+              </span>
             </p>
             <textarea
               className={classes.private}
               value={prk}
-              // tslint:disable-next-line:jsx-no-lambda
-              onChange={() => {
-                return
-              }}
+              readOnly={true}
+              ref={this.handleTextareaRef}
+              // // tslint:disable-next-line:jsx-no-lambda
+              // onChange={() => {
+              //   return
+              // }}
             />
             {note && <p className={classes.note}>{note}</p>}
           </DialogContent>
