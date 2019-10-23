@@ -134,6 +134,16 @@ export class CreateContract extends React.Component<IProps> {
     }
   }
 
+  validateAbi = (rawAbi: string) => {
+    try {
+      // TODO: validate the inner Content of file
+      JSON.parse(helper.Bytes.toString(rawAbi))
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   handleChangeAbi = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       // console.log(e.target.files[0].name.split('.').reverse())
@@ -149,7 +159,16 @@ export class CreateContract extends React.Component<IProps> {
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
         const abi = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
-        this.setStringField('abi', abi)
+        if (this.validateAbi(abi)) {
+          this.setStringField('abi', abi)
+        } else {
+          this.inputABI!.value = ''
+          this.setStringField('inputABIPlaceholder', '')
+          swal.fire({
+            type: 'error',
+            title: this.props.labels.errorAbiFile
+          })
+        }
       }
     }
   }
