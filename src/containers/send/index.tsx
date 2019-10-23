@@ -317,6 +317,12 @@ export class Send extends React.Component<IProps> {
     }
   }
 
+  handleAmountKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.keyCode === 13) {
+      e.preventDefault()
+    }
+  }
+
   render() {
     const { labels, classes } = this.props
     return (
@@ -328,7 +334,13 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.amount}</InputLabel>
-            <Input type="number" value={this.amount} onChange={this.amountChange} onBlur={this.handleGetEstimateGas} />
+            <Input
+              type="number"
+              onKeyDown={this.handleAmountKeyUp}
+              value={this.amount}
+              onChange={this.amountChange}
+              onBlur={this.handleGetEstimateGas}
+            />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.note}</InputLabel>
