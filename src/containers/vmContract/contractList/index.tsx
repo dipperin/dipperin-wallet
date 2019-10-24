@@ -1,4 +1,4 @@
-import { observable, action, reaction, runInAction, computed } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -43,14 +43,6 @@ export class VmContractList extends React.Component<Props> {
   constructor(props) {
     super(props)
     this.redirect()
-    reaction(
-      () => this.props.wallet!.activeAccountId,
-      () => {
-        if (window.location.pathname.split('/')[2] === 'vm_contract') {
-          this.redirect()
-        }
-      }
-    )
   }
 
   // componentDidUpdate = (preProps, preState) => {
@@ -60,33 +52,46 @@ export class VmContractList extends React.Component<Props> {
   // }
 
   redirect = () => {
-    const { match } = this.props
+    // const { match } = this.props
 
-    const { contracts } = this.props.vmContract!
-    const haveContract = contracts && contracts.length > 0
-    if (haveContract) {
-      const firstContract = contracts[0].contractAddress
-      this.props.history.push(`${match.url}/call/${firstContract}`)
-      runInAction(() => {
-        this.currentContract = firstContract
-      })
-    } else {
-      this.props.history.push(`${match.url}/create`)
+    // const { contracts } = this.props.vmContract!
+    // const haveContract = contracts && contracts.length > 0
+    // if (haveContract) {
+    //   const firstContract = contracts[0].contractAddress
+    //   this.props.history.push(`${match.url}/call/${firstContract}`)
+    //   runInAction(() => {
+    //     this.currentContract = firstContract
+    //   })
+    // } else {
+    //   this.props.history.push(`${match.url}/create`)
+    // }
+
+    if (this.props.vmContract!.contracts.length > 0 && this.props.vmContract!.path.split(':')[1] === '') {
+      const contract = this.props.vmContract!.contracts[0].contractAddress
+      this.jumpToCall(contract)
     }
   }
 
   @action
   jumpToCall = (contractAddress: string) => {
-    const { match, history } = this.props
+    // const { match, history } = this.props
+    // this.currentContract = contractAddress
+    // history.push(`${match.url}/call/${contractAddress}`)
+
     this.currentContract = contractAddress
-    history.push(`${match.url}/call/${contractAddress}`)
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
   }
 
   @action
   jumpToCreate = () => {
-    const { match, history } = this.props
-    history.push(`${match.url}/create`)
+    // const { match, history } = this.props
+    // history.push(`${match.url}/create`)
+    // this.currentContract = ''
+
     this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, '')
   }
 
   @action

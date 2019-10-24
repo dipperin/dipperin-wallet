@@ -23,9 +23,10 @@ import { I18nCollectionContract } from '@/i18n/i18n'
 import { helper } from '@dipperin/dipperin.js'
 import styles from './styles'
 
-interface WrapProps extends RouteComponentProps<{ address: string }> {
+interface WrapProps extends RouteComponentProps {
   vmContract: VmContractStore
   wallet: WalletStore
+  // address: string
 }
 
 interface IProps extends WithStyles<typeof styles>, WrapProps {
@@ -55,19 +56,16 @@ export class Call extends React.Component<IProps> {
 
   constructor(props) {
     super(props)
-    const {
-      match: {
-        params: { address }
-      },
-      vmContract
-    } = this.props
+    const { vmContract } = this.props
+    const address = this.props.vmContract.path.split(':')[1]
     const callContract = vmContract.contract.get(address)
     if (callContract) {
       this.abiChange(callContract.contractAbi)
     }
     reaction(
-      () => this.props.match.params.address,
-      (ad: string) => {
+      () => this.props.vmContract.path,
+      (path: string) => {
+        const ad = path.split(':')[1]
         const callContract1 = vmContract.contract.get(ad)
         if (callContract1) {
           this.abiChange(callContract1.contractAbi)
@@ -116,12 +114,8 @@ export class Call extends React.Component<IProps> {
     this.name = funcName
     this.params = params
     if (constant) {
-      const {
-        match: {
-          params: { address }
-        },
-        vmContract
-      } = this.props
+      const { vmContract } = this.props
+      const address = this.props.vmContract.path.split(':')[1]
       if (this.abi.find(abi => abi.name === this.name)!.constant === 'true') {
         // TODO: change following two func into one in vmContract Store
         const callContract = vmContract.contract.get(address)!
@@ -141,13 +135,8 @@ export class Call extends React.Component<IProps> {
   }
 
   dialogConfirm = async (password: string): Promise<CallRes | void> => {
-    const {
-      match: {
-        params: { address }
-      },
-      labels,
-      vmContract
-    } = this.props
+    const { labels, vmContract } = this.props
+    const address = this.props.vmContract.path.split(':')[1]
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
       const callContract = vmContract.contract.get(address)!
@@ -201,14 +190,8 @@ export class Call extends React.Component<IProps> {
   }
 
   render() {
-    const {
-      vmContract,
-      classes,
-      labels,
-      match: {
-        params: { address }
-      }
-    } = this.props
+    const { vmContract, classes, labels } = this.props
+    const address = this.props.vmContract.path.split(':')[1]
     const callContract = vmContract.contract.get(address)
     if (!callContract) {
       // return null
