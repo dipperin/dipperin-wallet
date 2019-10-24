@@ -40,12 +40,12 @@ describe('contractList', () => {
     expect(component.exists()).toBe(true)
   })
 
-  it('redirect', () => {
-    const mockHistoryPush = jest.fn()
-    mockRouterProps.history.push = mockHistoryPush
-    instance.redirect()
-    expect(mockHistoryPush).toHaveBeenCalled()
-  })
+  // it('redirect', () => {
+  //   const mockHistoryPush = jest.fn()
+  //   mockRouterProps.history.push = mockHistoryPush
+  //   instance.redirect()
+  //   expect(mockHistoryPush).toHaveBeenCalled()
+  // })
 
   it('jumpToCall', () => {
     const mockHistoryPush = jest.fn()

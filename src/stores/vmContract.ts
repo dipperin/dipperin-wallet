@@ -44,6 +44,13 @@ class VmContractStore {
   @observable
   private _receipts: Map<string, Receipt[]> = new Map()
 
+  /**
+   * @example
+   * '0x00000...001:create'
+   */
+  @observable
+  private _path: string = ':'
+
   constructor(store: RootStore) {
     this._store = store
     this._dipperin = new Dipperin(HTTPHOST)
@@ -457,6 +464,28 @@ class VmContractStore {
     return contractObj.map(item => {
       return VmContractModel.fromObj(item)
     })
+  }
+
+  @computed
+  get path() {
+    return this._path
+  }
+
+  @computed
+  get currentActiveAccount() {
+    return this._store.account.activeAccount.address
+  }
+
+  @action
+  setPath = (address: string, dist: string): boolean => {
+    if (!address.includes(':') && !dist.includes(':')) {
+      // TODO: validate address and dist
+      this._path = `${address}:${dist}`
+      console.log(this._path)
+      return true
+    } else {
+      return false
+    }
   }
 }
 
