@@ -404,6 +404,20 @@ class VmContractStore {
           .getContractByHash(contract.txHash)
           .then(res => {
             if (!res) {
+              // if the contract does not exist while the tx is on chain, we can set fail
+              this._store.dipperin.dr.getTransaction(contract.txHash).then(txRes => {
+                if (txRes === contract.txHash) {
+                  contract.setFail()
+                  // update contract in db
+                  updateVmContractStatus(
+                    contract.txHash,
+                    TRANSACTION_STATUS_FAIL,
+                    contract.contractAddress,
+                    getCurrentNet()
+                  )
+                }
+              })
+
               if (contract.isOverTime(getNowTimestamp())) {
                 contract.setFail()
                 // ? why fail tx has contractAddress
@@ -481,7 +495,8 @@ class VmContractStore {
     if (!address.includes(':') && !dist.includes(':')) {
       // TODO: validate address and dist
       this._path = `${address}:${dist}`
-      console.log(this._path)
+      // a useful log
+      // console.log(this._path)
       return true
     } else {
       return false
