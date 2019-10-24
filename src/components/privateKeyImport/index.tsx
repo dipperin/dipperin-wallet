@@ -5,6 +5,7 @@ import React from 'react'
 import { Button, Dialog, DialogContent, DialogTitle } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import swal from 'sweetalert2'
+import { I18nCollectionAccount } from '@/i18n/i18n'
 
 import styles from './styles'
 
@@ -13,10 +14,13 @@ interface Props extends WithStyles<typeof styles> {
   onConfirm: (password?: string) => void
   title: string
   label: string
-  btnText: string
+  btnText?: string
   cancelText?: string
   // prk: string
-  swal: string
+  swal?: string
+  err?: string
+  tips: I18nCollectionAccount['accounts']
+
   note?: string
   type?: string
 }
@@ -33,13 +37,24 @@ export class DialogConfirm extends React.Component<Props> {
 
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
-    await this.props.onConfirm(this.value)
-    swal.fire({
-      showCloseButton: false,
-      type: 'success',
-      timer: 1500,
-      title: this.props.swal
-    })
+    try {
+      await this.props.onConfirm(this.value)
+      swal.fire({
+        showCloseButton: false,
+        type: 'success',
+        timer: 1500,
+        title: this.props.tips.importSuccessTitle
+      })
+    } catch (e) {
+      console.log(e)
+      swal.fire({
+        showCloseButton: true,
+        type: 'error',
+        timer: 1500,
+        text: this.props.tips.importError,
+        title: this.props.tips.importErrorTitle
+      })
+    }
   }
 
   render() {
