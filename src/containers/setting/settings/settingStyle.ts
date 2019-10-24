@@ -304,7 +304,7 @@ const styles = createStyles({
     top: 6
   },
   tip: {
-    width: '100%',
+    width: '480px',
     height: '16px',
     color: '#838899',
     background: 'rgba(230,230,230,1)',
