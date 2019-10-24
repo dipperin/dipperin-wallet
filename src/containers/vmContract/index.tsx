@@ -35,11 +35,7 @@ export class VmContractHome extends React.Component<RouteComponentProps & Props 
       () => this.props.wallet!.activeAccountId,
       () => {
         if (this.props.vmContract.path.split(':')[0] !== this.props.account.activeAccount.address) {
-          let dist = ''
-          if (this.props.vmContract.contracts.length > 0) {
-            dist = this.props.vmContract.contracts[0].contractAddress
-          }
-          this.props.vmContract.setPath(this.props.account.activeAccount.address, dist)
+          this.props.vmContract.setPath(this.props.account.activeAccount.address, '')
         }
       }
     )
