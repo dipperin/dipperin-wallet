@@ -67,7 +67,9 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
       )
 
       dipperin.on('error', err => {
-        handleError(err, 'An error occured while running Dipperin.')
+        log.info('dipperin error', err)
+        // comment the following code to avoid user quit mainWindow unexportedly
+        // handleError(err, 'An error occured while running Dipperin.')
       })
 
       dipperin.on('close', exitCode => {
@@ -76,7 +78,11 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
         if (!exitCode) {
           return
         } else {
-          handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          // comment the following code to avoid user quit mainWindow unexportedly
+          // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+
+          
+          // The following line is history code
           // mainWindow.close()
         }
       })
