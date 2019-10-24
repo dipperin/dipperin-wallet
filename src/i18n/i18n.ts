@@ -245,7 +245,12 @@ export const zhCN = {
       currentAccount: CurrentAccountCN,
       privateKeyImport: '私钥导入',
       label: '请输入您的秘钥',
-      title: '秘钥导入'
+      title: '秘钥导入',
+      confirm: '确认',
+      cancel: '取消',
+      importSuccessTitle: '导入成功',
+      importErrorTitle: '导入失败',
+      importError: '请输入正确私钥'
     },
     account: {
       transfer: '转账',
@@ -550,13 +555,13 @@ export const enUS: I18nCollection = {
           developer: 'Developer',
           version: 'Version',
           copyright: 'Copyright',
-          function: '版本功能'
+          function: 'Features'
         },
         value: {
-          developer: '开发商',
-          version: '版本',
-          copyright: '版权所属',
-          function: '版本功能'
+          developer: 'Developer',
+          version: 'version',
+          copyright: 'Copyright',
+          function: 'Features'
         }
       },
       btn: {
@@ -703,7 +708,12 @@ export const enUS: I18nCollection = {
       currentAccount: CurrentAccountUS,
       privateKeyImport: 'Private Key Import',
       label: 'Paste your private key string here',
-      title: 'Enter Private Key'
+      title: 'Enter Private Key',
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      importSuccessTitle: 'Import Success',
+      importErrorTitle: 'Import Failure',
+      importError: 'Please enter correct private key!'
     },
     account: {
       transfer: 'Transfer',

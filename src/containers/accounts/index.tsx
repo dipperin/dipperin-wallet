@@ -111,15 +111,17 @@ export class Accounts extends React.Component<Props> {
       this.props.account!.addAccount()
     } catch (err) {
       this.props.history.push('/login')
+      // throw err
     }
     // await this.props.account!.showDbAccounts()
   }
 
   importPrivateKey = async (privateKey: string) => {
     try {
-      this.props.account!.importPrivateKey(privateKey)
+      await this.props.account!.importPrivateKey(privateKey)
     } catch (err) {
-      this.props.history.push('/login')
+      throw err
+      // this.props.history.push('/login')
     }
     // await this.props.account!.showDbAccounts()
   }
@@ -299,8 +301,7 @@ export class Accounts extends React.Component<Props> {
             onConfirm={this.importPrivateKey}
             title={labels.title}
             label={labels.label}
-            btnText={'Confirm'}
-            swal={'success'}
+            tips={this.props.labels}
           />
         )}
       </div>

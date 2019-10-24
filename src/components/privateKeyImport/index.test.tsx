@@ -1,7 +1,7 @@
 import { shallow, ShallowWrapper } from 'enzyme'
 import React from 'react'
 
-// import i18n from '@/i18n/i18n'
+import i18n from '@/i18n/i18n'
 // import mockRootBuilder from '@/tests/mocks/store'
 // import getMockRouterProps from '@/tests/mocks/router'
 import { mockStyleClasses } from '@/tests/utils'
@@ -51,7 +51,8 @@ describe('dialogConfirm', () => {
     prk: 'key',
     swal: '111',
     onClose: jest.fn(),
-    onConfirm: jest.fn()
+    onConfirm: jest.fn(),
+    tips: i18n['zh-CN'].account.accounts
   }
 
   let component: ShallowWrapper
