@@ -1,4 +1,4 @@
-import { observable, action, computed, reaction } from 'mobx'
+import { action, computed, reaction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -37,8 +37,13 @@ interface Props extends WithStyles<typeof styles>, WrapProps {
 @inject('vmContract', 'wallet')
 @observer
 export class VmContractList extends React.Component<Props> {
-  @observable
-  currentContract: string = ''
+  // @observable
+  // currentContract: string = ''
+
+  @computed
+  get currentContract() {
+    return this.props.vmContract!.path.split(':')[1]
+  }
 
   constructor(props) {
     super(props)
@@ -49,6 +54,10 @@ export class VmContractList extends React.Component<Props> {
         this.redirect()
       }
     )
+    const path = this.props.vmContract!.path
+    if (path.split(':')[1].length > 0) {
+      // this.currentContract = path.split(':')[1]
+    }
   }
 
   redirect = () => {
@@ -64,7 +73,7 @@ export class VmContractList extends React.Component<Props> {
     // this.currentContract = contractAddress
     // history.push(`${match.url}/call/${contractAddress}`)
 
-    this.currentContract = contractAddress
+    // this.currentContract = contractAddress
     const account = this.props.vmContract!.currentActiveAccount
     this.props.vmContract!.setPath(account, contractAddress)
   }
@@ -75,7 +84,7 @@ export class VmContractList extends React.Component<Props> {
     // history.push(`${match.url}/create`)
     // this.currentContract = ''
 
-    this.currentContract = ''
+    // this.currentContract = ''
     const account = this.props.vmContract!.currentActiveAccount
     this.props.vmContract!.setPath(account, '')
   }
@@ -84,7 +93,9 @@ export class VmContractList extends React.Component<Props> {
   jumpToDetail = (contractAddress: string) => {
     const { match, history } = this.props
     history.push(`${match.url}/receipts/${contractAddress}`)
-    this.currentContract = ''
+    // this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
   }
 
   @computed
