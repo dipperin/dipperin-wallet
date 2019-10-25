@@ -27,7 +27,9 @@ export const zhCN = {
         resetConfirm: '确定',
         warnText:
           '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
-        warn: '警告'
+        warn: '警告',
+        backupMnemonic:
+          '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。'
       }
     },
     import: {
@@ -44,9 +46,9 @@ export const zhCN = {
         success: '导入成功!',
         mnemonicLength: '请提供至少12位助记词',
         invalidMnemonic: '助记词不合法',
-        passwordLength: '密码长度至少8位',
+        passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
-        diffPassword: '两次密码不一致！',
+        diffPassword: '两次密码不一致',
         confirm: '确认'
       },
       tour: {
@@ -57,7 +59,7 @@ export const zhCN = {
       medium: '中',
       strong: '强',
       note:
-        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
+        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。'
     },
     sidebar: {
       wallet: '钱包',
@@ -86,7 +88,9 @@ export const zhCN = {
         remoteMecury: '水星',
         remoteVenus: '金星',
         closeRemote: '断开远程节点',
-        connectRemote: '连接远程节点'
+        connectRemote: '连接远程节点',
+        localHint: '连接本地节点需要同步区块，需要等待同步至最新高度才能发送交易',
+        remoteHint: '远程连接需信任节点，无需同步区块'
       },
       about: {
         title: '关于钱包',
@@ -153,14 +157,14 @@ export const zhCN = {
       return: '返回',
       title: '备份助记词',
       hint:
-        '我们强烈建议您将助记词记录在纸上，放置在一个安全的地方。任何人得到这些助记词都可以进入您的钱包使用您的资产！',
+        '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。',
       bottomHint: '请记下您的助记词。千万不要截屏！',
       confirm: '确定'
     },
     backupConfirm: {
       return: '返回',
       title: '确认助记词',
-      hint: '请按顺序选择助记词',
+      hint: '请按顺序依次选择助记词，确保助记词与您保存的一致。',
       confirm: '确定',
       dialogText: '您的助记词将从本机删除！',
       cancel: '取消',
@@ -275,8 +279,8 @@ export const zhCN = {
   contract: {
     contract: {
       selectFile: '请选择一个文件',
-      errorAbiFile: '这不是一个ABI文件',
-      errorWasmFile: '这不是一个WASM文件',
+      errorAbiFile: 'ABI文件格式错误',
+      errorWasmFile: '代码文件格式错误',
       add: '添加',
       call: '调用',
       favoriteContract: '收藏合约',
@@ -367,9 +371,11 @@ export const zhCN = {
         tryAgain: '请重新提交!',
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
-        insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
-        confirm: '确定'
+        insufficientFunds: '账户余额不足!',
+        invalidAddress: '地址格式不正确!',
+        confirm: '确定',
+        extraDataTooLong: '备注内容过多，请优化备注内容',
+        networkError: '当前网络不可用，请检查网络'
       }
     },
     approve: {
@@ -488,7 +494,9 @@ export const enUS: I18nCollection = {
         resetConfirm: 'Confirm',
         warnText:
           'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
-        warn: 'Warning'
+        warn: 'Warning',
+        backupMnemonic:
+          'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.'
       }
     },
     import: {
@@ -505,9 +513,9 @@ export const enUS: I18nCollection = {
         success: 'Success!',
         mnemonicLength: 'You should provide 12 words of mnemonics',
         invalidMnemonic: 'Invalid mnemonics',
-        passwordLength: 'Please fill in a password greater than or equal to 8 digits in length',
+        passwordLength: 'Password must be 8~24 characters in length',
         invalidPassword: 'Invalid password',
-        diffPassword: 'The first password is not equal to the second password!',
+        diffPassword: `Passwords don't match`,
         confirm: 'Ok'
       },
       tour: {
@@ -547,7 +555,11 @@ export const enUS: I18nCollection = {
         remoteTest: 'test',
         remoteMecury: 'mecury',
         closeRemote: 'disconnect remote node',
-        connectRemote: 'connect remote node'
+        connectRemote: 'connect remote node',
+        localHint:
+          'Running a client connecting to a local node, need to download the blockchain to your local machine. To send a transaction, please weit until the node is fully synced',
+        remoteHint:
+          "Running a client connecting to a remote node, don't need to download the blockchain to your local machine, but need to trust the remote node."
       },
       about: {
         title: 'About Wallet',
@@ -616,14 +628,14 @@ export const enUS: I18nCollection = {
       return: 'Return',
       title: 'Backup mnemonic',
       hint:
-        'We highly recommend you write down the mnemonic words on paper and keep it in a safe place. Anyone who gets it can access and spend your assets.',
+        'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.',
       bottomHint: 'Remember your mnemonic. DO NOT SCREENSHOT!',
       confirm: 'Confirm'
     },
     backupConfirm: {
       return: 'Return',
       title: 'Confirm mnemonic',
-      hint: 'Please select mnemonic words in correct order.',
+      hint: 'Please select Mnemonic Phrase in correct order.',
       confirm: 'Confirm',
       dialogText: 'Your mnemonic words will be removed from this device!',
       cancel: 'Cancel',
@@ -738,8 +750,8 @@ export const enUS: I18nCollection = {
   contract: {
     contract: {
       selectFile: 'Please select a file',
-      errorAbiFile: 'Error ABI File',
-      errorWasmFile: 'Error WASM File',
+      errorAbiFile: 'Incorrect ABI file format',
+      errorWasmFile: 'Incorrect wasm file format',
       add: 'Add',
       call: 'Call',
       favoriteContract: 'favorite contract',
@@ -830,8 +842,10 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
-        confirm: 'OK'
+        invalidAddress: 'Recipient address is invalid!',
+        confirm: 'OK',
+        extraDataTooLong: 'The entered text is too long, please optimize your content',
+        networkError: 'Current network is unreachable, please check your network connection'
       }
     },
     approve: {

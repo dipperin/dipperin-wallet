@@ -331,7 +331,7 @@ const styles = createStyles({
     float: 'right',
     fontWeight: 'bold',
     fontSize: '16px',
-    height: '16px',
+    // height: '16px',
     color: 'rgba(10,10,10,1)',
     '&:hover': {
       cursor: 'pointer'
