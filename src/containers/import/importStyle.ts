@@ -54,7 +54,8 @@ const styles = createStyles({
   },
   mnemonicInput: {
     width: 320,
-    height: 80
+    height: 70,
+    padding: '8px 13px'
   },
   pswInput: {
     width: 320,
@@ -120,10 +121,13 @@ const styles = createStyles({
   },
   inputLabel: {
     marginTop: 10,
-    marginBottom: 3,
+    marginBottom: 5,
     color: '#BABBBE',
     fontSize: 12,
-    lineHeight: '12px'
+    height: 14,
+    lineHeight: '14px',
+    display: 'flex',
+    alignItems: 'center'
   },
   item: {
     marginBottom: 10,
@@ -148,12 +152,13 @@ const styles = createStyles({
   button: {
     display: 'block',
     position: 'absolute',
-    bottom: 99,
+    bottom: 120,
     width: 320,
     height: '36px',
     textTransform: 'none',
     fontSize: '16px',
     ...materialButton,
+    background: '#528DD0',
     '& span': {
       fontWeight: 'bold'
     }
@@ -171,6 +176,7 @@ const styles = createStyles({
     height: 46,
     padding: 0,
     borderRadius: '0px 0px 6px 6px',
+    background: '#528DD0',
     color: '#fff',
     '& p': {
       fontWeight: 'bold'
@@ -221,6 +227,15 @@ const styles = createStyles({
     '&:nth-of-type(2)': {
       marginBottom: '45px'
     }
+  },
+  note: {
+    width: '320px',
+    position: 'absolute',
+    bottom: '60px',
+    fontSize: '10px',
+    fontWeight: 400,
+    color: 'rgba(131,136,153,1)',
+    lineHeight: '16px'
   },
   globalWrap: {
     position: 'absolute',

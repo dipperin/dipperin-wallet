@@ -3,7 +3,7 @@ import i18next from 'i18next'
 import classNames from 'classnames'
 import { observable, reaction, action, runInAction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
-import React from 'react'
+import React, { Fragment } from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import Tour from 'reactour'
@@ -19,6 +19,8 @@ import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import Add from '../../images/add-icon.png'
 import Curtain from '@/images/curtain.png'
+import CorrectIcon from '@/images/correct.png'
+import ErrorIcon from '@/images/error.png'
 // import En from '@/images/en.png'
 // import Cn from '@/images/cn.png'
 import styles from './importStyle'
@@ -131,6 +133,21 @@ export class Import extends React.Component<IImportProps> {
     }
   }
 
+  @computed
+  get validateMnemonic(): boolean {
+    return BIP39.validateMnemonic(this.mnemonic)
+  }
+
+  @computed
+  get validatePassword(): boolean {
+    return this.password !== '' && this.password.length >= 8 && isValidPassword(this.password)
+  }
+
+  @computed
+  get validateRptPassword(): boolean {
+    return this.password === this.repeatPassword
+  }
+
   verifyInputs = (
     mnemonic: string,
     password: string,
@@ -222,7 +239,7 @@ export class Import extends React.Component<IImportProps> {
 
   render() {
     const { labels, classes } = this.props
-    const disable = !this.mnemonic || !this.password || !this.repeatPassword || this.password !== this.repeatPassword
+    // const disable = !this.mnemonic || !this.password || !this.repeatPassword || this.password !== this.repeatPassword
     const isChinese = this.props.language === 'zh-CN'
     const steps = [
       {
@@ -255,7 +272,12 @@ export class Import extends React.Component<IImportProps> {
           <p className={classes.title}>{labels.title}</p>
           <div data-tour={'first'}>
             <FormControl fullWidth={true} className={classes.item}>
-              <label className={classes.inputLabel}>{labels.mnemonic}</label>
+              <label className={classes.inputLabel}>
+                <span>{labels.mnemonic}</span>
+                {this.mnemonic && (
+                  <Tip type={this.validateMnemonic} msg={!this.validateMnemonic ? labels.swal.invalidMnemonic : ''} />
+                )}
+              </label>
               <textarea
                 className={classNames([classes.textInput, classes.mnemonicInput])}
                 value={this.mnemonic}
@@ -263,14 +285,18 @@ export class Import extends React.Component<IImportProps> {
               />
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
-              <label className={classes.inputLabel}>{labels.setPassword}</label>
+              <label className={classes.inputLabel}>
+                <span>{labels.setPassword}</span>
+                {this.password && (
+                  <Tip type={this.validatePassword} msg={!this.validatePassword ? labels.swal.invalidPassword : ''} />
+                )}
+              </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
                 type="password"
                 value={this.password}
                 onChange={this.passwordInput}
               />
-              {/* <div style={{ position: 'absolute', right: 0, bottom: 0 }}>{this.passwordStrength}</div> */}
             </FormControl>
             {this.password && (
               <div className={classes.pswStr}>
@@ -292,7 +318,15 @@ export class Import extends React.Component<IImportProps> {
             )}
 
             <FormControl fullWidth={true} className={classes.item}>
-              <label className={classes.inputLabel}>{labels.repeatPassword}</label>
+              <label className={classes.inputLabel}>
+                <span>{labels.repeatPassword}</span>
+                {this.repeatPassword && (
+                  <Tip
+                    type={this.validateRptPassword}
+                    msg={!this.validateRptPassword ? labels.swal.diffPassword : ''}
+                  />
+                )}
+              </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
                 type="password"
@@ -300,20 +334,18 @@ export class Import extends React.Component<IImportProps> {
                 onChange={this.repeatPasswordInput}
               />
             </FormControl>
-            <Button disabled={disable} variant="contained" color="primary" className={classes.button} type="submit">
+            <Button variant="contained" color="primary" className={classes.button} type="submit">
               {labels.recovery}
             </Button>
+            <div className={classes.note}>{labels.note}</div>
           </div>
           <div className={classes.create} data-tour={'second'}>
             <Button className={classes.addBtn} variant="contained" color="primary" onClick={this.ToCreate}>
-              {/* <img src={Add} alt="" data-tour={'second'} /> */}
               <p className={classNames({ ['cn']: isChinese })}>
                 <span className={classes.addIcon}>+</span>
                 {labels.create}
               </p>
             </Button>
-
-            {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
           </div>
         </form>
         {false && (
@@ -322,7 +354,6 @@ export class Import extends React.Component<IImportProps> {
               <img src={Add} alt="" data-tour={'second'} />
             </Button>
             <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
-            {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
           </div>
         )}
         <Tour
@@ -353,4 +384,28 @@ export default withTranslation()(ImportWrap)
 
 const tourStyles = {
   borderRadius: '4px'
+}
+
+interface TipProps {
+  type: boolean
+  msg?: string
+}
+
+const Tip = (props: TipProps) => {
+  // console.log(`url(${props.type === 'correct' ? CorrectIcon : ErrorIcon})`)
+  return (
+    <Fragment>
+      <span
+        style={{
+          width: 14,
+          height: 14,
+          display: 'inline-block',
+          backgroundImage: `url(${props.type ? CorrectIcon : ErrorIcon})`,
+          marginLeft: '18px'
+          // transform: 'translateY(2px)'
+        }}
+      />
+      {props.msg && <span style={{ color: '#981733', marginLeft: '5px' }}>{props.msg}</span>}
+    </Fragment>
+  )
 }
