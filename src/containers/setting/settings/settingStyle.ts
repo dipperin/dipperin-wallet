@@ -305,7 +305,7 @@ const styles = createStyles({
   },
   tip: {
     width: '480px',
-    height: '16px',
+    // height: '16px',
     color: '#838899',
     background: 'rgba(230,230,230,1)',
     boxSizing: 'border-box',
@@ -331,7 +331,7 @@ const styles = createStyles({
     float: 'right',
     fontWeight: 'bold',
     fontSize: '16px',
-    // height: '16px',
+    height: '16px',
     color: 'rgba(10,10,10,1)',
     '&:hover': {
       cursor: 'pointer'
