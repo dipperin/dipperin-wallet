@@ -139,8 +139,14 @@ export class Import extends React.Component<IImportProps> {
   }
 
   @computed
-  get validatePassword(): boolean {
-    return this.password !== '' && this.password.length >= 8 && isValidPassword(this.password)
+  get validatePassword(): string {
+    if (!this.password || this.password.length < 8) {
+      return this.props.labels.swal.passwordLength
+    }
+    if (!isValidPassword(this.password)) {
+      return this.props.labels.swal.invalidPassword
+    }
+    return ''
   }
 
   @computed
@@ -287,9 +293,7 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.setPassword}</span>
-                {this.password && (
-                  <Tip type={this.validatePassword} msg={!this.validatePassword ? labels.swal.invalidPassword : ''} />
-                )}
+                {this.password && <Tip type={!this.validatePassword} msg={this.validatePassword} />}
               </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
