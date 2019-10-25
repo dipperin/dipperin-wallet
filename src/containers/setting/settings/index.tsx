@@ -428,7 +428,9 @@ export class Setting extends React.Component<Props> {
             {this.showTip && (
               <div className={classes.tip}>
                 <span className={classes.hornIcon} />
-                <span className={classes.tipContent}>连接本地节点需要同步区块，需要等待同步至最新才能发送交易</span>
+                <span className={classes.tipContent}>
+                  {isRemoteNode ? labels.net.remoteHint : labels.net.localHint}
+                </span>
                 <span className={classes.tipClose} onClick={this.handleCLoseTip}>
                   ×
                 </span>
