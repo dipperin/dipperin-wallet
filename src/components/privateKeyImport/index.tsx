@@ -20,7 +20,6 @@ interface Props extends WithStyles<typeof styles> {
   swal?: string
   err?: string
   tips: I18nCollectionAccount['accounts']
-
   note?: string
   type?: string
 }
@@ -58,7 +57,7 @@ export class DialogConfirm extends React.Component<Props> {
   }
 
   render() {
-    const { classes, onClose, title, label, btnText, note } = this.props
+    const { classes, onClose, title, label, note } = this.props
     return (
       <Dialog open={true} onClose={onClose} aria-labelledby="form-dialog-title">
         <form onSubmit={this.handleConfirm} className={classes.form}>
@@ -77,7 +76,7 @@ export class DialogConfirm extends React.Component<Props> {
             color="default"
             className={classes.button}
           >
-            {btnText}
+            {this.props.tips.cancel}
           </Button>
           <Button
             variant="contained"
@@ -85,7 +84,7 @@ export class DialogConfirm extends React.Component<Props> {
             className={classes.button}
             type="submit"
           >
-            {btnText}
+            {this.props.tips.confirm}
           </Button>
         </form>
       </Dialog>
