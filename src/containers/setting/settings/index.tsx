@@ -317,14 +317,20 @@ export class Setting extends React.Component<Props> {
   }
 
   handleGeneratePrivateKey = async (password: string) => {
-    this.handleCloseDialog()
     const res = await this.props.wallet!.checkPassword(password)
     let pri = ''
     if (res) {
+      this.handleCloseDialog()
       pri = this.props.account!.exportPrivateKey(password)
       this.setPrivateKay(pri)
       console.log(pri)
       this.handleShowPrivateKey()
+    } else {
+      swal.fire({
+        type: 'error',
+        title: this.props.labels.swal.incorrectPassword,
+        timer: 1000
+      })
     }
   }
 
