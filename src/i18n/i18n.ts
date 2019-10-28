@@ -132,7 +132,8 @@ export const zhCN = {
         warn: '警告',
         startUpdate: '开始更新?',
         documentTitle: 'Dipperin 钱包',
-        copySuccess: '复制成功'
+        copySuccess: '复制成功',
+        incorrectPassword: '密码错误'
       }
     }
   },
@@ -602,7 +603,8 @@ export const enUS: I18nCollection = {
         warn: 'Warning',
         startUpdate: 'Start update',
         documentTitle: 'Dipperin Wallet',
-        copySuccess: 'Copy Success'
+        copySuccess: 'Copy Success',
+        incorrectPassword: 'Incorrect password'
       }
     }
   },
