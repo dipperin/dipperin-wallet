@@ -361,7 +361,7 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
-            disabled={!this.address || !this.amount}
+            // disabled={!this.address || !this.amount}
             variant="contained"
             color="primary"
             className={classes.confirmButton}
