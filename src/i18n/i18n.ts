@@ -255,7 +255,8 @@ export const zhCN = {
       cancel: '取消',
       importSuccessTitle: '导入成功',
       importErrorTitle: '导入失败',
-      importError: '请输入正确私钥'
+      importError: '请输入正确私钥!',
+      addressReimportError: '导入账户已存在!'
     },
     account: {
       transfer: '转账',
@@ -727,7 +728,8 @@ export const enUS: I18nCollection = {
       cancel: 'Cancel',
       importSuccessTitle: 'Import Success',
       importErrorTitle: 'Import Failure',
-      importError: 'Please enter correct private key!'
+      importError: 'Please enter correct private key!',
+      addressReimportError: 'The account has already existed.'
     },
     account: {
       transfer: 'Transfer',

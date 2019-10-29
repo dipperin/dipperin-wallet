@@ -6,6 +6,7 @@ import { Accounts, EncryptResult, helper } from '@dipperin/dipperin.js'
 
 import { getAccount, insertAccount, removeAccount } from '@/db'
 import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH, TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
+import { TxResponseCode, TxResponseInfo } from '@/utils/errors'
 
 export default class AccountStore {
   private _store: RootStore
@@ -110,6 +111,9 @@ export default class AccountStore {
   importPrivateKey = async (privateKey: string) => {
     const newIndex = this.getSafeAccountIndex()
     const address = helper.Account.fromPrivate(privateKey)
+    if (this.accounts.filter(el => el.address === address).length > 0) {
+      throw new Error(TxResponseInfo[TxResponseCode.addressReimportError])
+    }
     // Add new account
     const newAccount = this.importAccount(newIndex, address, privateKey)
     // Save account
