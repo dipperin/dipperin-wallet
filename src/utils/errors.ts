@@ -19,11 +19,13 @@ export class NoEnoughBalanceError extends Error {
 }
 
 export enum TxResponseCode {
-  unknownError
+  unknownError,
+  addressReimportError
 }
 
 export const TxResponseInfo = {
-  [TxResponseCode.unknownError]: 'Something wrong!'
+  [TxResponseCode.unknownError]: 'Something wrong!',
+  [TxResponseCode.addressReimportError]: 'The address has already existed in wallet!'
 }
 
 interface TxResponse {

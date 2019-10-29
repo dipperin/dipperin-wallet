@@ -50,7 +50,7 @@ export class DialogConfirm extends React.Component<Props> {
         showCloseButton: true,
         type: 'error',
         timer: 1500,
-        text: this.props.tips.importError,
+        text: e.message,
         title: this.props.tips.importErrorTitle
       })
     }

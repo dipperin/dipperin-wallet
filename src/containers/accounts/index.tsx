@@ -15,6 +15,7 @@ import { I18nCollectionAccount } from '@/i18n/i18n'
 import SmallAccountList from './components/smallAccountList'
 import BigAccountList from './components/bigAccountList'
 import PrivateConfirm from '@/components/privateKeyImport'
+import { TxResponseCode, TxResponseInfo } from '@/utils/errors'
 
 import Close from '@/images/close.png'
 import Left from '@/images/left.png'
@@ -120,7 +121,12 @@ export class Accounts extends React.Component<Props> {
     try {
       await this.props.account!.importPrivateKey(privateKey)
     } catch (err) {
-      throw err
+      if (err.message === TxResponseInfo[TxResponseCode.addressReimportError]) {
+        throw new Error(this.props.labels.addressReimportError)
+      } else {
+        throw new Error(this.props.labels.importError)
+      }
+
       // this.props.history.push('/login')
     }
     // await this.props.account!.showDbAccounts()
