@@ -237,16 +237,6 @@ export default class AccountStore {
     }
   }
 
-  private async getAddressLockMoney(address: string): Promise<string> {
-    try {
-      const res = await this._store.dipperin.dr.getLockedMoney(address)
-      console.log('getAddressLockMoney', res)
-      return res || '0'
-    } catch (err) {
-      return ''
-    }
-  }
-
   /**
    * Get account nonce from the chain
    * @param address Account Address
