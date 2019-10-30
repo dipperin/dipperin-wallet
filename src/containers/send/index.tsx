@@ -140,6 +140,7 @@ export class Send extends React.Component<IProps> {
 
     if (bnUnit.lt(amountUnit, 10)) {
       throw new Error(label.swal.insufficientFunds)
+
     }
   }
 

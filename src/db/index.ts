@@ -20,6 +20,7 @@ import {
 
 import { TransactionInterface } from '../models/transaction'
 import { VmContractObj } from '@/models/vmContract'
+import { reject } from 'q'
 
 const getDB = (type: string): Nedb => {
   const { remote } = require('electron')
