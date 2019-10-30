@@ -104,12 +104,6 @@ export class VmContractList extends React.Component<Props> {
     return contracts.concat(pendingContracts).sort((a, b) => a.timestamp - b.timestamp)
   }
 
-  @computed
-  get contracts() {
-    const { contracts, pendingContracts } = this.props.vmContract!
-    return contracts.concat(pendingContracts).sort((a, b) => a.timestamp - b.timestamp)
-  }
-
   render() {
     const { vmContract, classes, labels } = this.props
     const { contracts, pendingContracts } = vmContract!

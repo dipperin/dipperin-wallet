@@ -235,34 +235,6 @@ export default class AccountStore {
   }
 
   /**
-   * verifys the nonce should be updated
-   * @param address
-   * @param nonce
-   */
-  verifyAccountNonce(address: string, nonce: string): boolean {
-    const txs = (this._store.transaction.transactionsMap.get(address) || []).filter(tx => tx.from === address).slice()
-    const nonceNumber = Number(nonce)
-    const now = new Date().valueOf()
-    // console.log('===============verifying==========', address, nonce)
-    if (txs) {
-      txs.sort((a, b) => Number(b.nonce) - Number(a.nonce))
-      for (const tx of txs) {
-        // console.log('verifyAccountNonce', tx.nonce)
-        if (!tx.isOverLongTime(now) && !(tx.isEnded && tx.status !== TRANSACTION_STATUS_SUCCESS)) {
-          if (Number(tx.nonce) >= nonceNumber) {
-            return false
-          } else {
-            return true
-          }
-        }
-      }
-      return true
-    } else {
-      return true
-    }
-  }
-
-  /**
    * Get account balance from the chain
    * @param address Account Address
    */
