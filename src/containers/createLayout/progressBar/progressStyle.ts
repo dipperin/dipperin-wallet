@@ -3,7 +3,7 @@ import { primaryColor, grayColor } from '@/styles/appStyle'
 
 const styles = createStyles({
   process: {
-    margin: '48px 0 58px',
+    margin: '48px 0 38px',
     textAlign: 'center'
   },
   step: {

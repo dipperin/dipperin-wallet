@@ -20,7 +20,6 @@ import {
 
 import { TransactionInterface } from '../models/transaction'
 import { VmContractObj } from '@/models/vmContract'
-import { reject } from 'q'
 
 const getDB = (type: string): Nedb => {
   const { remote } = require('electron')
@@ -296,7 +295,7 @@ export const insertReceipt = (receipt: ReceiptModel, address: string, net: strin
 
 export const getReceipt = async (net: string = DEFAULT_NET): Promise<ReceiptModel[]> => {
   const db = getDB(RECEIPT_DB)
-  const receipts = (await new Promise(resolve => {
+  const receipts = (await new Promise((resolve, reject) => {
     db.find({ net }, (err, res) => {
       if (err) {
         reject(err)

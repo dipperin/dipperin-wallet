@@ -54,4 +54,9 @@ describe('utils', () => {
       )
     ).toBe('1000')
   })
+
+  it('formatAmount', () => {
+    expect(utils.formatAmount('.3')).toBe('0.3')
+    expect(utils.formatAmount('')).toBe('')
+  })
 })

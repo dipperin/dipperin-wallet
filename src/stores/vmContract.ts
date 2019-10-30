@@ -3,7 +3,7 @@ import { isString } from 'lodash'
 
 import { insertVmContract, getVmContract, updateVmContractStatus, getReceipt, insertReceipt } from '@/db'
 import {
-  DEFAULT_CHAIN_ID,
+  // DEFAULT_CHAIN_ID,
   TRANSACTION_STATUS_FAIL,
   TRANSACTION_STATUS_SUCCESS,
   VM_CONTRACT_ADDRESS
@@ -43,6 +43,13 @@ class VmContractStore {
 
   @observable
   private _receipts: Map<string, Receipt[]> = new Map()
+
+  /**
+   * @example
+   * '0x00000...001:create'
+   */
+  @observable
+  private _path: string = ':'
 
   constructor(store: RootStore) {
     this._store = store
@@ -122,10 +129,11 @@ class VmContractStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       if (!isString(res)) {
         const errRes = res
@@ -153,10 +161,11 @@ class VmContractStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
@@ -236,7 +245,7 @@ class VmContractStore {
     }
   }
 
-  addContract(abi: string, address: string): TxResponse {
+  async addContract(abi: string, address: string): Promise<TxResponse> {
     const contract = new VmContractModel({
       contractAbi: abi,
       contractAddress: address,
@@ -249,14 +258,14 @@ class VmContractStore {
       this._contract.get(address)!.hasOwner(this._store.account.activeAccount.address)
     ) {
       return generateTxResponse(false, 'The Contract has already existed!')
-    } else if (this._contract.has(contract.contractAddress)) {
+    } else if (this._contract.has(address)) {
       this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
-      insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
+      await insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
     } else {
       runInAction(() => {
         this._contract.set(contract.contractAddress, contract)
       })
-      insertVmContract(contract.toJS(), getCurrentNet())
+      await insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
     // console.log('after addContract', this._contract.get(address))
@@ -311,6 +320,7 @@ class VmContractStore {
     try {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+        .transactionHash
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
       return generateTxResponse(true, res as string)
     } catch (err) {
@@ -394,6 +404,20 @@ class VmContractStore {
           .getContractByHash(contract.txHash)
           .then(res => {
             if (!res) {
+              // if the contract does not exist while the tx is on chain, we can set fail
+              this._store.dipperin.dr.getTransaction(contract.txHash).then(txRes => {
+                if (txRes === contract.txHash) {
+                  contract.setFail()
+                  // update contract in db
+                  updateVmContractStatus(
+                    contract.txHash,
+                    TRANSACTION_STATUS_FAIL,
+                    contract.contractAddress,
+                    getCurrentNet()
+                  )
+                }
+              })
+
               if (contract.isOverTime(getNowTimestamp())) {
                 contract.setFail()
                 // ? why fail tx has contractAddress
@@ -454,6 +478,29 @@ class VmContractStore {
     return contractObj.map(item => {
       return VmContractModel.fromObj(item)
     })
+  }
+
+  @computed
+  get path() {
+    return this._path
+  }
+
+  @computed
+  get currentActiveAccount() {
+    return this._store.account.activeAccount.address
+  }
+
+  @action
+  setPath = (address: string, dist: string): boolean => {
+    if (!address.includes(':') && !dist.includes(':')) {
+      // TODO: validate address and dist
+      this._path = `${address}:${dist}`
+      // a useful log
+      // console.log(this._path)
+      return true
+    } else {
+      return false
+    }
   }
 }
 

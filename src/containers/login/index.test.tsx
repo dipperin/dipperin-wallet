@@ -21,9 +21,9 @@ describe('login', () => {
     <Login root={root} wallet={mockWallet} labels={labels} {...mockRouterProps} classes={mockStyleClasses(styles)} />
   )
   const login = component.dive().instance() as Login
-  const clickEvent = {
-    preventDefault: () => null
-  }
+  // const clickEvent = {
+  //   preventDefault: () => null
+  // }
   const mockSet = jest.spyOn(settings, 'set')
   it('render', () => {
     expect(component.dive().exists()).toBe(true)
@@ -42,7 +42,7 @@ describe('login', () => {
   it('confirm unverified', () => {
     mockSwalFire.mockClear()
     login.password = ''
-    login.confirm(clickEvent)
+    login.confirm()
     expect(mockPush).not.toBeCalled()
     expect(mockSwalFire.mock.calls[0][0]).toEqual({
       type: 'error',
@@ -53,7 +53,7 @@ describe('login', () => {
   it('confirm unlock', async () => {
     mockSwalFire.mockClear()
     login.password = 'password'
-    await login.confirm(clickEvent)
+    await login.confirm()
     expect(mockPush).not.toBeCalled()
     expect(mockSwalFire.mock.calls[0][0]).toEqual({ type: 'error', title: labels.swal.incorrectPassword })
   })
@@ -62,7 +62,7 @@ describe('login', () => {
     mockSwalFire.mockClear()
     mockPush.mockClear()
     login.password = '12345678'
-    await login.confirm(clickEvent)
+    await login.confirm()
     expect(mockSwalFire.mock.calls[0][0]).toEqual({
       text: labels.swal.success,
       type: 'success',

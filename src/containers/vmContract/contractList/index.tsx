@@ -1,4 +1,4 @@
-import { observable, action, reaction, runInAction, computed } from 'mobx'
+import { action, computed, reaction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -37,8 +37,13 @@ interface Props extends WithStyles<typeof styles>, WrapProps {
 @inject('vmContract', 'wallet')
 @observer
 export class VmContractList extends React.Component<Props> {
-  @observable
-  currentContract: string = ''
+  // @observable
+  // currentContract: string = ''
+
+  @computed
+  get currentContract() {
+    return this.props.vmContract!.path.split(':')[1]
+  }
 
   constructor(props) {
     super(props)
@@ -46,54 +51,51 @@ export class VmContractList extends React.Component<Props> {
     reaction(
       () => this.props.wallet!.activeAccountId,
       () => {
-        if (window.location.pathname.split('/')[2] === 'vm_contract') {
-          this.redirect()
-        }
+        this.redirect()
       }
     )
+    const path = this.props.vmContract!.path
+    if (path.split(':')[1].length > 0) {
+      // this.currentContract = path.split(':')[1]
+    }
   }
 
-  // componentDidUpdate = (preProps, preState) => {
-  //   if (this.props.match.url === this.props.location.pathname) {
-  //     this.redirect()
-  //   }
-  // }
-
   redirect = () => {
-    const { match } = this.props
-
-    const { contracts } = this.props.vmContract!
-    const haveContract = contracts && contracts.length > 0
-    if (haveContract) {
-      const firstContract = contracts[0].contractAddress
-      this.props.history.push(`${match.url}/call/${firstContract}`)
-      runInAction(() => {
-        this.currentContract = firstContract
-      })
-    } else {
-      this.props.history.push(`${match.url}/create`)
+    if (this.props.vmContract!.contracts.length > 0 && this.props.vmContract!.path.split(':')[1] === '') {
+      const contract = this.props.vmContract!.contracts[0].contractAddress
+      this.jumpToCall(contract)
     }
   }
 
   @action
   jumpToCall = (contractAddress: string) => {
-    const { match, history } = this.props
-    this.currentContract = contractAddress
-    history.push(`${match.url}/call/${contractAddress}`)
+    // const { match, history } = this.props
+    // this.currentContract = contractAddress
+    // history.push(`${match.url}/call/${contractAddress}`)
+
+    // this.currentContract = contractAddress
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
   }
 
   @action
   jumpToCreate = () => {
-    const { match, history } = this.props
-    history.push(`${match.url}/create`)
-    this.currentContract = ''
+    // const { match, history } = this.props
+    // history.push(`${match.url}/create`)
+    // this.currentContract = ''
+
+    // this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, '')
   }
 
   @action
   jumpToDetail = (contractAddress: string) => {
     const { match, history } = this.props
     history.push(`${match.url}/receipts/${contractAddress}`)
-    this.currentContract = ''
+    // this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
   }
 
   @computed
