@@ -25,6 +25,7 @@
     "precommit": "lint-staged",
     "clean:dist": "rimraf dist",
     "clean:dev": "rimraf dev",
+    "clean": "rimraf dist && rimraf build",
     "dev": "node scripts/start.js",
     "electron": "IS_MAIN=true electron ./build/app.js",
     "watch:main": "NODE_ENV=development REACT_APP_ENV=development webpack-cli --config ./config/webpack.config.main.dev.js",
