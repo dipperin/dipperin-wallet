@@ -35,6 +35,7 @@ export class Sidebar extends React.Component<Props> {
       case Boolean(pathname.match('/contract')):
       case Boolean(pathname.match('/vm_contract')):
       case Boolean(pathname.match('/setting')):
+      case Boolean(pathname.match('/mine')):
         return false
       default:
         return true
