@@ -134,6 +134,16 @@ export class CreateContract extends React.Component<IProps> {
     }
   }
 
+  validateAbi = (rawAbi: string) => {
+    try {
+      // TODO: validate the inner Content of file
+      JSON.parse(helper.Bytes.toString(rawAbi))
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   handleChangeAbi = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       // console.log(e.target.files[0].name.split('.').reverse())
@@ -149,7 +159,16 @@ export class CreateContract extends React.Component<IProps> {
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
         const abi = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
-        this.setStringField('abi', abi)
+        if (this.validateAbi(abi)) {
+          this.setStringField('abi', abi)
+        } else {
+          this.inputABI!.value = ''
+          this.setStringField('inputABIPlaceholder', '')
+          swal.fire({
+            type: 'error',
+            title: this.props.labels.errorAbiFile
+          })
+        }
       }
     }
   }
@@ -225,11 +244,16 @@ export class CreateContract extends React.Component<IProps> {
 
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      this.handleShowDialog()
-    } catch (e) {
-      const label = this.props.labels.createSwal
-      swal.fire(label.createErr, e.message, 'error')
+    if (this.flags.get('isCreated')) {
+      try {
+        this.validateParams()
+        this.handleShowDialog()
+      } catch (e) {
+        const label = this.props.labels.createSwal
+        swal.fire(label.createErr, e.message, 'error')
+      }
+    } else {
+      this.handleAddContract()
     }
   }
 
@@ -273,22 +297,62 @@ export class CreateContract extends React.Component<IProps> {
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
 
-  handleAddContract = async (e: React.MouseEvent) => {
-    e.preventDefault()
+  validateContractAddress = (address: string) => {
     const { labels } = this.props
-    const abi = this.getStringField('abi')
-    const contractAddress = this.getStringField('contractAddress')
-    const contractRes = this.props.vmContract!.addContract(abi, contractAddress)
-    if (contractRes.success) {
-      await swal.fire({
-        title: labels.createSwal.createSuccess,
-        type: 'success',
-        timer: 1000
-      })
-    } else {
+    if (!isVmContractAddress(address)) {
+      throw new Error(labels.createSwal.contractAddressErr)
+    }
+  }
+
+  handleAddContract = async () => {
+    // e: React.MouseEvent
+    // e.preventDefault()
+    const { labels } = this.props
+    try {
+      const contractAddress = this.getStringField('contractAddress')
+      this.validateContractAddress(contractAddress)
+      const abi = this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`)
+      if (abi.length === 0) {
+        try {
+          await this.getAbi()
+          if (this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`).length === 0) {
+            throw new Error()
+          }
+        } catch (e) {
+          swal.fire({
+            title: labels.createSwal.createErr,
+            text: labels.createSwal.getAbi,
+            type: 'error'
+          })
+          return
+        }
+      }
+      // if (abi.length === 0) {
+      //   swal.fire({
+      //     title: labels.createSwal.createErr,
+      //     text: labels.createSwal.getAbi,
+      //     type: 'error'
+      //   })
+      //   return
+      // }
+      const contractRes = await this.props.vmContract!.addContract(abi, contractAddress)
+      if (contractRes.success) {
+        await swal.fire({
+          title: labels.createSwal.createSuccess,
+          type: 'success',
+          timer: 1000
+        })
+      } else {
+        swal.fire({
+          title: labels.createSwal.createErr,
+          text: contractRes.info,
+          type: 'error'
+        })
+      }
+    } catch (e) {
       swal.fire({
         title: labels.createSwal.createErr,
-        text: contractRes.info,
+        text: e.message,
         type: 'error'
       })
     }
@@ -331,7 +395,8 @@ export class CreateContract extends React.Component<IProps> {
       const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
-        this.setStringField('abi', abi)
+        console.log(`getAbi`, abi)
+        this.setStringField(`abi:${contractAddress.toLocaleLowerCase()}`, abi)
       }
     }
   }
@@ -352,7 +417,7 @@ export class CreateContract extends React.Component<IProps> {
     return (
       <Fragment>
         <div className={classes.tab}>
-          <div className={classes.tabLeft} data-tour="created-btn">
+          <div className={classes.tabLeft}>
             <Button
               onClick={this.handleJumpToCreated}
               variant="contained"
@@ -361,7 +426,7 @@ export class CreateContract extends React.Component<IProps> {
               {labels.created}
             </Button>
           </div>
-          <div className={classes.tabRight} data-tour="receive-btn">
+          <div className={classes.tabRight}>
             <Button
               onClick={this.handleJumpToFavorite}
               variant="contained"
@@ -387,9 +452,9 @@ export class CreateContract extends React.Component<IProps> {
                   <img src={this.stringField.get('inputABIPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
-                  required={false}
+                  required={true}
                   onChange={this.handleChangeAbi}
                   ref={input => {
                     this.inputABI = input
@@ -409,7 +474,7 @@ export class CreateContract extends React.Component<IProps> {
                   <img src={this.stringField.get('inputWasmPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
                   required={true}
                   onChange={this.handleChangeCode}
@@ -486,8 +551,12 @@ export class CreateContract extends React.Component<IProps> {
                 />
               </div>
               <div className={classes.inputRow}>
-                <span>{labels.estimateGas}</span>
-                <span>{this.stringField.get('estimateGas')}</span>
+                <span style={{ width: 80, fontSize: 10 }}>{labels.estimateGas}</span>
+                <span style={{ width: 220, fontSize: 10 }}>
+                  {this.stringField.get('estimateGas')
+                    ? Number(this.stringField.get('estimateGas')).toLocaleString()
+                    : ''}
+                </span>
               </div>
 
               <Button variant="contained" color="primary" className={classes.button} type="submit">
@@ -505,10 +574,10 @@ export class CreateContract extends React.Component<IProps> {
                   value={this.stringField.get('contractAddress') || ''}
                   required={true}
                   onChange={this.handleChangeContractAddress}
-                  onBlur={this.getAbi}
+                  // onBlur={this.getAbi}
                 />
               </div>
-              <Button variant="contained" color="primary" className={classes.button} onClick={this.handleAddContract}>
+              <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.add}
               </Button>
             </Fragment>

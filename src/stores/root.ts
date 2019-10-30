@@ -252,7 +252,7 @@ class RootStore {
         }
       })
       .catch(err => {
-        console.error('asdfsdf', err)
+        console.error('checkIsConnect', err)
         this.changeIsConnecting(false)
       })
   }

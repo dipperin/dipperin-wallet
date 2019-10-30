@@ -50,22 +50,24 @@ export const formatUTCTime = (time: string) => {
   return format(date, 'YYYY-MM-DD HH:mm:ss A+UTC')
 }
 
-const VMCONTRACT_ADDRESS_PREFIX = '0014'
+// const VMCONTRACT_ADDRESS_PREFIX = '0014'
 /**
  * Checks if the given string is an contract address
  * @param address the given HEX address
  */
 export const isVmContractAddress = (address: string): boolean => {
-  if (address.replace('0x', '').length !== 44) {
-    return false
-  }
-  const prefix = address.replace('0x', '').slice(0, 4)
-  switch (prefix) {
-    case VMCONTRACT_ADDRESS_PREFIX:
-      return true
-    default:
-      return false
-  }
+  return /^(0x)?(0014)[0-9a-fA-F]{40}$/i.test(address)
+
+  // if (address.replace('0x', '').length !== 44) {
+  //   return false
+  // }
+  // const prefix = address.replace('0x', '').slice(0, 4)
+  // switch (prefix) {
+  //   case VMCONTRACT_ADDRESS_PREFIX:
+  //     return true
+  //   default:
+  //     return false
+  // }
 }
 
 export const isAlpha = version => version.includes('alpha')
@@ -125,4 +127,23 @@ export const showContractTo = (tx): string => {
 
 export const getNowTimestamp = (): number => {
   return new Date().valueOf()
+}
+
+export const formatAmount = (amount: string) => {
+  // add 0 before . if . is first
+  let formattedAmount = amount
+  if (formattedAmount.slice(0, 1) === '.') {
+    formattedAmount = '0' + formattedAmount
+  }
+  // get rid of ., if . is in end
+  if (/^\d+\.$/.test(formattedAmount)) {
+    formattedAmount = formattedAmount.slice(0, formattedAmount.length - 1)
+  }
+  // get rid of the number too small .
+  const temp = formattedAmount.match(/^\d+\.(\d*)$/)
+  if (temp && temp[1].length > 18) {
+    formattedAmount = (formattedAmount.match(/^(\d+\.\d{0,18})\d*$/) as any) as string
+  }
+
+  return formattedAmount
 }

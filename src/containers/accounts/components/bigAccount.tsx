@@ -26,6 +26,7 @@ export class BigAccount extends React.Component<BigAccountProps> {
     document.body.appendChild(input)
     input.setAttribute('value', address)
     input.select()
+    console.log(input)
     if (document.execCommand('copy')) {
       document.execCommand('copy')
       swal.fire({

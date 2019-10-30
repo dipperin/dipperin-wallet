@@ -10,15 +10,16 @@ import { mockAbi } from '@/tests/testData/vmContract'
 //
 import { Call } from './index'
 import styles from './styles'
+// import { VmContract } from '@dipperin/dipperin.js';
 
-describe('setting', () => {
+describe('call', () => {
   const root = mockRootBuilder(true)
   const mockWallet = root.wallet
   const mockVmContract = root.vmContract
   const labels = i18n['zh-CN'].contract.contract
   const classes = mockStyleClasses(styles)
 
-  const mockRouterProps = getMockRouterProps({ address: '0x001488Fb46F1a09274745d6022EF1A176bcD4C5a02Aa' })
+  const mockRouterProps = getMockRouterProps({})
   const mockProps = {
     labels,
     classes,
@@ -82,7 +83,8 @@ describe('setting', () => {
 
   it('handleCall', async () => {
     root.vmContract.addContract(mockAbi, '0x001')
-    mockRouterProps.match.params.address = '0x001'
+    // mockRouterProps.match.params.address = '0x001'
+    mockVmContract.setPath('', '0x001')
     instance.abiChange(mockAbi)
     root.vmContract.confirmConstantCallContractMethod = jest.fn(async () => {
       return { success: true, info: '0x002' }

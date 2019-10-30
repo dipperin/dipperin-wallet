@@ -100,7 +100,7 @@ export const styles = createStyles({
       display: 'inline-block',
       widht: 58,
       height: 62,
-      marginTop: 147,
+      marginTop: 100,
       marginBottom: 24
     },
     '& p': {

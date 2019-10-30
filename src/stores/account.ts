@@ -1,10 +1,12 @@
 import { computed, observable, action } from 'mobx'
 
-import AccountModel from '../models/account'
+import AccountModel, { AccountType, Opt } from '../models/account'
 import RootStore from './root'
+import { Accounts, EncryptResult, helper } from '@dipperin/dipperin.js'
 
 import { getAccount, insertAccount, removeAccount } from '@/db'
 import { FIRST_ACCOUNT_ID, ACCOUNTS_PATH, TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
+import { TxResponseCode, TxResponseInfo } from '@/utils/errors'
 
 export default class AccountStore {
   private _store: RootStore
@@ -96,6 +98,24 @@ export default class AccountStore {
     const address = this._store.wallet.getAccountByPath(newPath).address
     // Add new account
     const newAccount = this.newAccount(newIndex, newPath, address)
+    // Save account
+    this._accountMap.set(newIndex, newAccount)
+    // add to db
+    await insertAccount(newAccount.toJS())
+    this.changeActiveAccount(newAccount.id)
+    this.updateAccountsBalance(newAccount.id)
+    this.updateAccountsNonce(newAccount.id)
+  }
+
+  @action
+  importPrivateKey = async (privateKey: string) => {
+    const newIndex = this.getSafeAccountIndex()
+    const address = helper.Account.fromPrivate(privateKey)
+    if (this.accounts.filter(el => el.address === address).length > 0) {
+      throw new Error(TxResponseInfo[TxResponseCode.addressReimportError])
+    }
+    // Add new account
+    const newAccount = this.importAccount(newIndex, address, privateKey)
     // Save account
     this._accountMap.set(newIndex, newAccount)
     // add to db
@@ -215,6 +235,34 @@ export default class AccountStore {
   }
 
   /**
+   * verifys the nonce should be updated
+   * @param address
+   * @param nonce
+   */
+  verifyAccountNonce(address: string, nonce: string): boolean {
+    const txs = (this._store.transaction.transactionsMap.get(address) || []).filter(tx => tx.from === address).slice()
+    const nonceNumber = Number(nonce)
+    const now = new Date().valueOf()
+    // console.log('===============verifying==========', address, nonce)
+    if (txs) {
+      txs.sort((a, b) => Number(b.nonce) - Number(a.nonce))
+      for (const tx of txs) {
+        // console.log('verifyAccountNonce', tx.nonce)
+        if (!tx.isOverLongTime(now) && !(tx.isEnded && tx.status !== TRANSACTION_STATUS_SUCCESS)) {
+          if (Number(tx.nonce) >= nonceNumber) {
+            return false
+          } else {
+            return true
+          }
+        }
+      }
+      return true
+    } else {
+      return true
+    }
+  }
+
+  /**
    * Get account balance from the chain
    * @param address Account Address
    */
@@ -266,11 +314,49 @@ export default class AccountStore {
     return new AccountModel(id, path, address)
   }
 
+  private importAccount(id: string, address: string, privateKey: string): AccountModel {
+    const newPath = `${ACCOUNTS_PATH}/${0}`
+    const opt: Opt = {
+      type: AccountType.privateKey,
+      encryptKey: Accounts.encrypt(privateKey, this._store.wallet.getPrivateKeyByPath(newPath))
+    }
+    const newAccount = new AccountModel(id, newPath, address, opt)
+    return newAccount
+  }
+
   /**
    * Get safe account Index
    */
   private getSafeAccountIndex(): string {
-    return (this._accountMap.size + 1).toString()
+    let maxId = 1
+    for (const account of this._accountMap.values()) {
+      if (account.isHDWallet()) {
+        const id = Number(account.path.split('/').slice(-1))
+        if (id > maxId) {
+          maxId = id
+        }
+      }
+    }
+    return (maxId + 1).toString()
+  }
+
+  /**
+   * @example get the activeAccount's privateKey by the following steps
+   * ```ts
+   * accountStore.exportPrivateKey()
+   * => ''
+   * ```
+   */
+  exportPrivateKey(password: string) {
+    if (this.activeAccount.isHDWallet()) {
+      const privateKey = this._store.wallet.getPrivateKeyByPath(this.activeAccount.path)
+      return privateKey
+    } else if (this.activeAccount.isPrivateKey()) {
+      const path = this.activeAccount.path
+      const prv0 = this._store.wallet.getPrivateKeyByPath(path)
+      return Accounts.decrypt(this.activeAccount.encrypt as EncryptResult, prv0).seed
+    }
+    return ''
   }
 }
 

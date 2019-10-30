@@ -9,8 +9,8 @@ const styles = createStyles({
     marginBottom: '40px'
   },
   tab: {
-    height: 28,
-    width: 200,
+    height: 36,
+    width: 262,
     margin: '0 auto 18px',
     border: `1px solid ${primaryColor}`,
     borderRadius: '4px',
@@ -62,6 +62,7 @@ const styles = createStyles({
     fontSize: 12,
     width: '100%',
     height: '30px',
+    position: 'relative',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',

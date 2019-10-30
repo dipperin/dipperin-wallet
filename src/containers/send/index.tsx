@@ -1,5 +1,5 @@
 // import BN from 'bignumber.js'
-import { action, observable, reaction, computed } from 'mobx'
+import { action, observable, reaction, computed, runInAction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ import { I18nCollectionTransaction } from '@/i18n/i18n'
 import AccountStore from '@/stores/account'
 import TransactionStore from '@/stores/transaction'
 import WalletStore from '@/stores/wallet'
-import { isValidAmount } from '@/utils'
+import { isValidAmount, formatAmount } from '@/utils'
 import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/styles'
 import { Utils } from '@dipperin/dipperin.js'
@@ -97,13 +97,24 @@ export class Send extends React.Component<IProps> {
   // }
 
   handleGetEstimateGas = async () => {
+    runInAction(() => {
+      this.amount = formatAmount(this.amount)
+      console.log(this.amount)
+    })
     const hexAddress = `0x${this.address.replace('0x', '')}`
-    const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
-    // console.log('estimateGas', res2)
-    if (res2.success) {
-      this.setEstimateGas(res2.info)
-      this.setWaitConfirm(true)
+    try {
+      this.validateAddress(hexAddress)
+      this.validateAmount(this.amount)
+      const res = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
+      if (res.success) {
+        this.setEstimateGas(res.info)
+        this.setWaitConfirm(true)
+      }
+    } catch (e) {
+      console.log(e)
     }
+
+    // console.log('estimateGas', res2)
   }
 
   validateAddress = (address: string) => {
@@ -155,6 +166,49 @@ export class Send extends React.Component<IProps> {
     this.setShowDialog(false)
   }
 
+  // mock transaction.confirmTransaction timeout
+  // mockTimeout = (
+  //   address: string,
+  //   amount: string,
+  //   memo: string,
+  //   gas: string,
+  //   gasPrice: string
+  // ): Promise<{ success: boolean; info?: string }> => {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       resolve({
+  //         success: true,
+  //         info:
+  //           '0x' +
+  //           Buffer.alloc(44)
+  //             .fill('a')
+  //             .toString()
+  //       })
+  //     }, 3000)
+  //   })
+  // }
+
+  wrappedConfirmTransaction = (
+    address: string,
+    amount: string,
+    memo: string,
+    gas: string,
+    gasPrice: string
+  ): Promise<{ success: boolean; info?: string }> => {
+    return new Promise((resolve, reject) => {
+      const timeoutTimer = setTimeout(() => {
+        reject(this.props.labels.swal.timeout)
+      }, 3000)
+      this.props
+        .transaction!.confirmTransaction(address, amount, memo, gas, gasPrice)
+        .then(res => {
+          clearTimeout(timeoutTimer)
+          resolve(res)
+        })
+        .catch(e => reject(e))
+    })
+  }
+
   send = async () => {
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
@@ -162,25 +216,34 @@ export class Send extends React.Component<IProps> {
     if (this.estimateGas && /^[0-9]*$/.test(this.estimateGas)) {
       gas = String(Number(this.estimateGas) * 2)
     } else {
-      gas = '120000'
+      gas = '21000'
     }
     // const gas: string = String(Number(this.estimateGas)! * 2) | '120000'
-    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
-    if (res.success) {
-      this.handleCloseDialog()
-      this.initState()
-      await swal.fire({
-        text: labels.swal.success,
-        type: 'success',
-        confirmButtonText: labels.swal.confirm,
-        timer: 1000
-      })
-      this.props.transaction!.updateTransactionType()
-    } else {
-      this.handleCloseDialog()
+    try {
+      const res = await this.wrappedConfirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
+      if (res.success) {
+        this.handleCloseDialog()
+        this.initState()
+        await swal.fire({
+          text: labels.swal.success,
+          type: 'success',
+          confirmButtonText: labels.swal.confirm,
+          timer: 1000
+        })
+        this.props.transaction!.updateTransactionType()
+      } else {
+        this.handleCloseDialog()
+        await swal.fire({
+          title: labels.swal.fail,
+          text: res.info,
+          type: 'error',
+          confirmButtonText: labels.swal.confirm
+        })
+      }
+    } catch (e) {
       await swal.fire({
         title: labels.swal.fail,
-        text: res.info,
+        text: e,
         type: 'error',
         confirmButtonText: labels.swal.confirm
       })
@@ -214,7 +277,9 @@ export class Send extends React.Component<IProps> {
 
   @action
   addressChange = (e: React.ChangeEvent<{ value: string }>) => {
-    this.address = e.target.value
+    if (/^(0x)?[0-9a-f]{0,44}$/i.test(e.target.value.toLowerCase())) {
+      this.address = e.target.value
+    }
   }
 
   @action
@@ -253,6 +318,12 @@ export class Send extends React.Component<IProps> {
     }
   }
 
+  handleAmountKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.keyCode === 13) {
+      e.preventDefault()
+    }
+  }
+
   render() {
     const { labels, classes } = this.props
     return (
@@ -264,7 +335,13 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.amount}</InputLabel>
-            <Input type="number" value={this.amount} onChange={this.amountChange} onBlur={this.handleGetEstimateGas} />
+            <Input
+              type="number"
+              onKeyDown={this.handleAmountKeyUp}
+              value={this.amount}
+              onChange={this.amountChange}
+              onBlur={this.handleGetEstimateGas}
+            />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.note}</InputLabel>
@@ -285,7 +362,7 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
-            disabled={!this.address || !this.amount}
+            // disabled={!this.address || !this.amount}
             variant="contained"
             color="primary"
             className={classes.confirmButton}

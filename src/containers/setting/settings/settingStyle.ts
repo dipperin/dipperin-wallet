@@ -4,6 +4,7 @@ import Update from '@/images/setting-update.png'
 import Reset from '@/images/setting-reset.png'
 import ResetActive from '@/images/reset-active.png'
 import UpdateActive from '@/images/update-active.png'
+import Horn from '@/images/horn.png'
 
 const styles = createStyles({
   setting: {
@@ -40,17 +41,26 @@ const styles = createStyles({
     fontSize: 18,
     fontWeight: 'bold'
   },
+  version: {
+    position: 'absolute',
+    bottom: '16px',
+    '& p': {
+      fontSize: 12
+    }
+  },
   netWrap: {
     display: 'flex',
-    marginBottom: 20
+    marginBottom: 0
   },
   netBtn: {
-    margin: '0 20px 20px 0',
+    margin: '0 20px 10px 0',
     width: 140,
     height: 24,
     background: '#fff',
     minHeight: 0,
     minWidth: 0,
+    border: '1px solid rgba(120,139,179,1)',
+    boxShadow: 'none',
     '& span': {
       fontSize: 12,
       color: grayColor,
@@ -58,7 +68,8 @@ const styles = createStyles({
     }
   },
   netBtnActive: {
-    background: '#3450C5',
+    background: '#528DD0',
+    border: 'none',
     '&:hover': {
       background: '#3450C5'
     },
@@ -95,16 +106,18 @@ const styles = createStyles({
     boxShadow: 'none',
     ...materialButton,
     '& .btn-img': {
-      marginRight: 10,
-      width: 20,
-      height: 20,
+      marginRight: 8,
+      width: 16,
+      height: 16,
       backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover'
+      backgroundSize: 'cover',
+      position: 'relative',
+      top: '-2px'
     },
     '&:hover': {
       background: '#fff',
       '& span': {
-        color: '#3450C5'
+        color: '#528DD0'
       }
     },
     '& span': {
@@ -119,7 +132,7 @@ const styles = createStyles({
   },
   updateNodeButton: {
     bottom: 10,
-    right: 200,
+    right: 153,
     '& .btn-img': {
       backgroundImage: `url(${Update}) `
     },
@@ -131,7 +144,7 @@ const styles = createStyles({
   },
   resetButton: {
     bottom: 10,
-    right: 10,
+    right: 20,
     '& .btn-img': {
       backgroundImage: `url(${Reset}) `
     },
@@ -260,6 +273,69 @@ const styles = createStyles({
     color: '#666',
     fontSize: 14,
     cursor: 'pointer'
+  },
+  dialogTitleModal: {
+    textAlign: 'center'
+  },
+  dialogContentModal: {
+    width: 310
+  },
+  dialogBtnsModal: {
+    justifyContent: 'space-evenly'
+  },
+  buttonModal: {
+    display: 'block',
+    margin: '15px auto',
+    width: '262px',
+    height: '36px',
+    textTransform: 'none',
+    fontSize: '16px',
+    ...materialButton,
+    '& span': {
+      fontWeight: 'bold'
+    }
+  },
+  formModal: {
+    position: 'relative'
+  },
+  closeModal: {
+    position: 'absolute',
+    right: -26,
+    top: 6
+  },
+  tip: {
+    width: '480px',
+    // height: '16px',
+    color: '#838899',
+    background: 'rgba(230,230,230,1)',
+    boxSizing: 'border-box',
+    padding: '0 9px',
+    borderRadius: '8px',
+    lineHeight: '16px'
+  },
+  hornIcon: {
+    display: 'inline-block',
+    transform: 'translateY(1px)',
+    width: 12,
+    height: 10,
+    background: `url(${Horn})`
+    // float: 'left',
+  },
+  tipContent: {
+    // float: 'left',
+    height: '16px',
+    fontSize: '11px',
+    marginLeft: '6px'
+  },
+  tipClose: {
+    float: 'right',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    height: '16px',
+    color: 'rgba(10,10,10,1)',
+    '&:hover': {
+      cursor: 'pointer'
+    }
   }
 })
 
