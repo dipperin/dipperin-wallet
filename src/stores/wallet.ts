@@ -342,6 +342,7 @@ export default class WalletStore {
     }
 
     try {
+      // console.log(this._currentWallet.encryptSeed)
       const account = Accounts.decrypt(this._currentWallet.encryptSeed, password)
       this._currentWallet.unlockErrTimes = DEFAULT_ERR_TIMES
       return account
@@ -351,6 +352,26 @@ export default class WalletStore {
       this._currentWallet.unlockErrTimes = ++errTimes
       return
     }
+  }
+
+  /**
+   * miner relate
+   */
+  startMine = async () => {
+    const err = await this._store.dipperin.dr.startMine()
+    return err
+  }
+
+  stopMine = () => {
+    this._store.dipperin.dr.stopMine()
+  }
+
+  queryBalance = async (address: string) => {
+    return await this._store.dipperin.dr.getBalance(address)
+  }
+
+  withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
+    return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
   }
 }
 

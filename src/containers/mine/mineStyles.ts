@@ -1,10 +1,10 @@
 import { createStyles } from '@material-ui/core/styles'
-import { grayColor, materialButton } from '@/styles/appStyle'
+import { grayColor } from '@/styles/appStyle'
 
 const styles = createStyles({
   main: {
     position: 'relative',
-    display: 'flex',
+    // display: 'flex',
     width: 892,
     height: 450,
     margin: '0 auto',
@@ -15,7 +15,9 @@ const styles = createStyles({
     overflow: 'hidden'
   },
   btn: {
-    ...materialButton
+    // ...materialButton
+    height: 30,
+    width: 100
   }
 })
 
