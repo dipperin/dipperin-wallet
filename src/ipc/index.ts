@@ -10,7 +10,9 @@ import {
   OPEN_DIPPERIN,
   START_NODE,
   STOP_NODE,
-  START_SUCCESS
+  START_SUCCESS,
+  START_MINER_NODE,
+  START_NODE_FAILURE
 } from '@/utils/constants'
 import { getIsRemoteNode } from '@/utils/node'
 
@@ -42,12 +44,28 @@ export const onStartNodeSuccess = (cb: () => void) => {
   })
 }
 
+export const onceStartNodeSuccess = (cb: () => void) => {
+  ipcRenderer.on(START_SUCCESS, () => {
+    cb()
+  })
+}
+
+export const onStartNodeFailure = (cb: () => void) => {
+  ipcRenderer.once(START_NODE_FAILURE, () => {
+    cb()
+  })
+}
+
 export const sendStartNode = () => {
   ipcRenderer.send(START_NODE)
 }
 
 export const sendStopNode = () => {
   ipcRenderer.send(STOP_NODE)
+}
+
+export const sendStartMineNode = () => {
+  ipcRenderer.send(START_MINER_NODE)
 }
 
 export const sendUpdateVersion = () => {

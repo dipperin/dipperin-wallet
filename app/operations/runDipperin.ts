@@ -9,7 +9,7 @@ import util from 'util'
 
 import dipperinPath from '../utils/dipperinPath'
 import handleError from './handleError'
-import { START_SUCCESS } from '../ipc';
+import { START_NODE_FAILURE, START_SUCCESS } from '../ipc';
 
 export const DEFAULT_NET = 'venus'
 
@@ -57,7 +57,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
           '--debug_mode=0',
           '--is_scanner=0',
           '--is_upload_node_data=0',
-          `--allow_hosts=${process.env.NODE_ENV === 'development' ? '*' : 'localhost'}`
+          `--allow_hosts=${process.env.NODE_ENV === 'development' ? '*' : 'localhost'}`,
         ],
         {
           env: {
@@ -99,6 +99,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
     })
     .catch(err => {
       handleError(err, 'An error occured while running Dipperin.')
+      mainWindow.webContents.send(START_NODE_FAILURE)
     })
 }
 export const killDipperin = async () => {
@@ -112,4 +113,90 @@ export const killDipperin = async () => {
 
 export const getNodeEnv = (net: string): string => {
   return net || DEFAULT_NET
+}
+
+export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
+  log.info('running net:', getNodeEnv(net))
+  // Create a logStream to save logs
+  const chainDataDir = path.join(os.homedir(), `tmp`,`dipperin_apps`,`${getNodeEnv(net)}`,`wallet`)
+  const chainLogPath = path.join(`${chainDataDir}`,`dipperin.log`)
+  // FIXME: maybe delete later
+  const minerCSWallet = path.join(chainDataDir, `CSWallet`)
+
+  if (dipperin) {
+    return
+  }
+  return fsExists(chainLogPath)
+    .then(() => {
+      const logStats = fs.statSync(chainLogPath)
+      log.info('Chain log size', logStats.size)
+      if (logStats.size > MAX_LOG_SIZE) {
+        return fsExtra.remove(chainLogPath)
+      }
+      return
+    })
+    .catch(noop)
+    .then(() => fsChmod(dipperinPath(), '755')) // Should already be 755 after download, just to be sure
+    .then(() => {
+      log.info('dipperinPath:', dipperinPath())
+      log.info('chainDataDir:', chainDataDir)
+      dipperin = spawn(
+        dipperinPath(),
+        [
+          '--node_name=dipperin-wallet',
+          `--data_dir=${chainDataDir}`,
+          '--node_type=1',
+          '--p2p_listener=:60619',
+          '--http_port=7783',
+          '--ws_port=8893',
+          '--log_level=info',
+          '--debug_mode=0',
+          '--is_scanner=0',
+          '--is_upload_node_data=0',
+          `--allow_hosts=${process.env.NODE_ENV === 'development' ? '*' : 'localhost'}`,
+          `--soft_wallet_pwd=123`,
+          `--soft_wallet_path=${minerCSWallet}`
+        ],
+        {
+          env: {
+            boots_env: getNodeEnv(net)
+          }
+        }
+      )
+
+      dipperin.on('error', err => {
+        log.info('dipperin error', err)
+        // comment the following code to avoid user quit mainWindow unexportedly
+        // handleError(err, 'An error occured while running Dipperin.')
+      })
+
+      dipperin.on('close', exitCode => {
+        log.info('close', exitCode)
+        // null || 0
+        if (!exitCode) {
+          return
+        } else {
+          // comment the following code to avoid user quit mainWindow unexportedly
+          // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+
+          
+          // The following line is history code
+          // mainWindow.close()
+        }
+      })
+    })
+    .then(() => fsExtra.ensureDir(chainDataDir))
+    .then(() => {
+      // send start success ipc
+      mainWindow.webContents.send(START_SUCCESS) 
+      // Write to Dipperin log file
+      const logStream = fs.createWriteStream(chainLogPath, { flags: 'a+' })
+
+      dipperin.stdout.pipe(logStream)
+      dipperin.stderr.pipe(logStream)
+    })
+    .catch(err => {
+      handleError(err, 'An error occured while running Dipperin Miner.')
+      mainWindow.webContents.send(START_NODE_FAILURE)
+    })
 }

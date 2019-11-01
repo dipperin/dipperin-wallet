@@ -79,6 +79,8 @@ export const OPEN_DIPPERIN = 'openDipperin'
 export const START_NODE = 'startNode'
 export const STOP_NODE = 'stopNode'
 export const START_SUCCESS = 'startSucces'
+export const START_NODE_FAILURE = 'startNodeFailure'
+export const START_MINER_NODE = 'startMinerNode'
 /**
  * node net
  */

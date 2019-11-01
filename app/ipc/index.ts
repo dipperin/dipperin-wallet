@@ -7,7 +7,7 @@ import doesDipperinExist from '../operations/doesDipperinExist'
 import fetchDipperin from '../operations/fetchDipperin'
 import handleError from '../operations/handleError'
 import { openDipperin, openTmp } from '../operations/openFile'
-import { killDipperin, runDipperin } from '../operations/runDipperin'
+import { killDipperin, runDipperin, runDipperinMiner } from '../operations/runDipperin'
 import updateDipperin from '../operations/updateDipperin'
 
 const UPDATE_VERSION = 'updateVersion'
@@ -26,6 +26,9 @@ const SET_NET = 'setNet'
 // start/stop node
 const START_NODE = 'startNode'
 const STOP_NODE = 'stopNode'
+const START_MINER_NODE = 'startMinerNode'
+
+export const START_NODE_FAILURE = 'startNodeFailure'
 export const START_SUCCESS = 'startSucces'
 
 const initIPC = (mainWindow: BrowserWindow) => {
@@ -57,6 +60,11 @@ const initIPC = (mainWindow: BrowserWindow) => {
   ipcMain.on(STOP_NODE, () => {
     log.info('stop node')
     killDipperin()
+  })
+
+  ipcMain.on(START_MINER_NODE, () => {
+    log.info('start miner node')
+    runDipperinMiner(settings.get('netEnv') as string, mainWindow)
   })
 }
 
