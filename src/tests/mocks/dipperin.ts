@@ -7,7 +7,7 @@ const mockDipperinBuilder = (): Dipperin => {
 
   dipperin.dr.getBalance = jest.fn(async () => Utils.toUnit('10000'))
   dipperin.dr.getNonce = jest.fn(async () => '12')
-  dipperin.dr.setMineCoinbase = jest.fn(async (address: string) => undefined)
+  dipperin.dr.setMineCoinbase = jest.fn(async (address: string) => '')
   dipperin.dr.getCurrentBlock = jest.fn(async () => blockInfo)
   dipperin.dr.getTransaction = jest.fn(async () => ({
     blockNumber: 1,
