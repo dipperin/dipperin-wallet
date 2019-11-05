@@ -357,6 +357,17 @@ export default class WalletStore {
   /**
    * miner relate
    */
+  @observable
+  mineState: string = 'stop'
+
+  @action
+  setMineState = (state: string) => {
+    const allowStates = ['stop', 'loading', 'mining']
+    if (allowStates.includes(state)) {
+      this.mineState = state
+    }
+  }
+
   startMine = async () => {
     const err = await this._store.dipperin.dr.startMine()
     return err
@@ -379,7 +390,7 @@ export default class WalletStore {
     }
   }
 
-  withdrawBalance = async (from: string, to: string, value: string, gasPrice: number, nonce: number) => {
+  withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
     return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
   }
 }
