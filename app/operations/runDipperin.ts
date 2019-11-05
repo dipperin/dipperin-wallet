@@ -9,7 +9,7 @@ import util from 'util'
 
 import dipperinPath from '../utils/dipperinPath'
 import handleError from './handleError'
-import { START_NODE_FAILURE, START_SUCCESS } from '../ipc';
+import { START_MINER_NODE_FAILURE, START_NODE_FAILURE, START_MINER_NODE_SUCCESS, START_SUCCESS } from '../ipc';
 
 export const DEFAULT_NET = 'venus'
 
@@ -188,7 +188,7 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
     .then(() => fsExtra.ensureDir(chainDataDir))
     .then(() => {
       // send start success ipc
-      mainWindow.webContents.send(START_SUCCESS) 
+      mainWindow.webContents.send(START_MINER_NODE_SUCCESS) 
       // Write to Dipperin log file
       const logStream = fs.createWriteStream(chainLogPath, { flags: 'a+' })
 
@@ -197,6 +197,6 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
     })
     .catch(err => {
       handleError(err, 'An error occured while running Dipperin Miner.')
-      mainWindow.webContents.send(START_NODE_FAILURE)
+      mainWindow.webContents.send(START_MINER_NODE_FAILURE)
     })
 }

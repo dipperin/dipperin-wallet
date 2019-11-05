@@ -370,7 +370,16 @@ export default class WalletStore {
     return await this._store.dipperin.dr.getBalance(address)
   }
 
-  withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
+  getAccountNonce = async (address: string): Promise<string> => {
+    try {
+      const res = await this._store.dipperin.dr.getNonce(address)
+      return res || '0'
+    } catch (err) {
+      return ''
+    }
+  }
+
+  withdrawBalance = async (from: string, to: string, value: string, gasPrice: number, nonce: number) => {
     return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
   }
 }
