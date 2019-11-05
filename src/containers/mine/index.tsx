@@ -1,16 +1,13 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { inject, observer } from 'mobx-react'
+import { observable, action, runInAction, reaction } from 'mobx'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-// import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 import WalletStore from '@/stores/wallet'
 import RootStore from '@/stores/root'
 import AccountStore from '@/stores/account'
-
-import styles from './mineStyles'
-import { observable, action, runInAction, reaction } from 'mobx'
-// import { csWallet } from '@/tests/testData/cswallet'
+// import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 import {
   sendStartMineNode,
   sendStopNode,
@@ -21,7 +18,12 @@ import {
 } from '@/ipc'
 import { sleep } from '@/utils'
 import { Utils } from '@dipperin/dipperin.js'
-import BN from 'bignumber.js'
+
+import Something from './something'
+
+import styles from './mineStyles'
+// import { csWallet } from '@/tests/testData/cswallet'
+// import BN from 'bignumber.js'
 
 const FAILURE_TIMES = 5
 const LONG_TIMEOUT = 15000
@@ -47,7 +49,9 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   @observable
   mineBalance: string = ''
   @observable
-  updateMineBalanceTimer: NodeJS.Timeout
+  updateMineBalanceTimer: NodeJS.Timeout | undefined
+  @observable
+  showTips: boolean = false
 
   @action
   handleChandeQueryAddress = (e: React.ChangeEvent<{ value: string }>) => {
@@ -60,13 +64,20 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   }
 
   @action
-  setMining = (flag: boolean | undefined) => {
-    this.mining = flag
+  setShowTips(flag: boolean) {
+    this.showTips = flag
   }
+
+  // @action
+  // setMining = (flag: boolean | undefined) => {
+  //   this.mining = flag
+  // }
 
   @action
   setMineBalance = (num: string) => {
-    this.mineBalance = num
+    if (num.match(/^([0-9]+(\.[0-9]{1,6})?)/)) {
+      this.mineBalance = num.match(/^([0-9]+(\.[0-9]{1,6})?)/)![0]
+    }
   }
 
   @action
@@ -77,20 +88,37 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   constructor(props) {
     super(props)
 
+    if (this.props.wallet.mineState === 'mining') {
+      this.updateMineBalance()
+    }
+
     reaction(
-      () => this.mining,
-      mining => {
-        if (mining === true) {
-          clearInterval(this.updateMineBalanceTimer)
+      () => this.props.wallet.mineState,
+      mineState => {
+        if (mineState === 'mining') {
+          if (this.updateMineBalanceTimer) {
+            clearInterval(this.updateMineBalanceTimer)
+          }
           this.updateMineBalance()
+        } else if (mineState === 'stop') {
+          if (this.updateMineBalanceTimer) {
+            clearInterval(this.updateMineBalanceTimer)
+          }
         }
       }
     )
   }
 
+  componentWillUnmount() {
+    if (this.updateMineBalanceTimer !== undefined) {
+      clearInterval(this.updateMineBalanceTimer)
+      this.updateMineBalanceTimer = undefined
+    }
+  }
+
   handleStartMinerNode = () => {
     if (this.mining === false) {
-      this.setMining(undefined)
+      this.props.wallet.setMineState('loading')
       if (this.props.root.isConnecting) {
         // stop node
         sendStopNode()
@@ -101,7 +129,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
       onceStartMinerNodeSuccess(() => {
         console.log('启动矿工节点成功')
         this.props.root.reconnect()
-        this.setMining(true)
+        this.props.wallet.setMineState('mining')
         this.props.root.dipperin.net.isConnecting().then((res: boolean) => {
           console.log('isConnecting', res)
         })
@@ -156,39 +184,39 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     while (failureTimes < FAILURE_TIMES) {
       const result = await this.sendStartMineCommand()
       if (result) {
-        this.setMining(true)
+        this.props.wallet.setMineState('mining')
         return
       } else {
         failureTimes += 1
       }
       await sleep(DEFAULT_TIMEOUT)
     }
-    this.setMining(false)
+    this.props.wallet.setMineState('stop')
     console.log('try times out, fail to start Mine')
   }
 
   private handleStartNodeFailure = () => {
     console.log('启动矿工节点失败')
-    this.setMining(false)
+    this.props.wallet.setMineState('stop')
   }
 
   private handleStartMinerNodeTimeout = () => {
     console.log('启动矿工节点超时')
-    this.setMining(false)
+    this.props.wallet.setMineState('stop')
   }
 
   handleStartMine = async () => {
     // start loading
-    this.setMining(undefined)
+    this.props.wallet.setMineState('loading')
     // 1. try to send startMine command
     try {
       await this.props.wallet.startMine()
-      this.setMining(true)
+      this.props.wallet.setMineState('mining')
     } catch (e) {
       switch (e.message) {
         case `Returned error: "miner is mining"`:
           console.log(`miner is mining`)
-          this.setMining(true)
+          this.props.wallet.setMineState('mining')
           break
         case `Returned error: "current node is not mine master"`:
           console.log(`current node is not mine master"`)
@@ -235,10 +263,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   handleStopMine = () => {
     try {
       this.props.wallet.stopMine()
+      this.props.wallet.setMineState('stop')
     } catch (e) {
       switch (e.message) {
         case `Returned error: "mining had been stopped"`:
           console.log('mining had been stopped')
+          this.props.wallet.setMineState('stop')
           break
         default:
           console.log(e.message)
@@ -251,16 +281,21 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   testAccount = '0x00008d3EEd5fb2dB537919AdCC04c6a22d2ECaa9E634'
   // testAccount = `0x0000fA5e0e6D1548CfAdB2A4AAC8d73ceF3A64C69be7`
 
-  updateMineBalance = async () => {
-    const timer: NodeJS.Timeout = setInterval(async () => {
+  private getBalanceAndUpdate = async () => {
+    try {
+      const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+      console.log(response)
+      this.setMineBalance(Utils.fromUnit(response))
+    } catch (e) {
+      console.log(`updateMineBalance error:`, e.message)
+    }
+  }
+
+  updateMineBalance = () => {
+    this.getBalanceAndUpdate()
+    const timer: NodeJS.Timeout = setInterval(() => {
       console.log(`updateBalance`)
-      try {
-        const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-        console.log(response)
-        this.setMineBalance(Utils.fromUnit(response))
-      } catch (e) {
-        console.log(`updateMineBalance error:`, e.message)
-      }
+      this.getBalanceAndUpdate()
     }, LONG_TIMEOUT)
     this.setUpdateMineBalanceTimer(timer)
   }
@@ -274,23 +309,23 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     try {
       const curAddress = this.props.account.activeAccount.address
       console.log(curAddress)
-      const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-      const value = new BN(response).minus(new BN(21000))
+      // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+      const value = 100000000000000000000
       const nonce = await this.props.wallet.getAccountNonce(this.testAccount)
       console.log(value)
-      const result = await this.props.wallet.withdrawBalance(
-        this.testAccount,
-        curAddress,
-        value.toString(10),
-        1,
-        Number(nonce)
-      )
+      const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
       runInAction(() => {
-        this.nonce = String(Number(this.nonce) + 1)
+        this.nonce = String(Number(nonce) + 1)
       })
-      console.log(result)
+      console.log(`handleWithdrawBalance`, result)
     } catch (e) {
-      console.log(`handleWithdrawBalance error:`, e.message)
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          console.log('this transaction already in tx pool')
+          break
+        default:
+          console.log(`handleWithdrawBalance error:`, e.message)
+      }
     }
   }
 
@@ -299,38 +334,60 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   // }
 
   render() {
-    const { classes } = this.props
+    const { classes, wallet } = this.props
     return (
       <div className={classes.main}>
-        <button className={classes.btn} onClick={this.handleStartMinerNode}>
+        <div className={`${wallet.mineState === 'mining' ? classes.smallBackgroundMining : classes.smallBackground}`} />
+        {/* <button className={classes.btn} onClick={this.handleStartMinerNode}>
           开启矿工节点
         </button>
         <button className={classes.btn} onClick={this.sendStartMineCommand}>
           开始挖矿
-        </button>
-        <button className={classes.btn} onClick={this.handleStartMine}>
-          一键挖矿
-        </button>
-        <button className={classes.btn} onClick={this.handleStopMine}>
+        </button> */}
+        {wallet.mineState !== 'mining' && (
+          <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMine}>
+            {wallet.mineState === 'stop' && `一键挖矿`}
+            {wallet.mineState === 'loading' && `启动中`}
+          </button>
+        )}
+        {wallet.mineState === 'mining' && (
+          <button
+            className={`${classes.btn} ${classes.mineBtn}`}
+            style={{ background: '#BEC0C6' }}
+            onClick={this.handleStopMine}
+          >
+            {`停止挖矿`}
+          </button>
+        )}
+        <span className={classes.mineTips} onClick={this.setShowTips.bind(this, true)} />
+
+        {/* <button className={classes.btn} onClick={this.handleStopMine}>
           停止挖矿
-        </button>
-        <input className={classes.btn} type="text" value={this.queryAddress} onChange={this.handleChandeQueryAddress} />
-        <button className={classes.btn} onClick={this.handleQueryBalance}>
+        </button> */}
+
+        {/* <input className={classes.input} type="text" value={this.queryAddress} onChange={this.handleChandeQueryAddress} /> */}
+
+        {/* <button className={classes.btn} onClick={this.handleQueryBalance}>
           查询余额
-        </button>
-        <input className={classes.btn} type="text" value={this.mineBalance} readOnly={true} />
-        <button className={classes.btn} onClick={this.handleWithdrawBalance}>
+        </button> */}
+
+        <div className={classes.mineBalanceLabel}>
+          <span>挖矿奖励</span>
+        </div>
+        <div className={`${classes.input} ${classes.balanceDisplay}`}>{this.mineBalance || '0'} DIP</div>
+        <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.handleWithdrawBalance}>
           提取余额
         </button>
-        <button className={classes.btn} onClick={this.handleWithdrawBalance}>
-          提取所有
-        </button>
-        <input className={classes.btn} type="text" value={this.nonce} onChange={this.handleChandeNonce} />
-        <p>
-          {this.mining === false && '未开始'}
-          {this.mining === undefined && '正在启动矿工节点'}
-          {this.mining === true && '挖矿中'}
-        </p>
+
+        <div className={`${wallet.mineState === 'mining' ? classes.bigBackgroundMining : classes.bigBackground}`} />
+
+        {/* <input className={classes.input} type="text" value={this.nonce} onChange={this.handleChandeNonce} /> */}
+        {/* <p>
+          {this.props.wallet.mineState === 'stop' && '未开始'}
+          {this.props.wallet.mineState === 'loading' && '正在启动矿工节点'}
+          {this.props.wallet.mineState === 'mining' && '挖矿中'}
+        </p> */}
+        {this.showTips && <Something onClose={this.setShowTips.bind(this, false)} />}
       </div>
     )
   }
