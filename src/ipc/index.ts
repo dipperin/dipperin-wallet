@@ -11,8 +11,10 @@ import {
   START_NODE,
   STOP_NODE,
   START_SUCCESS,
+  START_MINER_NODE_SUCCESS,
   START_MINER_NODE,
-  START_NODE_FAILURE
+  START_NODE_FAILURE,
+  START_MINER_NODE_FAILURE
 } from '@/utils/constants'
 import { getIsRemoteNode } from '@/utils/node'
 
@@ -45,15 +47,35 @@ export const onStartNodeSuccess = (cb: () => void) => {
 }
 
 export const onceStartNodeSuccess = (cb: () => void) => {
-  ipcRenderer.on(START_SUCCESS, () => {
+  ipcRenderer.once(START_SUCCESS, () => {
     cb()
   })
+}
+
+export const onceStartMinerNodeSuccess = (cb: () => void) => {
+  ipcRenderer.on(START_MINER_NODE_SUCCESS, () => {
+    cb()
+  })
+}
+
+export const removeOnceStartMinerNodeSuccess = () => {
+  ipcRenderer.removeAllListeners(START_MINER_NODE_SUCCESS)
 }
 
 export const onStartNodeFailure = (cb: () => void) => {
   ipcRenderer.once(START_NODE_FAILURE, () => {
     cb()
   })
+}
+
+export const onceStartMinerNodeFailure = (cb: () => void) => {
+  ipcRenderer.once(START_MINER_NODE_FAILURE, () => {
+    cb()
+  })
+}
+
+export const removeOnceStartMinerNodeFailure = () => {
+  ipcRenderer.removeAllListeners(START_MINER_NODE_FAILURE)
 }
 
 export const sendStartNode = () => {

@@ -81,6 +81,8 @@ export const STOP_NODE = 'stopNode'
 export const START_SUCCESS = 'startSucces'
 export const START_NODE_FAILURE = 'startNodeFailure'
 export const START_MINER_NODE = 'startMinerNode'
+export const START_MINER_NODE_FAILURE = 'startMinerNodeFailure'
+export const START_MINER_NODE_SUCCESS = 'startMinerNodeSuccess'
 /**
  * node net
  */

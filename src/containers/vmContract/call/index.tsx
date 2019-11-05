@@ -111,8 +111,6 @@ export class Call extends React.Component<IProps> {
 
   @action
   handleCall = async (funcName: string, params: string, constant?: boolean): Promise<CallRes | void> => {
-    // FIXME: to delete console.log
-    console.log('call function', funcName, params, constant)
     this.name = funcName
     this.params = params
     if (constant) {
@@ -129,8 +127,6 @@ export class Call extends React.Component<IProps> {
           this.gasPrice,
           this.params.split(',').map(param => param.trim())
         )
-        // FIXME: to delete console.log
-        console.log(callRes)
         return callRes as CallRes
       }
     } else {

@@ -28,7 +28,9 @@ const START_NODE = 'startNode'
 const STOP_NODE = 'stopNode'
 const START_MINER_NODE = 'startMinerNode'
 
+export const START_MINER_NODE_FAILURE = 'startMinerNodeFailure'
 export const START_NODE_FAILURE = 'startNodeFailure'
+export const START_MINER_NODE_SUCCESS = 'startMinerNodeSuccess'
 export const START_SUCCESS = 'startSucces'
 
 const initIPC = (mainWindow: BrowserWindow) => {
