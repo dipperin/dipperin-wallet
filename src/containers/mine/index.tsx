@@ -329,21 +329,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     }
   }
 
-  // parseCswallet = ()=> {
-  //   Accounts.decrypt(csWallet,'123')
-  // }
-
   render() {
     const { classes, wallet } = this.props
     return (
       <div className={classes.main}>
         <div className={`${wallet.mineState === 'mining' ? classes.smallBackgroundMining : classes.smallBackground}`} />
-        {/* <button className={classes.btn} onClick={this.handleStartMinerNode}>
-          开启矿工节点
-        </button>
-        <button className={classes.btn} onClick={this.sendStartMineCommand}>
-          开始挖矿
-        </button> */}
+
         {wallet.mineState !== 'mining' && (
           <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMine}>
             {wallet.mineState === 'stop' && `一键挖矿`}
@@ -361,16 +352,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
         )}
         <span className={classes.mineTips} onClick={this.setShowTips.bind(this, true)} />
 
-        {/* <button className={classes.btn} onClick={this.handleStopMine}>
-          停止挖矿
-        </button> */}
-
-        {/* <input className={classes.input} type="text" value={this.queryAddress} onChange={this.handleChandeQueryAddress} /> */}
-
-        {/* <button className={classes.btn} onClick={this.handleQueryBalance}>
-          查询余额
-        </button> */}
-
         <div className={classes.mineBalanceLabel}>
           <span>挖矿奖励</span>
         </div>
@@ -381,12 +362,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
 
         <div className={`${wallet.mineState === 'mining' ? classes.bigBackgroundMining : classes.bigBackground}`} />
 
-        {/* <input className={classes.input} type="text" value={this.nonce} onChange={this.handleChandeNonce} /> */}
-        {/* <p>
-          {this.props.wallet.mineState === 'stop' && '未开始'}
-          {this.props.wallet.mineState === 'loading' && '正在启动矿工节点'}
-          {this.props.wallet.mineState === 'mining' && '挖矿中'}
-        </p> */}
         {this.showTips && <Something onClose={this.setShowTips.bind(this, false)} />}
       </div>
     )
