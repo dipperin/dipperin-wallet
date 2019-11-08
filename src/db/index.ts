@@ -15,7 +15,8 @@ import {
   TRANSACTION_STATUS_SUCCESS,
   WALLET_DB,
   VM_CONTRACT_DB,
-  RECEIPT_DB
+  RECEIPT_DB,
+  MINE_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
@@ -324,6 +325,58 @@ export const getReceipt = async (net: string = DEFAULT_NET): Promise<ReceiptMode
 //   return ownerAddress
 // }
 
+/**
+ * mine db
+ */
+export const insertMinerData = async (mnemonic: string) => {
+  const db = getDB(MINE_DB)
+  const minerData = {
+    mnemonic,
+    updateTime: new Date().valueOf()
+  }
+  await new Promise((resolve, reject) => {
+    db.insert(minerData, (err, res) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(true)
+    })
+  })
+}
+
+export const removeMinerData = async () => {
+  const db = getDB(MINE_DB)
+  await new Promise((resolve, reject) => {
+    db.remove({}, (err, res) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(true)
+    })
+  })
+}
+
+export const getMiner = (): Promise<{ mnemonic: string; updateTime: number }> => {
+  const db = getDB(MINE_DB)
+
+  return new Promise((resolve, reject) => {
+    db.find({}).exec((err, res: any[]) => {
+      if (err) {
+        reject(err)
+      }
+      if (res.length > 0) {
+        const result = {
+          mnemonic: res[0]!.mnemonic as string,
+          updateTime: res[0].updateTime as number
+        }
+        resolve(result)
+      } else {
+        resolve(undefined)
+      }
+    })
+  })
+}
+
 export const resetDB = () => {
   getDB(ACCOUNT_DB).remove({}, { multi: true })
   getDB(TRANSACTION_DB).remove({}, { multi: true })
@@ -332,4 +385,5 @@ export const resetDB = () => {
   getDB(FAVORITE_CONTRACT).remove({}, { multi: true })
   getDB(OWNER_DB).remove({}, { multi: true })
   getDB(VM_CONTRACT_DB).remove({}, { multi: true })
+  getDB(MINE_DB).remove({}, { multi: true })
 }
