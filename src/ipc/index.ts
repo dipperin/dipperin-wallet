@@ -14,7 +14,13 @@ import {
   START_MINER_NODE_SUCCESS,
   START_MINER_NODE,
   START_NODE_FAILURE,
-  START_MINER_NODE_FAILURE
+  START_MINER_NODE_FAILURE,
+  DELETE_CSWALLET,
+  DELETE_CSWALLET_SUCCESS,
+  DIPPERIN_IPC,
+  DIPPERIN_IPC_RESPONSE,
+  CHAIN_IPC_PATH,
+  CHAIN_DATA_DIR
 } from '@/utils/constants'
 import { getIsRemoteNode } from '@/utils/node'
 
@@ -112,4 +118,72 @@ export const openTmp = () => {
 
 export const openDipperin = () => {
   ipcRenderer.send(OPEN_DIPPERIN)
+}
+
+export const deleteCsWallet = (net: string) => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.send(DELETE_CSWALLET, net)
+    setTimeout(() => {
+      reject(new Error('deleteCsWallet timeout!'))
+    }, 5000)
+    ipcRenderer.once(DELETE_CSWALLET_SUCCESS, () => {
+      resolve()
+    })
+  })
+}
+
+// TODO: arrange the error
+export const dipperinIpc = (rpcString: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      JSON.parse(rpcString)
+    } catch (e) {
+      reject(e)
+    }
+    const jsonRpc = JSON.parse(rpcString)
+    if (typeof jsonRpc === 'object' && 'id' in jsonRpc) {
+      // send
+      ipcRenderer.send(DIPPERIN_IPC, rpcString)
+      // handle response
+      ipcRenderer.once(DIPPERIN_IPC_RESPONSE, (_: Event, response: string) => {
+        const jsonResponse = JSON.parse(response)
+        if (typeof jsonResponse === 'object' && 'id' in jsonResponse && jsonRpc.id === jsonResponse.id) {
+          resolve(jsonResponse)
+        } else if (typeof jsonResponse === 'object' && 'error' in jsonResponse) {
+          reject(new Error(jsonResponse.error!.message))
+        } else {
+          resolve(response)
+        }
+      })
+      setTimeout(() => {
+        reject(new Error('dipperin ipc timeout'))
+      }, 2000)
+    } else {
+      reject(new Error('incorrect input'))
+    }
+  })
+}
+
+export const getChainIpcPath = () => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.send(CHAIN_IPC_PATH)
+    ipcRenderer.once(CHAIN_IPC_PATH, (_: Event, response) => {
+      resolve(response)
+    })
+    setTimeout(() => {
+      reject(`getChainIpcPath timeout`)
+    }, 1500)
+  })
+}
+
+export const getChainDataDir = (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.send(CHAIN_DATA_DIR)
+    ipcRenderer.once(CHAIN_DATA_DIR, (_: Event, response: string) => {
+      resolve(response)
+    })
+    setTimeout(() => {
+      reject('getChainIpcPath timeout')
+    }, 1500)
+  })
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { inject, observer } from 'mobx-react'
-import { observable, action, runInAction, reaction } from 'mobx'
+import { observable, action, reaction } from 'mobx'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import WalletStore from '@/stores/wallet'
@@ -213,12 +213,14 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
       await this.props.wallet.startMine()
       this.props.wallet.setMineState('mining')
     } catch (e) {
+      console.log(e.message)
       switch (e.message) {
         case `Returned error: "miner is mining"`:
           console.log(`miner is mining`)
           this.props.wallet.setMineState('mining')
           break
         case `Returned error: "current node is not mine master"`:
+        case `CONNECTION ERROR: Couldn't connect to node on WS.`:
           console.log(`current node is not mine master"`)
           // 1. try to set up the mine master
           await this.stopNode()
@@ -229,7 +231,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
           )
           break
         case `CONNECTION ERROR: Couldn't connect to node ws://localhost:8893.`:
-          console.log(`could not connect note`)
+          console.log(`could not connect node`)
           this.startMineMaster(
             this.handleStartNodeSuccess,
             this.handleStartNodeFailure,
@@ -239,6 +241,14 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
         default:
           console.log(e.message)
       }
+    }
+  }
+
+  handleStartMineV2 = async () => {
+    if (this.props.wallet.mineState === 'init') {
+      await this.props.wallet.initMine()
+    } else {
+      await this.handleStartMine()
     }
   }
 
@@ -281,9 +291,9 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   testAccount = '0x00008d3EEd5fb2dB537919AdCC04c6a22d2ECaa9E634'
   // testAccount = `0x0000fA5e0e6D1548CfAdB2A4AAC8d73ceF3A64C69be7`
 
-  private getBalanceAndUpdate = async () => {
+  private getBalanceAndUpdate = async (accountAddress: string) => {
     try {
-      const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+      const response = (await this.props.wallet.queryBalance(accountAddress)) || '0'
       console.log(response)
       this.setMineBalance(Utils.fromUnit(response))
     } catch (e) {
@@ -292,10 +302,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   }
 
   updateMineBalance = () => {
-    this.getBalanceAndUpdate()
+    const minerAddress = this.props.wallet.getMinerAccount().address
+    console.log(minerAddress)
+    this.getBalanceAndUpdate(minerAddress)
     const timer: NodeJS.Timeout = setInterval(() => {
       console.log(`updateBalance`)
-      this.getBalanceAndUpdate()
+      this.getBalanceAndUpdate(minerAddress)
     }, LONG_TIMEOUT)
     this.setUpdateMineBalanceTimer(timer)
   }
@@ -306,17 +318,15 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   }
 
   handleWithdrawBalance = async () => {
+    let nonce
     try {
       const curAddress = this.props.account.activeAccount.address
       console.log(curAddress)
       // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
       const value = 100000000000000000000
-      const nonce = await this.props.wallet.getAccountNonce(this.testAccount)
+      nonce = await this.props.wallet.getAccountNonce(this.testAccount)
       console.log(value)
       const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
-      runInAction(() => {
-        this.nonce = String(Number(nonce) + 1)
-      })
       console.log(`handleWithdrawBalance`, result)
     } catch (e) {
       switch (e.message) {
@@ -329,6 +339,47 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     }
   }
 
+  handleWithdrawBalanceAll = async () => {
+    let nonce = 1
+    while (true) {
+      try {
+        const curAddress = this.props.account.activeAccount.address
+        console.log(curAddress)
+        // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+        const value = 100000000000000000000
+        // const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
+        console.log(value)
+        const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
+        console.log(`handleWithdrawBalance`, result)
+        nonce = nonce + 1
+      } catch (e) {
+        switch (e.message) {
+          case `Returned error: "this transaction already in tx pool"`:
+            console.log('this transaction already in tx pool')
+            nonce = nonce + 1
+            break
+          default:
+            console.log(`handleWithdrawBalance error:`, e.message)
+            const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
+            nonce = Number(newNonce)
+        }
+      }
+    }
+  }
+
+  listWallet = async () => {
+    try {
+      const result = await this.props.wallet.listWallet()
+      console.log(`list wallet: `, result)
+    } catch (e) {
+      console.log(`list wallet:`, e.message)
+    }
+  }
+
+  // handleTestRpc = () => {
+  //   this.props.wallet.testRpc()
+  // }
+
   render() {
     const { classes, wallet } = this.props
     return (
@@ -336,8 +387,8 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
         <div className={`${wallet.mineState === 'mining' ? classes.smallBackgroundMining : classes.smallBackground}`} />
 
         {wallet.mineState !== 'mining' && (
-          <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMine}>
-            {wallet.mineState === 'stop' && `一键挖矿`}
+          <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMineV2}>
+            {['stop', 'init'].includes(wallet.mineState) && `一键挖矿`}
             {wallet.mineState === 'loading' && `启动中`}
           </button>
         )}
@@ -356,7 +407,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
           <span>挖矿奖励</span>
         </div>
         <div className={`${classes.input} ${classes.balanceDisplay}`}>{this.mineBalance || '0'} DIP</div>
-        <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.handleWithdrawBalance}>
+        <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.listWallet}>
           提取余额
         </button>
 
