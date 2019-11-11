@@ -325,61 +325,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     this.setUpdateMineBalanceTimer(timer)
   }
 
-  handleQueryBalance = async () => {
-    const response = await this.props.wallet.queryBalance(this.queryAddress)
-    console.log(response)
-  }
-
-  // handleWithdrawBalance = async () => {
-  //   let nonce
-  //   try {
-  //     const curAddress = this.props.account.activeAccount.address
-  //     console.log(curAddress)
-  //     // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-  //     const value = 100000000000000000000
-  //     nonce = await this.props.wallet.getAccountNonce(this.testAccount)
-  //     console.log(value)
-  //     const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
-  //     console.log(`handleWithdrawBalance`, result)
-  //   } catch (e) {
-  //     switch (e.message) {
-  //       case `Returned error: "this transaction already in tx pool"`:
-  //         console.log('this transaction already in tx pool')
-  //         break
-  //       default:
-  //         console.log(`handleWithdrawBalance error:`, e.message)
-  //     }
-  //   }
-  // }
-
-  // handleWithdrawBalanceAll = async () => {
-  //   let nonce = 1
-  //   while (true) {
-  //     try {
-  //       const curAddress = this.props.account.activeAccount.address
-  //       console.log(curAddress)
-  //       // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-  //       const value = 100000000000000000000
-  //       // const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
-  //       console.log(value)
-  //       const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
-  //       console.log(`handleWithdrawBalance`, result)
-  //       nonce = nonce + 1
-  //     } catch (e) {
-  //       switch (e.message) {
-  //         case `Returned error: "this transaction already in tx pool"`:
-  //           console.log('this transaction already in tx pool')
-  //           nonce = nonce + 1
-  //           break
-  //         default:
-  //           console.log(`handleWithdrawBalance error:`, e.message)
-  //           const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
-  //           nonce = Number(newNonce)
-  //       }
-  //     }
-  //   }
-  // }
-
   withdrawBalance = async (address: string, value: string) => {
     await this.props.wallet.withdrawAmount(address, value)
   }

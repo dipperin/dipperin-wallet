@@ -554,7 +554,13 @@ export default class WalletStore {
       const res = await this._store.dipperin.dr.sendSignedTransaction(tx.signedTransactionData)
       console.log(res)
     } catch (e) {
-      console.log(e.message)
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          console.log('this transaction already in tx pool')
+          break
+        default:
+          console.log(`handleWithdrawBalance error:`, e.message)
+      }
     }
   }
 
@@ -572,7 +578,13 @@ export default class WalletStore {
       const res = await this._store.dipperin.dr.sendSignedTransaction(tx.signedTransactionData)
       console.log(res)
     } catch (e) {
-      console.log(e.message)
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          console.log('this transaction already in tx pool')
+          break
+        default:
+          console.log(`handleWithdrawBalance error:`, e.message)
+      }
     }
   }
 
