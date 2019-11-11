@@ -541,7 +541,6 @@ export default class WalletStore {
 
   withdrawAll = async (to: string) => {
     try {
-      console.log('withdrawAll')
       const hdAccount = this.getMinerAccount()
       const minerAddress = hdAccount.address
       const balance = await this.queryBalance(minerAddress)
@@ -566,7 +565,6 @@ export default class WalletStore {
 
   withdrawAmount = async (to: string, amount: string) => {
     try {
-      console.log('withdrawAll')
       const hdAccount = this.getMinerAccount()
       const minerAddress = hdAccount.address
       const nonce = await this.getAccountNonce(minerAddress)
