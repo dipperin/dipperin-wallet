@@ -454,6 +454,28 @@ export const zhCN = {
       cancel: '取消',
       confirm: '确认'
     }
+  },
+  mine: {
+    main: {
+      easyMine: '一键挖矿',
+      loading: '启动中',
+      stopMining: '停止挖矿',
+      mineReward: '挖矿奖励',
+      withdrawBalance: '提取余额'
+    },
+    tips: {
+      title: '注意事项',
+      tipContent: '当启动钱包挖矿功能时，钱包网络节点会切换至本地节点，等待本地节点同步至最新区块高度后即开始挖矿。',
+      done: '确认'
+    },
+    withdraw: {
+      withdraw: '提现',
+      receipt: '收款地址',
+      withdrawAmount: '提款金额',
+      availableAmount: '可提现金额：',
+      cancel: '取消',
+      confirm: '提款'
+    }
   }
 }
 
@@ -470,6 +492,8 @@ export type I18nCollectionDialog = typeof zhCN.dialog
 export type I18nCollectionWallet = typeof zhCN.wallet
 
 export type I18nCollectionCreate = typeof zhCN.create
+
+export type I18nCollectionMine = typeof zhCN.mine
 
 export const enUS: I18nCollection = {
   wallet: {
@@ -926,6 +950,30 @@ export const enUS: I18nCollection = {
       password: 'Password',
       cancel: 'Cancel',
       confirm: 'Confirm'
+    }
+  },
+
+  mine: {
+    main: {
+      easyMine: 'Start Mining',
+      loading: 'Loading',
+      stopMining: 'Stop Mining',
+      mineReward: 'Mining Reward',
+      withdrawBalance: 'Withdraw Balance'
+    },
+    tips: {
+      title: 'Attentions',
+      tipContent:
+        'When the wallet starts mining, it will automatically switch to the local node and wait for the local node to synchronize to the latest block height before mining.',
+      done: 'Done'
+    },
+    withdraw: {
+      withdraw: 'Withdraw Balance',
+      receipt: 'Receipt Address',
+      withdrawAmount: 'Withdraw Amount',
+      availableAmount: 'Available Amount: ',
+      cancel: 'Cancel',
+      confirm: 'Withdraw'
     }
   }
 }

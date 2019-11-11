@@ -2,6 +2,8 @@ import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { inject, observer } from 'mobx-react'
 import { observable, action, reaction } from 'mobx'
+import { I18nCollectionMine } from '@/i18n/i18n'
+import { withTranslation, WithTranslation } from 'react-i18next'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import WalletStore from '@/stores/wallet'
@@ -37,9 +39,13 @@ interface Props {
   account: AccountStore
 }
 
+interface IProps extends WithStyles<typeof styles>, Props {
+  labels: I18nCollectionMine['main']
+}
+
 @inject('root', 'wallet', 'account')
 @observer
-export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<typeof styles> & Props> {
+export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   @observable
   queryAddress: string = ''
   @observable
@@ -346,8 +352,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   //   this.props.wallet.testRpc()
   // }
 
+  handleCloseTips = () => {
+    this.setShowTips(false)
+  }
+
   render() {
-    const { classes, wallet, account } = this.props
+    const { classes, wallet, account, labels } = this.props
     const currentAddress = account.activeAccount.address
     return (
       <div className={classes.main}>
@@ -355,8 +365,8 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
 
         {wallet.mineState !== 'mining' && (
           <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMineV2}>
-            {['stop', 'init'].includes(wallet.mineState) && `一键挖矿`}
-            {wallet.mineState === 'loading' && `启动中`}
+            {['stop', 'init'].includes(wallet.mineState) && labels.easyMine}
+            {wallet.mineState === 'loading' && labels.loading}
           </button>
         )}
         {wallet.mineState === 'mining' && (
@@ -365,22 +375,22 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
             style={{ background: '#BEC0C6' }}
             onClick={this.handleStopMine}
           >
-            {`停止挖矿`}
+            {labels.stopMining}
           </button>
         )}
         <span className={classes.mineTips} onClick={this.setShowTips.bind(this, true)} />
 
         <div className={classes.mineBalanceLabel}>
-          <span>挖矿奖励</span>
+          <span>{labels.mineReward}</span>
         </div>
         <div className={`${classes.input} ${classes.balanceDisplay}`}>{this.mineBalance || '0'} DIP</div>
         <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.handleWithdraw}>
-          提取余额
+          {labels.withdrawBalance}
         </button>
 
         <div className={`${wallet.mineState === 'mining' ? classes.bigBackgroundMining : classes.bigBackground}`} />
 
-        {this.showTips && <Something onClose={this.setShowTips.bind(this, false)} />}
+        {this.showTips && <Something onClose={this.handleCloseTips} />}
         {this.showWithdrawModal && (
           <WithdrawModal
             onClose={this.setShowWithdrawModal.bind(this, false)}
@@ -394,4 +404,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   }
 }
 
-export default withStyles(styles)(Mine)
+const MineWithStyle = withStyles(styles)(Mine)
+
+const MineWrap = (props: Props & WithTranslation) => {
+  const { t, ...other } = props
+  console.log(t)
+  return <MineWithStyle {...other} labels={t('mine:main')} />
+}
+
+export default withTranslation()(MineWrap)
