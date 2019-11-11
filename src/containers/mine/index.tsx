@@ -20,6 +20,7 @@ import { sleep } from '@/utils'
 import { Utils } from '@dipperin/dipperin.js'
 
 import Something from './something'
+import WithdrawModal from './withdrawModal'
 
 import styles from './mineStyles'
 // import { csWallet } from '@/tests/testData/cswallet'
@@ -49,9 +50,13 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
   @observable
   mineBalance: string = ''
   @observable
+  mineBalanceUnit: string = ''
+  @observable
   updateMineBalanceTimer: NodeJS.Timeout | undefined
   @observable
   showTips: boolean = false
+  @observable
+  showWithdrawModal: boolean = false
 
   @action
   handleChandeQueryAddress = (e: React.ChangeEvent<{ value: string }>) => {
@@ -68,6 +73,11 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     this.showTips = flag
   }
 
+  @action
+  setShowWithdrawModal(flag: boolean) {
+    this.showWithdrawModal = flag
+  }
+
   // @action
   // setMining = (flag: boolean | undefined) => {
   //   this.mining = flag
@@ -78,6 +88,11 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     if (num.match(/^([0-9]+(\.[0-9]{1,6})?)/)) {
       this.mineBalance = num.match(/^([0-9]+(\.[0-9]{1,6})?)/)![0]
     }
+  }
+
+  @action
+  setMineBalanceUnit = (num: string) => {
+    this.mineBalanceUnit = num
   }
 
   @action
@@ -288,14 +303,12 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
 
   // *************************************** handle miner account ***************************************************
 
-  testAccount = '0x00008d3EEd5fb2dB537919AdCC04c6a22d2ECaa9E634'
-  // testAccount = `0x0000fA5e0e6D1548CfAdB2A4AAC8d73ceF3A64C69be7`
-
   private getBalanceAndUpdate = async (accountAddress: string) => {
     try {
       const response = (await this.props.wallet.queryBalance(accountAddress)) || '0'
       console.log(response)
       this.setMineBalance(Utils.fromUnit(response))
+      this.setMineBalanceUnit(response)
     } catch (e) {
       console.log(`updateMineBalance error:`, e.message)
     }
@@ -317,71 +330,80 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
     console.log(response)
   }
 
-  handleWithdrawBalance = async () => {
-    let nonce
-    try {
-      const curAddress = this.props.account.activeAccount.address
-      console.log(curAddress)
-      // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-      const value = 100000000000000000000
-      nonce = await this.props.wallet.getAccountNonce(this.testAccount)
-      console.log(value)
-      const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
-      console.log(`handleWithdrawBalance`, result)
-    } catch (e) {
-      switch (e.message) {
-        case `Returned error: "this transaction already in tx pool"`:
-          console.log('this transaction already in tx pool')
-          break
-        default:
-          console.log(`handleWithdrawBalance error:`, e.message)
-      }
-    }
+  // handleWithdrawBalance = async () => {
+  //   let nonce
+  //   try {
+  //     const curAddress = this.props.account.activeAccount.address
+  //     console.log(curAddress)
+  //     // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+  //     const value = 100000000000000000000
+  //     nonce = await this.props.wallet.getAccountNonce(this.testAccount)
+  //     console.log(value)
+  //     const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
+  //     console.log(`handleWithdrawBalance`, result)
+  //   } catch (e) {
+  //     switch (e.message) {
+  //       case `Returned error: "this transaction already in tx pool"`:
+  //         console.log('this transaction already in tx pool')
+  //         break
+  //       default:
+  //         console.log(`handleWithdrawBalance error:`, e.message)
+  //     }
+  //   }
+  // }
+
+  // handleWithdrawBalanceAll = async () => {
+  //   let nonce = 1
+  //   while (true) {
+  //     try {
+  //       const curAddress = this.props.account.activeAccount.address
+  //       console.log(curAddress)
+  //       // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
+  //       const value = 100000000000000000000
+  //       // const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
+  //       console.log(value)
+  //       const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
+  //       console.log(`handleWithdrawBalance`, result)
+  //       nonce = nonce + 1
+  //     } catch (e) {
+  //       switch (e.message) {
+  //         case `Returned error: "this transaction already in tx pool"`:
+  //           console.log('this transaction already in tx pool')
+  //           nonce = nonce + 1
+  //           break
+  //         default:
+  //           console.log(`handleWithdrawBalance error:`, e.message)
+  //           const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
+  //           nonce = Number(newNonce)
+  //       }
+  //     }
+  //   }
+  // }
+
+  withdrawBalance = async (address: string, value: string) => {
+    await this.props.wallet.withdrawAmount(address, value)
   }
 
-  handleWithdrawBalanceAll = async () => {
-    let nonce = 1
-    while (true) {
-      try {
-        const curAddress = this.props.account.activeAccount.address
-        console.log(curAddress)
-        // const response = (await this.props.wallet.queryBalance(this.testAccount)) || '0'
-        const value = 100000000000000000000
-        // const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
-        console.log(value)
-        const result = await this.props.wallet.withdrawBalance(this.testAccount, curAddress, value, 1, Number(nonce))
-        console.log(`handleWithdrawBalance`, result)
-        nonce = nonce + 1
-      } catch (e) {
-        switch (e.message) {
-          case `Returned error: "this transaction already in tx pool"`:
-            console.log('this transaction already in tx pool')
-            nonce = nonce + 1
-            break
-          default:
-            console.log(`handleWithdrawBalance error:`, e.message)
-            const newNonce = await this.props.wallet.getAccountNonce(this.testAccount)
-            nonce = Number(newNonce)
-        }
-      }
-    }
+  handleWithdraw = () => {
+    this.setShowWithdrawModal(true)
   }
 
-  listWallet = async () => {
-    try {
-      const result = await this.props.wallet.listWallet()
-      console.log(`list wallet: `, result)
-    } catch (e) {
-      console.log(`list wallet:`, e.message)
-    }
-  }
+  // listWallet = async () => {
+  //   try {
+  //     const result = await this.props.wallet.listWallet()
+  //     console.log(`list wallet: `, result)
+  //   } catch (e) {
+  //     console.log(`list wallet:`, e.message)
+  //   }
+  // }
 
   // handleTestRpc = () => {
   //   this.props.wallet.testRpc()
   // }
 
   render() {
-    const { classes, wallet } = this.props
+    const { classes, wallet, account } = this.props
+    const currentAddress = account.activeAccount.address
     return (
       <div className={classes.main}>
         <div className={`${wallet.mineState === 'mining' ? classes.smallBackgroundMining : classes.smallBackground}`} />
@@ -407,13 +429,21 @@ export class Mine extends React.Component<RouteComponentProps<{}> & WithStyles<t
           <span>挖矿奖励</span>
         </div>
         <div className={`${classes.input} ${classes.balanceDisplay}`}>{this.mineBalance || '0'} DIP</div>
-        <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.listWallet}>
+        <button className={`${classes.btn} ${classes.withdrawBalance}`} onClick={this.handleWithdraw}>
           提取余额
         </button>
 
         <div className={`${wallet.mineState === 'mining' ? classes.bigBackgroundMining : classes.bigBackground}`} />
 
         {this.showTips && <Something onClose={this.setShowTips.bind(this, false)} />}
+        {this.showWithdrawModal && (
+          <WithdrawModal
+            onClose={this.setShowWithdrawModal.bind(this, false)}
+            onConfirm={this.withdrawBalance}
+            address={currentAddress}
+            balance={this.mineBalanceUnit}
+          />
+        )}
       </div>
     )
   }

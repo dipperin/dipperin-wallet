@@ -541,11 +541,31 @@ export default class WalletStore {
 
   withdrawAll = async (to: string) => {
     try {
+      console.log('withdrawAll')
       const hdAccount = this.getMinerAccount()
       const minerAddress = hdAccount.address
       const balance = await this.queryBalance(minerAddress)
       const nonce = await this.getAccountNonce(minerAddress)
       const value = new BN(balance).minus(new BN(21000)).toString(10)
+      console.log('send value', value)
+      const tx = this._store.transaction.createTransaction(minerAddress, to, value, '', '21000', '1', nonce, '')
+      const chainId = this._store.transaction.getChainId()
+      tx.signTranaction(hdAccount.privateKey, chainId)
+      const res = await this._store.dipperin.dr.sendSignedTransaction(tx.signedTransactionData)
+      console.log(res)
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
+  withdrawAmount = async (to: string, amount: string) => {
+    try {
+      console.log('withdrawAll')
+      const hdAccount = this.getMinerAccount()
+      const minerAddress = hdAccount.address
+      const nonce = await this.getAccountNonce(minerAddress)
+      const value = new BN(amount).minus(new BN(21000)).toString(10)
+      console.log('send value', value)
       const tx = this._store.transaction.createTransaction(minerAddress, to, value, '', '21000', '1', nonce, '')
       const chainId = this._store.transaction.getChainId()
       tx.signTranaction(hdAccount.privateKey, chainId)
