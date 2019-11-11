@@ -70,10 +70,11 @@ export class WithdrawModal extends React.Component<IProps> {
   @action
   handleOnblur = () => {
     // get rid of 0.000000
-    let fmtValue = this.value.replace(/\.?0*$/, '')
-    fmtValue = fmtValue + ' DIP'
+    let fmtValue = this.value
+    fmtValue = fmtValue.replace(/([0-9]*\.[0-9]*[1-9])(0*)$/, '$1')
+    fmtValue = fmtValue.replace(/([0-9]*)\.$/, '$1')
     runInAction(() => {
-      this.value = fmtValue
+      this.value = fmtValue + ' DIP'
       this.withdrawAmountUnit = Utils.toUnit(fmtValue)
     })
   }
