@@ -2,21 +2,27 @@ import { observable, action, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { Utils } from '@dipperin/dipperin.js'
+import { withTranslation, WithTranslation } from 'react-i18next'
 
+import { I18nCollectionMine } from '@/i18n/i18n'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import styles from './styles'
 
-interface Props extends WithStyles<typeof styles> {
+interface WrapProps {
   onClose: () => void
   onConfirm: (address: string, value: string) => void
   address: string
   balance: string
 }
 
+interface IProps extends WithStyles<typeof styles>, WrapProps {
+  labels: I18nCollectionMine['withdraw']
+}
+
 @observer
-export class WithdrawModal extends React.Component<Props> {
+export class WithdrawModal extends React.Component<IProps> {
   @observable
   targetAddress: string = ''
   @observable
@@ -78,22 +84,22 @@ export class WithdrawModal extends React.Component<Props> {
   }
 
   render() {
-    const { classes, onClose } = this.props
+    const { classes, onClose, labels } = this.props
     return (
       <Dialog open={true} onClose={onClose} aria-labelledby="form-dialog-title">
         <div className={classes.dialogMain}>
           <DialogTitle className={classes.dialogTitle} id="form-dialog-title">
-            <span className={classes.dialogTitle}>提现</span>
+            <span className={classes.dialogTitle}>{labels.withdraw}</span>
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
-            <p className={classes.inputLabel}>收款地址</p>
+            <p className={classes.inputLabel}>{labels.receipt}</p>
             <textarea
               className={classes.input}
               style={{ height: '54px', marginBottom: '10px' }}
               value={this.targetAddress}
               onChange={this.handleChangeTargetAddress}
             />
-            <p className={classes.inputLabel}>提现金额</p>
+            <p className={classes.inputLabel}>{labels.withdrawAmount}</p>
             <textarea
               className={classes.input}
               style={{ height: '36px' }}
@@ -102,7 +108,10 @@ export class WithdrawModal extends React.Component<Props> {
               onFocus={this.handleOnFocus}
               onBlur={this.handleOnblur}
             />
-            <p className={classes.postInfo}>可提现金额：{`${this.formatBalance(this.props.balance)} DIP`}</p>
+            <p className={classes.postInfo}>
+              {labels.availableAmount}
+              {`${this.formatBalance(this.props.balance)} DIP`}
+            </p>
           </DialogContent>
           <DialogActions className={classes.dialogBtns}>
             <Button
@@ -112,10 +121,10 @@ export class WithdrawModal extends React.Component<Props> {
               color="primary"
               onClick={onClose}
             >
-              <span style={{ color: '#838899' }}>Cancel</span>
+              <span style={{ color: '#838899' }}>{labels.cancel}</span>
             </Button>
             <Button variant="contained" className={classes.dialogBtn} color="primary" onClick={this.handleOnConfrim}>
-              Withdraw
+              {labels.confirm}
             </Button>
           </DialogActions>
         </div>
@@ -124,4 +133,11 @@ export class WithdrawModal extends React.Component<Props> {
   }
 }
 
-export default withStyles(styles)(WithdrawModal)
+const WithdrawModalWithStyle = withStyles(styles)(WithdrawModal)
+
+const WithdrawModalWrap = (props: WrapProps & WithTranslation) => {
+  const { t, ...other } = props
+  return <WithdrawModalWithStyle {...other} labels={t('mine:withdraw')} />
+}
+
+export default withTranslation()(WithdrawModalWrap)
