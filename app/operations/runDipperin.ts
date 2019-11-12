@@ -11,6 +11,7 @@ import lnet from 'net'
 import dipperinPath from '../utils/dipperinPath'
 import handleError from './handleError'
 import { START_MINER_NODE_FAILURE, START_NODE_FAILURE, START_MINER_NODE_SUCCESS, START_SUCCESS } from '../ipc'
+import { getOs } from '../utils/dipperinPath'
 
 export const DEFAULT_NET = 'venus'
 
@@ -213,20 +214,26 @@ export const getChainIpcPath = () => {
 
 export const dipperinIpcRequest = (rpcString: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const dipperinIpcSocket = new lnet.Socket()
-    dipperinIpcSocket.connect({ path: dipperinIpcPath }, () => {
-      dipperinIpcSocket.once('data', data => {
-        const result = data.toString()
-        dipperinIpcSocket.end()
-        resolve(result)
+    try {
+      const dipperinIpcSocket = new lnet.Socket()
+      const wrapPath = getOs() === 'windows' ? `\\\\.\\pipe\\` + dipperinIpcPath : dipperinIpcPath
+      dipperinIpcSocket.connect({ path: wrapPath }, () => {
+        dipperinIpcSocket.once('data', data => {
+          const result = data.toString()
+          dipperinIpcSocket.end()
+          resolve(result)
+        })
+        dipperinIpcSocket.on('error', (err: Error) => {
+          reject(err)
+        })
+        setTimeout(() => {
+          dipperinIpcSocket.end()
+          reject(new Error('ipcRequest timeout.'))
+        }, 3000)
+        dipperinIpcSocket.write(rpcString)
       })
-      dipperinIpcSocket.on('error', (err: Error) => {
-        reject(err)
-      })
-      setTimeout(() => {
-        reject(new Error('ipcRequest timeout.'))
-      },3000)
-      dipperinIpcSocket.write(rpcString)
-    })
+    } catch (e) {
+      reject(e)
+    }
   })
 }
