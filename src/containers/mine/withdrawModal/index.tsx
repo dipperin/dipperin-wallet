@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import { Utils } from '@dipperin/dipperin.js'
 import { withTranslation, WithTranslation } from 'react-i18next'
+import swal from 'sweetalert2'
 
 import { I18nCollectionMine } from '@/i18n/i18n'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
@@ -12,7 +13,7 @@ import styles from './styles'
 
 interface WrapProps {
   onClose: () => void
-  onConfirm: (address: string, value: string) => void
+  onConfirm: (address: string, value: string) => Promise<void | string>
   address: string
   balance: string
 }
@@ -80,7 +81,29 @@ export class WithdrawModal extends React.Component<IProps> {
   }
 
   handleOnConfrim = async () => {
-    await this.props.onConfirm(this.targetAddress, this.withdrawAmountUnit)
+    const result = await this.props.onConfirm(this.targetAddress, this.withdrawAmountUnit)
+    if (result) {
+      let text: string
+      switch (result) {
+        case `Returned error: "this transaction already in tx pool"`:
+          text = this.props.labels.inPoolError
+          break
+        default:
+          text = result
+      }
+      swal.fire({
+        type: 'error',
+        timer: 3000,
+        text
+      })
+    } else {
+      swal.fire({
+        text: this.props.labels.success,
+        type: 'success',
+        // confirmButtonText: labels.swal.confirm,
+        timer: 3000
+      })
+    }
     this.props.onClose()
   }
 
