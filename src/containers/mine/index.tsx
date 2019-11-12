@@ -111,6 +111,9 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
 
     if (this.props.wallet.mineState === 'mining') {
       this.updateMineBalance()
+    } else {
+      const minerAddress = this.props.wallet.getMinerAccount().address
+      this.getBalanceAndUpdate(minerAddress)
     }
 
     reaction(
@@ -312,7 +315,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   private getBalanceAndUpdate = async (accountAddress: string) => {
     try {
       const response = (await this.props.wallet.queryBalance(accountAddress)) || '0'
-      console.log(response)
+      // console.log(response)
       this.setMineBalance(Utils.fromUnit(response))
       this.setMineBalanceUnit(response)
     } catch (e) {
@@ -322,17 +325,18 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
 
   updateMineBalance = () => {
     const minerAddress = this.props.wallet.getMinerAccount().address
-    console.log(minerAddress)
+    // console.log(minerAddress)
     this.getBalanceAndUpdate(minerAddress)
     const timer: NodeJS.Timeout = setInterval(() => {
-      console.log(`updateBalance`)
+      // console.log(`updateBalance`)
       this.getBalanceAndUpdate(minerAddress)
     }, LONG_TIMEOUT)
     this.setUpdateMineBalanceTimer(timer)
   }
 
   withdrawBalance = async (address: string, value: string) => {
-    await this.props.wallet.withdrawAmount(address, value)
+    const result = await this.props.wallet.withdrawAmount(address, value)
+    return result
   }
 
   handleWithdraw = () => {
@@ -408,7 +412,6 @@ const MineWithStyle = withStyles(styles)(Mine)
 
 const MineWrap = (props: Props & WithTranslation) => {
   const { t, ...other } = props
-  console.log(t)
   return <MineWithStyle {...other} labels={t('mine:main')} />
 }
 

@@ -474,7 +474,9 @@ export const zhCN = {
       withdrawAmount: '提款金额',
       availableAmount: '可提现金额：',
       cancel: '取消',
-      confirm: '提款'
+      confirm: '提款',
+      success: '提现成功',
+      inPoolError: '交易已经发出，请等待'
     }
   }
 }
@@ -973,7 +975,9 @@ export const enUS: I18nCollection = {
       withdrawAmount: 'Withdraw Amount',
       availableAmount: 'Available Amount: ',
       cancel: 'Cancel',
-      confirm: 'Withdraw'
+      confirm: 'Withdraw',
+      success: 'Withdraw Success',
+      inPoolError: 'The transaction has already in pool, please wait a moment.'
     }
   }
 }

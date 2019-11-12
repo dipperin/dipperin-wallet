@@ -69,6 +69,8 @@ export default class WalletStore {
         }
       }
     )
+
+    this.initMiner()
   }
 
   @computed
@@ -382,11 +384,6 @@ export default class WalletStore {
   mineState: string = 'init'
   @observable
   minerMnemonic: string = ''
-  @observable
-  minerWallet = {
-    mnemonic: '',
-    address: ''
-  }
   /**
    * init means the wallet hasn't mined before this time
    * stop means the wallet has mined this time
@@ -461,8 +458,15 @@ export default class WalletStore {
     return err
   }
 
-  stopMine = () => {
-    this._store.dipperin.dr.stopMine()
+  stopMine = async () => {
+    const wrappedRpc = {
+      id: 3,
+      jsonrpc: '2.0',
+      method: 'dipperin_stopMine',
+      params: []
+    }
+    const err = await dipperinIpc(JSON.stringify(wrappedRpc))
+    return err
   }
 
   handleStartMine = async () => {
@@ -492,11 +496,13 @@ export default class WalletStore {
 
   initMiner = async () => {
     try {
-      const miner = await getMiner()
-      if (miner) {
-        this.setMinerMnemonic(miner.mnemonic)
-      } else {
-        this.genMinerAccount()
+      if (this.minerMnemonic === '') {
+        const miner = await getMiner()
+        if (miner) {
+          this.setMinerMnemonic(miner.mnemonic)
+        } else {
+          this.genMinerAccount()
+        }
       }
     } catch (e) {
       console.log(`initMiner error:`, e.message)
@@ -583,17 +589,18 @@ export default class WalletStore {
         default:
           console.log(`handleWithdrawBalance error:`, e.message)
       }
+      return e.message
     }
   }
 
-  withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
-    return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
-  }
+  // withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
+  //   return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
+  // }
 
-  listWallet = async () => {
-    const result = await this._store.dipperin.dr.listWallet()
-    return result
-  }
+  // listWallet = async () => {
+  //   const result = await this._store.dipperin.dr.listWallet()
+  //   return result
+  // }
 
   // testRpc = () => {
   //   restoreWallet()
