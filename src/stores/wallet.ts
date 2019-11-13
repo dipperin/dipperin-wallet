@@ -469,11 +469,11 @@ export default class WalletStore {
     return err
   }
 
-  handleStartMine = async () => {
-    if (this.mineState === 'init') {
-      this.initMine()
-    }
-  }
+  // handleStartMine = async () => {
+  //   if (this.mineState === 'init') {
+  //     this.initMine()
+  //   }
+  // }
 
   initMine = async () => {
     this.setMineState('loading')
@@ -533,11 +533,11 @@ export default class WalletStore {
     this.genMinerAccount()
   }
 
-  getMinerPriv = (mnemonic: string) => {
-    const seed = `0x${BIP39.mnemonicToSeedHex(mnemonic)}`
-    const hdAccount = Accounts.create(seed)
-    return hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).privateKey
-  }
+  // getMinerPriv = (mnemonic: string) => {
+  //   const seed = `0x${BIP39.mnemonicToSeedHex(mnemonic)}`
+  //   const hdAccount = Accounts.create(seed)
+  //   return hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).privateKey
+  // }
 
   getMinerAccount = () => {
     const seed = `0x${BIP39.mnemonicToSeedHex(this.minerMnemonic)}`
