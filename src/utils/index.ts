@@ -1,4 +1,5 @@
 import format from 'date-fns/format'
+import crypto from 'crypto'
 
 export const stringMapToPlainObject = (map: Map<string, any>): object => {
   const plainObject = {}
@@ -154,4 +155,16 @@ export const sleep = (time: number) => {
       resolve()
     }, time)
   })
+}
+
+export function encrypt(key: string, iv: string, data: string) {
+  const decipher = crypto.createCipheriv('aes-256-cbc', key, iv)
+  // decipher.setAutoPadding(true);
+  return decipher.update(data, 'binary', 'hex') + decipher.final('hex')
+}
+
+export function decrypt(key: string, iv: string, crypted: string) {
+  const cryptedBuf = Buffer.from(crypted, 'hex')
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
+  return decipher.update(cryptedBuf, 'binary', 'utf8') + decipher.final('utf8')
 }
