@@ -3,10 +3,11 @@ import { noop } from 'lodash'
 import { observable, reaction, computed, action, runInAction } from 'mobx'
 import BN from 'bignumber.js'
 import path from 'path'
+import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 
+import { encrypt, decrypt } from '@/utils'
 import settings from '@/utils/settings'
 import { getCurrentNet } from '@/utils/node'
-import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 import {
   getWallet,
   insertWallet,
@@ -469,12 +470,6 @@ export default class WalletStore {
     return err
   }
 
-  // handleStartMine = async () => {
-  //   if (this.mineState === 'init') {
-  //     this.initMine()
-  //   }
-  // }
-
   initMine = async () => {
     this.setMineState('loading')
     try {
@@ -499,7 +494,15 @@ export default class WalletStore {
       if (this.minerMnemonic === '') {
         const miner = await getMiner()
         if (miner) {
-          this.setMinerMnemonic(miner.mnemonic)
+          if (miner.mnemonic.split(' ').length === 12) {
+            this.setMinerMnemonic(miner.mnemonic)
+          } else {
+            const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+            const key = pub.substring(0, 32)
+            const iv = pub.substring(32, 48)
+            const mnemonic = decrypt(key, iv, miner.mnemonic)
+            this.setMinerMnemonic(mnemonic)
+          }
         } else {
           this.genMinerAccount()
         }
@@ -525,19 +528,17 @@ export default class WalletStore {
   genMinerAccount = () => {
     const mnemonic = BIP39.generateMnemonic()
     this.setMinerMnemonic(mnemonic)
-    insertMinerData(mnemonic)
+    const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+    const key = pub.substring(0, 32)
+    const iv = pub.substring(32, 48)
+    const encryptedMnemonic = encrypt(key, iv, mnemonic)
+    insertMinerData(encryptedMnemonic)
   }
 
   changeMinerAccount = async () => {
     await removeMinerData()
     this.genMinerAccount()
   }
-
-  // getMinerPriv = (mnemonic: string) => {
-  //   const seed = `0x${BIP39.mnemonicToSeedHex(mnemonic)}`
-  //   const hdAccount = Accounts.create(seed)
-  //   return hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).privateKey
-  // }
 
   getMinerAccount = () => {
     const seed = `0x${BIP39.mnemonicToSeedHex(this.minerMnemonic)}`
@@ -592,19 +593,6 @@ export default class WalletStore {
       return e.message
     }
   }
-
-  // withdrawBalance = async (from: string, to: string, value: number, gasPrice: number, nonce: number) => {
-  //   return await this._store.dipperin.dr.sendTransaction(from, to, value, gasPrice, 21000, [], nonce)
-  // }
-
-  // listWallet = async () => {
-  //   const result = await this._store.dipperin.dr.listWallet()
-  //   return result
-  // }
-
-  // testRpc = () => {
-  //   restoreWallet()
-  // }
 }
 
 // animal enter candy frame garbage thought whip obvious artefact mean tuition pepper
