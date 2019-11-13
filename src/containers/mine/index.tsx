@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react'
 import { observable, action, reaction } from 'mobx'
 import { I18nCollectionMine } from '@/i18n/i18n'
 import { withTranslation, WithTranslation } from 'react-i18next'
+import swal from 'sweetalert2'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import WalletStore from '@/stores/wallet'
@@ -25,6 +26,7 @@ import Something from './something'
 import WithdrawModal from './withdrawModal'
 
 import styles from './mineStyles'
+import { getIsRemoteNode } from '@/utils/node'
 // import { csWallet } from '@/tests/testData/cswallet'
 // import BN from 'bignumber.js'
 
@@ -269,6 +271,23 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   }
 
   handleStartMineV2 = async () => {
+    if (getIsRemoteNode()) {
+      await swal.fire({
+        type: 'error',
+        text: this.props.labels.remoteNodeError,
+        title: this.props.labels.startFailure,
+        timer: 2000
+      })
+      return
+    } else if (!this.props.root.isConnecting) {
+      await swal.fire({
+        type: 'error',
+        text: this.props.labels.remoteNodeError,
+        title: this.props.labels.unstartNodeError,
+        timer: 2000
+      })
+      return
+    }
     if (this.props.wallet.mineState === 'init') {
       await this.props.wallet.initMine()
     } else {
@@ -342,19 +361,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   handleWithdraw = () => {
     this.setShowWithdrawModal(true)
   }
-
-  // listWallet = async () => {
-  //   try {
-  //     const result = await this.props.wallet.listWallet()
-  //     console.log(`list wallet: `, result)
-  //   } catch (e) {
-  //     console.log(`list wallet:`, e.message)
-  //   }
-  // }
-
-  // handleTestRpc = () => {
-  //   this.props.wallet.testRpc()
-  // }
 
   handleCloseTips = () => {
     this.setShowTips(false)
