@@ -461,7 +461,10 @@ export const zhCN = {
       loading: '启动中',
       stopMining: '停止挖矿',
       mineReward: '挖矿奖励',
-      withdrawBalance: '提取余额'
+      withdrawBalance: '提取余额',
+      startFailure: '启动失败',
+      remoteNodeError: '请开启本地节点后启动.',
+      unstartNodeError: '请启动节点后开启挖矿'
     },
     tips: {
       title: '注意事项',
@@ -961,7 +964,10 @@ export const enUS: I18nCollection = {
       loading: 'Loading',
       stopMining: 'Stop Mining',
       mineReward: 'Mining Reward',
-      withdrawBalance: 'Withdraw Balance'
+      withdrawBalance: 'Withdraw Balance',
+      startFailure: 'Start Failure',
+      remoteNodeError: 'please restart after switching to local node.',
+      unstartNodeError: 'please restart after booting booting node'
     },
     tips: {
       title: 'Attentions',
