@@ -10,16 +10,6 @@ import { withStyles, WithStyles } from '@material-ui/core/styles'
 import WalletStore from '@/stores/wallet'
 import RootStore from '@/stores/root'
 import AccountStore from '@/stores/account'
-// import { Accounts, AccountObject } from '@dipperin/dipperin.js'
-import {
-  sendStartMineNode,
-  sendStopNode,
-  onceStartMinerNodeSuccess,
-  onceStartMinerNodeFailure,
-  removeOnceStartMinerNodeSuccess,
-  removeOnceStartMinerNodeFailure
-} from '@/ipc'
-import { sleep } from '@/utils'
 import { Utils } from '@dipperin/dipperin.js'
 
 import Something from './something'
@@ -27,13 +17,8 @@ import WithdrawModal from './withdrawModal'
 
 import styles from './mineStyles'
 import { getIsRemoteNode } from '@/utils/node'
-// import { csWallet } from '@/tests/testData/cswallet'
-// import BN from 'bignumber.js'
 
-const FAILURE_TIMES = 5
 const LONG_TIMEOUT = 15000
-const DEFAULT_WAIT_TIME = 1500
-const DEFAULT_TIMEOUT = 5000
 
 interface Props {
   wallet: WalletStore
@@ -49,13 +34,6 @@ interface IProps extends WithStyles<typeof styles>, Props {
 @observer
 export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   @observable
-  queryAddress: string = ''
-  @observable
-  nonce: string = ''
-  // FIXME: move to store
-  @observable
-  mining: boolean | undefined = false
-  @observable
   mineBalance: string = ''
   @observable
   mineBalanceUnit: string = ''
@@ -67,16 +45,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   showWithdrawModal: boolean = false
 
   @action
-  handleChandeQueryAddress = (e: React.ChangeEvent<{ value: string }>) => {
-    this.queryAddress = e.target.value
-  }
-
-  @action
-  handleChandeNonce = (e: React.ChangeEvent<{ value: string }>) => {
-    this.nonce = e.target.value
-  }
-
-  @action
   setShowTips(flag: boolean) {
     this.showTips = flag
   }
@@ -85,11 +53,6 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   setShowWithdrawModal(flag: boolean) {
     this.showWithdrawModal = flag
   }
-
-  // @action
-  // setMining = (flag: boolean | undefined) => {
-  //   this.mining = flag
-  // }
 
   @action
   setMineBalance = (num: string) => {
@@ -142,94 +105,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
     }
   }
 
-  handleStartMinerNode = () => {
-    if (this.mining === false) {
-      this.props.wallet.setMineState('loading')
-      if (this.props.root.isConnecting) {
-        // stop node
-        sendStopNode()
-        this.props.root.stopConnectNode()
-      }
-      sendStartMineNode()
-      // this.props.wallet.startMine()
-      onceStartMinerNodeSuccess(() => {
-        console.log('启动矿工节点成功')
-        this.props.root.reconnect()
-        this.props.wallet.setMineState('mining')
-        this.props.root.dipperin.net.isConnecting().then((res: boolean) => {
-          console.log('isConnecting', res)
-        })
-      })
-      onceStartMinerNodeFailure(this.handleStartNodeFailure)
-    }
-  }
-
   // ******************* handle the miner master *************************************
-
-  private stopNode = async () => {
-    try {
-      sendStopNode()
-      this.props.root.stopConnectNode()
-    } catch (e) {
-      console.log(e.message)
-    }
-    await sleep(DEFAULT_WAIT_TIME)
-  }
-
-  /**
-   * when the node stop, start mine master
-   */
-  private startMineMaster = (success: () => void, fail: () => void, timeout?: () => void) => {
-    sendStartMineNode()
-    // this.props.wallet.startMine()
-    const timeoutTimer = setTimeout(() => {
-      if (timeout) {
-        timeout()
-      } else {
-        fail()
-      }
-      removeOnceStartMinerNodeSuccess()
-      removeOnceStartMinerNodeFailure()
-    }, LONG_TIMEOUT)
-    onceStartMinerNodeSuccess(() => {
-      clearTimeout(timeoutTimer)
-      success()
-    })
-    onceStartMinerNodeFailure(() => {
-      clearTimeout(timeoutTimer)
-      fail()
-    })
-  }
-
-  private handleStartNodeSuccess = async () => {
-    console.log('启动矿工节点成功')
-    this.props.root.reconnect()
-    // try serveral times startMine
-    await sleep(DEFAULT_WAIT_TIME)
-    let failureTimes = 0
-    while (failureTimes < FAILURE_TIMES) {
-      const result = await this.sendStartMineCommand()
-      if (result) {
-        this.props.wallet.setMineState('mining')
-        return
-      } else {
-        failureTimes += 1
-      }
-      await sleep(DEFAULT_TIMEOUT)
-    }
-    this.props.wallet.setMineState('stop')
-    console.log('try times out, fail to start Mine')
-  }
-
-  private handleStartNodeFailure = () => {
-    console.log('启动矿工节点失败')
-    this.props.wallet.setMineState('stop')
-  }
-
-  private handleStartMinerNodeTimeout = () => {
-    console.log('启动矿工节点超时')
-    this.props.wallet.setMineState('stop')
-  }
 
   handleStartMine = async () => {
     // start loading
@@ -239,30 +115,10 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
       await this.props.wallet.startMine()
       this.props.wallet.setMineState('mining')
     } catch (e) {
-      console.log(e.message)
       switch (e.message) {
         case `Returned error: "miner is mining"`:
           console.log(`miner is mining`)
           this.props.wallet.setMineState('mining')
-          break
-        case `Returned error: "current node is not mine master"`:
-        case `CONNECTION ERROR: Couldn't connect to node on WS.`:
-          console.log(`current node is not mine master"`)
-          // 1. try to set up the mine master
-          await this.stopNode()
-          this.startMineMaster(
-            this.handleStartNodeSuccess,
-            this.handleStartNodeFailure,
-            this.handleStartMinerNodeTimeout
-          )
-          break
-        case `CONNECTION ERROR: Couldn't connect to node ws://localhost:8893.`:
-          console.log(`could not connect node`)
-          this.startMineMaster(
-            this.handleStartNodeSuccess,
-            this.handleStartNodeFailure,
-            this.handleStartMinerNodeTimeout
-          )
           break
         default:
           console.log(e.message)
