@@ -71,6 +71,10 @@ export class Setting extends React.Component<Props> {
   privateKey: string = ''
   @observable
   showTip: boolean = true
+  @observable
+  chainDataDir: string = ''
+
+  chainDataDirInput: HTMLInputElement
 
   constructor(props: Props) {
     super(props)
@@ -120,6 +124,20 @@ export class Setting extends React.Component<Props> {
   @action
   setShowDialog = (flag: boolean) => {
     this.showDialog = flag
+  }
+
+  @action
+  setChainDataDir = (path: string) => {
+    this.chainDataDir = path
+  }
+
+  chainDataDirRef = (instance: HTMLInputElement) => {
+    if (instance) {
+      instance.setAttribute('webkitdirectory', '')
+      instance.setAttribute('directory', '')
+      instance.setAttribute('multiple', '')
+    }
+    this.chainDataDirInput = instance
   }
 
   handleCloseDialog = () => {
@@ -355,6 +373,13 @@ export class Setting extends React.Component<Props> {
     this.showTip = false
   }
 
+  handleChangeDir = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files)
+    if (e.target.files && e.target.files.length > 0) {
+      this.setChainDataDir(e.target.files[0].path)
+    }
+  }
+
   render() {
     const {
       labels,
@@ -389,6 +414,8 @@ export class Setting extends React.Component<Props> {
                 {labels.about.label.version} : {PackageJson.version}
               </p>
             </div>
+            <input type="file" onChange={this.handleChangeDir} ref={this.chainDataDirRef} />
+            {this.chainDataDir}
           </div>
           <div className={classes.right}>
             <Tooltip title={isRemoteNode ? labels.net.closeRemote : labels.net.connectRemote}>
@@ -533,3 +560,13 @@ const SettingWrap = (props: WrapProps & WithTranslation) => {
 export default withTranslation()(SettingWrap)
 
 // export default withStyles(styles)(withNamespaces('setting')(Setting))
+
+// export const mockFile = {
+//   lastModified: 1564729958000,
+//   lastModifiedDate: 'Fri Aug 02 2019 15:12:38 GMT+0800 (CST)',
+//   name: 'build',
+//   path: '/home/liuboheng/Desktop/chrome-extension/build',
+//   size: 4096,
+//   type: '',
+//   webkitRelativePath: 'chrome-extension/build'
+// }
