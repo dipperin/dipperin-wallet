@@ -1,16 +1,17 @@
 import { computed, observable, reaction, runInAction, action } from 'mobx'
 import { isString } from 'lodash'
 
-import { insertVmContract, getVmContract, updateVmContractStatus } from '@/db'
+import { insertVmContract, getVmContract, updateVmContractStatus, getReceipt, insertReceipt } from '@/db'
 import {
-  DEFAULT_CHAIN_ID,
+  // DEFAULT_CHAIN_ID,
   TRANSACTION_STATUS_FAIL,
   TRANSACTION_STATUS_SUCCESS,
   VM_CONTRACT_ADDRESS
 } from '@/utils/constants'
 
 import VmContractModel, { VmContractObj } from '../models/vmContract'
-import { getCurrentNet } from '../utils/node'
+import { getCurrentNet } from '@/utils/node'
+import { generateTxResponse } from '@/utils/errors'
 import { getNowTimestamp } from '@/utils'
 
 import RootStore from './root'
@@ -30,6 +31,9 @@ class VmContractStore {
   private _store: RootStore
 
   private _dipperin: Dipperin
+  // key is contract txHash
+  @observable
+  private _pendingContract: Map<string, VmContractModel> = new Map()
   // current contract (created & favorite)
   @observable
   private _contract: Map<string, VmContractModel> = new Map()
@@ -40,9 +44,17 @@ class VmContractStore {
   @observable
   private _receipts: Map<string, Receipt[]> = new Map()
 
+  /**
+   * @example
+   * '0x00000...001:create'
+   */
+  @observable
+  private _path: string = ':'
+
   constructor(store: RootStore) {
     this._store = store
     this._dipperin = new Dipperin(HTTPHOST)
+    // TODO: try to remove this part by changing rely function
     reaction(
       () => this._store.account.activeAccount,
       () => {
@@ -51,33 +63,54 @@ class VmContractStore {
     )
   }
 
+  @action
+  updateDipperin(newDipperin: Dipperin) {
+    this._dipperin = newDipperin
+  }
+
   @computed
   get contracts(): VmContractModel[] {
     const contracts: VmContractModel[] = []
+    // if activeAccount does not exist
     if (!this._store.account.activeAccount) {
       return contracts
     }
-    const accountAddress = this._store.account.activeAccount.address
 
+    const accountAddress = this._store.account.activeAccount.address
     this._contract.forEach((contract: VmContractModel) => {
-      let owners: string[]
-      if (contract.owner instanceof Array) {
-        owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
-      } else {
-        owners = [contract.owner.toLocaleLowerCase()]
-      }
+      const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
       }
     })
-    console.log('contracts', contracts)
-
     return contracts.sort((a, b) => a.timestamp - b.timestamp)
+  }
+
+  @computed
+  get pendingContracts(): VmContractModel[] {
+    const pendingContracts: VmContractModel[] = []
+    // if activeAccount does not exist
+    if (!this._store.account.activeAccount) {
+      return pendingContracts
+    }
+
+    const accountAddress = this._store.account.activeAccount.address
+    this._pendingContract.forEach((contract: VmContractModel) => {
+      const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
+      if (owners.includes(accountAddress.toLocaleLowerCase())) {
+        pendingContracts.push(contract)
+      }
+    })
+    return pendingContracts.sort((a, b) => a.timestamp - b.timestamp)
   }
 
   // current address contract
   get contract() {
     return this._contract
+  }
+
+  get pendingContract() {
+    return this._pendingContract
   }
 
   get receipts() {
@@ -93,25 +126,18 @@ class VmContractStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
-    // console.log('confirmTransaction.............')
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
-      // console.debug(`tx${JSON.stringify(transaction.toJS())}`)
-      // console.dir(transaction.toJS())
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       const res = await this._dipperin.dr.sendSignedTransaction(transaction.signedTransactionData)
       if (!isString(res)) {
         const errRes = res
-        return {
-          success: false,
-          info: errRes.error ? errRes.error.message : 'Something wrong!'
-        }
+        return generateTxResponse(false, errRes.error)
       }
       if (res === transaction.transactionHash) {
         // Append Transaction
@@ -119,28 +145,12 @@ class VmContractStore {
         this._store.transaction.appendTransaction(activeAccountAddress, [transaction.toJS()])
         // Plus account nonce
         this._store.account.activeAccount.plusNonce()
-        return {
-          success: true,
-          hash: transaction.transactionHash
-        }
+        return generateTxResponse(true, transaction.transactionHash)
       } else {
-        return {
-          success: false,
-          info: 'Something wrong!'
-        }
+        return generateTxResponse(false)
       }
     } catch (err) {
-      // console.error(String(err))
-      if (err instanceof Errors.NoEnoughBalanceError) {
-        return {
-          success: false,
-          info: err.message
-        }
-      }
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -148,48 +158,31 @@ class VmContractStore {
     address: string,
     amount: string,
     memo: string,
-    // fee?: string,
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+    const transaction = this._store.transaction.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
-      // const transaction = this.createNewTransaction(address, amount, memo, fee, gas, gasPrice)
-      const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
-      transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
+      // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
+      // const transaction = this._store.transaction.createNewTransaction(address, amount, memo, gas, gasPrice)
+      // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.dipperin.dr.estimateGas(transaction.signedTransactionData)
       } else {
         res = await this._dipperin.dr.estimateGas(transaction.signedTransactionData)
       }
-      return {
-        success: true,
-        info: Number(res).toString()
-      }
+      return generateTxResponse(true, Number(res).toString())
     } catch (err) {
       // console.error(String(err))
       if (err instanceof Errors.NoEnoughBalanceError) {
-        return {
-          success: false,
-          info: err.message
-        }
+        return generateTxResponse(false, err.message)
       }
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
-  async createContractEstimateGas(
-    code: string,
-    abi: string,
-    gas: string,
-    gasPrice: string,
-    amount: string,
-    params?: string[]
-  ): Promise<TxResponse> {
+  async createContractEstimateGas(code: string, abi: string, amount: string, params?: string[]): Promise<TxResponse> {
     try {
       const contract = new VmContractModel({
         contractCode: code,
@@ -198,15 +191,11 @@ class VmContractStore {
         owner: this._store.account.activeAccount.address
       })
 
-      const res2 = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
+      const res = await this.estimateGas(VM_CONTRACT_ADDRESS, amount, contract.contractData, '1', '1')
 
-      return res2
+      return res
     } catch (err) {
-      console.error(String(err))
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -225,8 +214,8 @@ class VmContractStore {
         initParams: params,
         owner: this._store.account.activeAccount.address
       })
-      const callData = Array.prototype.slice.call(Buffer.from(contract.contractData.replace('0x', ''), 'hex'))
-      console.log('contractData', callData)
+      // const callData = Array.prototype.slice.call(Buffer.from(contract.contractData.replace('0x', ''), 'hex'))
+      // console.log('contractData', callData)
       let res
       if (this._store.isRemoteNode) {
         res = await this._store.transaction.confirmTransaction(
@@ -241,31 +230,22 @@ class VmContractStore {
       }
 
       if (res.success) {
-        contract.txHash = res.hash as string
+        contract.txHash = res.info as string
         runInAction(() => {
-          this._contract.set(contract.txHash, contract)
+          this._pendingContract.set(contract.txHash, contract)
         })
         // insert to all contract
         insertVmContract(contract.toJS(), getCurrentNet())
-        return {
-          success: true
-        }
+        return generateTxResponse(true)
       } else {
-        return {
-          success: false,
-          info: res.info
-        }
+        return generateTxResponse(false, res.info)
       }
     } catch (err) {
-      console.error(String(err))
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
-  addContract(abi: string, address: string): TxResponse {
+  async addContract(abi: string, address: string): Promise<TxResponse> {
     const contract = new VmContractModel({
       contractAbi: abi,
       contractAddress: address,
@@ -275,26 +255,32 @@ class VmContractStore {
     // console.log('contractData', contract.contractData)
     if (
       this._contract.has(address) &&
-      this._contract.get(contract.contractAddress)!.hasOwner(this._store.account.activeAccount.address)
+      this._contract.get(address)!.hasOwner(this._store.account.activeAccount.address)
     ) {
-      return {
-        success: false,
-        info: 'The Contract has already existed!'
-      }
-    } else if (this._contract.has(contract.contractAddress)) {
+      return generateTxResponse(false, 'The Contract has already existed!')
+    } else if (this._contract.has(address)) {
       this._contract.get(address)!.addOwner(this._store.account.activeAccount.address)
-      insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
+      await insertVmContract(this._contract.get(address)!.toJS(), getCurrentNet())
     } else {
       runInAction(() => {
         this._contract.set(contract.contractAddress, contract)
       })
-      insertVmContract(contract.toJS(), getCurrentNet())
+      await insertVmContract(contract.toJS(), getCurrentNet())
     }
     // insert to all contract
-    console.log('after addContract', this._contract.get(address))
+    // console.log('after addContract', this._contract.get(address))
 
-    return {
-      success: true
+    return generateTxResponse(true)
+  }
+
+  async getLogs(blockHash: string, fromBlock: number, toBlock: number, addresses: string[], topics: string[][]) {
+    try {
+      // console.log('vmcontract store getLogs..........')
+      const res = await this._store.dipperin.dr.vmContract.getLogs(blockHash, fromBlock, toBlock, addresses, topics)
+      // console.log('getLogs', res)
+      return generateTxResponse(true, res)
+    } catch (e) {
+      return generateTxResponse(false, e)
     }
   }
 
@@ -313,21 +299,13 @@ class VmContractStore {
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
         this._contractTxsMap.set(address, [...txs, res.hash as string])
-        return {
-          success: true,
-          info: res.hash
-        }
+        console.log('new tx', this._contractTxsMap.get(address)![0])
+        return generateTxResponse(true, res.info)
       } else {
-        return {
-          success: false,
-          info: res.info
-        }
+        return generateTxResponse(false, res.info)
       }
     } catch (err) {
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
@@ -342,37 +320,43 @@ class VmContractStore {
     try {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
       const hash = this._store.transaction.getSignedTransactionData(address, '0', callData, gas, gasPrice)
+        .signedTransactionData
       const res = await this._store.dipperin.dr.callConstFunc(hash, 0)
-      return {
-        success: true,
-        info: res
-      }
+      return generateTxResponse(true, res as string)
     } catch (err) {
-      return {
-        success: false,
-        info: String(err)
-      }
+      return generateTxResponse(false, err)
     }
   }
 
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
-    console.log('vmContractStore load', contractDb)
     runInAction(() => {
-      const removeList: string[] = []
       this.getContractsFromObj(contractDb).forEach(contract => {
-        this._contract.set(contract.contractAddress, contract)
-        if (this._contract.has(contract.txHash)) {
-          removeList.push(contract.txHash)
+        if (contract.contractAddress) {
+          this._contract.set(contract.contractAddress, contract)
+        } else if (contract.txHash) {
+          this._pendingContract.set(contract.txHash, contract)
         }
       })
-      removeList.forEach(txHash => this._contract.delete(txHash))
+    })
+    const receipts = await getReceipt(getCurrentNet())
+    // console.log(receipts)
+    runInAction(() => {
+      receipts.forEach(receipt => {
+        const preReceipts = this._receipts.get(receipt.address as string) || []
+        if (!preReceipts.find(item => item.transactionHash === receipt.transactionHash)) {
+          preReceipts.push(receipt)
+          this._receipts.set(receipt.address as string, preReceipts)
+        }
+      })
     })
   }
 
+  @action
   clear() {
     this._contract.clear()
+    this._pendingContract.clear()
   }
 
   reload() {
@@ -382,6 +366,7 @@ class VmContractStore {
 
   getContractReceipt() {
     this._contractTxsMap.forEach(async (txs, address) => {
+      console.log('removeTxs1')
       const removeTxs = await Promise.all(
         txs.map(async tx => {
           try {
@@ -390,6 +375,7 @@ class VmContractStore {
               const preReceipts = this._receipts.get(address) || []
               preReceipts.push(res)
               this._receipts.set(address, preReceipts)
+              insertReceipt(res, address)
               return tx
             }
             return
@@ -398,6 +384,7 @@ class VmContractStore {
           }
         })
       )
+      console.log('removeTxs2', removeTxs)
       const newTxs = txs.filter(tx => !removeTxs.find(t => tx === t))
       this._contractTxsMap.set(address, newTxs)
     })
@@ -411,14 +398,29 @@ class VmContractStore {
 
   updateContractStatus() {
     // const newContracts: VmContractModel[] = []
-    this._contract.forEach(contract => {
+    this._pendingContract.forEach(contract => {
       if (!contract.isSuccess && !contract.isOverLongTime(getNowTimestamp())) {
         this._store.dipperin.dr.vmContract
           .getContractByHash(contract.txHash)
           .then(res => {
             if (!res) {
+              // if the contract does not exist while the tx is on chain, we can set fail
+              this._store.dipperin.dr.getTransaction(contract.txHash).then(txRes => {
+                if (txRes === contract.txHash) {
+                  contract.setFail()
+                  // update contract in db
+                  updateVmContractStatus(
+                    contract.txHash,
+                    TRANSACTION_STATUS_FAIL,
+                    contract.contractAddress,
+                    getCurrentNet()
+                  )
+                }
+              })
+
               if (contract.isOverTime(getNowTimestamp())) {
                 contract.setFail()
+                // ? why fail tx has contractAddress
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,
@@ -432,7 +434,11 @@ class VmContractStore {
               if (res) {
                 contract.contractAddress = res
                 contract.setSuccess()
-                console.log('update contract status.....................')
+                runInAction(() => {
+                  this._contract.set(contract.contractAddress, contract)
+                  this._pendingContract.delete(contract.txHash)
+                })
+                // console.log('update contract status.....................')
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,
@@ -472,6 +478,29 @@ class VmContractStore {
     return contractObj.map(item => {
       return VmContractModel.fromObj(item)
     })
+  }
+
+  @computed
+  get path() {
+    return this._path
+  }
+
+  @computed
+  get currentActiveAccount() {
+    return this._store.account.activeAccount.address
+  }
+
+  @action
+  setPath = (address: string, dist: string): boolean => {
+    if (!address.includes(':') && !dist.includes(':')) {
+      // TODO: validate address and dist
+      this._path = `${address}:${dist}`
+      // a useful log
+      // console.log(this._path)
+      return true
+    } else {
+      return false
+    }
   }
 }
 

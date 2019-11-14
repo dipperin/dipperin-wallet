@@ -1,4 +1,4 @@
-import { observable, action, reaction, runInAction } from 'mobx'
+import { action, computed, reaction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 // import Pagination from 'rc-pagination'
 import React, { Fragment } from 'react'
@@ -37,8 +37,13 @@ interface Props extends WithStyles<typeof styles>, WrapProps {
 @inject('vmContract', 'wallet')
 @observer
 export class VmContractList extends React.Component<Props> {
-  @observable
-  currentContract: string = ''
+  // @observable
+  // currentContract: string = ''
+
+  @computed
+  get currentContract() {
+    return this.props.vmContract!.path.split(':')[1]
+  }
 
   constructor(props) {
     super(props)
@@ -51,63 +56,60 @@ export class VmContractList extends React.Component<Props> {
         }
       }
     )
-  }
-
-  componentDidUpdate = (preProps, preState) => {
-    if (this.props.match.url === this.props.location.pathname) {
-      this.redirect()
+    const path = this.props.vmContract!.path
+    if (path.split(':')[1].length > 0) {
+      // this.currentContract = path.split(':')[1]
     }
   }
 
   redirect = () => {
-    const { match } = this.props
-
-    const { contracts } = this.props.vmContract!
-    const haveContract = contracts && contracts.length > 0
-    if (haveContract) {
-      const firstContract = contracts[0].contractAddress
-      if (this.props.vmContract!.contract.get(firstContract)) {
-        this.props.history.push(`${match.url}/call/${firstContract}`)
-      } else {
-        this.props.history.push(`${match.url}/call/${contracts[0].txHash}`)
-      }
-      runInAction(() => {
-        this.currentContract = firstContract
-      })
-    } else {
-      this.props.history.push(`${match.url}/create`)
+    if (this.props.vmContract!.contracts.length > 0 && this.props.vmContract!.path.split(':')[1] === '') {
+      const contract = this.props.vmContract!.contracts[0].contractAddress
+      this.jumpToCall(contract)
     }
   }
 
   @action
-  jumpToCall = (contractAddress: string, contractTxHash: string) => {
-    const { vmContract, match, history } = this.props
-    this.currentContract = contractAddress
-    if (vmContract!.contract.has(contractAddress)) {
-      history.push(`${match.url}/call/${contractAddress}`)
-    } else {
-      history.push(`${match.url}/call/${contractTxHash}`)
-    }
+  jumpToCall = (contractAddress: string) => {
+    // const { match, history } = this.props
+    // this.currentContract = contractAddress
+    // history.push(`${match.url}/call/${contractAddress}`)
+
+    // this.currentContract = contractAddress
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
   }
 
   @action
   jumpToCreate = () => {
-    const { match, history } = this.props
-    history.push(`${match.url}/create`)
-    this.currentContract = ''
+    // const { match, history } = this.props
+    // history.push(`${match.url}/create`)
+    // this.currentContract = ''
+
+    // this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, '')
   }
 
   @action
   jumpToDetail = (contractAddress: string) => {
     const { match, history } = this.props
     history.push(`${match.url}/receipts/${contractAddress}`)
-    this.currentContract = ''
+    // this.currentContract = ''
+    const account = this.props.vmContract!.currentActiveAccount
+    this.props.vmContract!.setPath(account, contractAddress)
+  }
+
+  @computed
+  get contracts() {
+    const { contracts, pendingContracts } = this.props.vmContract!
+    return contracts.concat(pendingContracts).sort((a, b) => a.timestamp - b.timestamp)
   }
 
   render() {
     const { vmContract, classes, labels } = this.props
-    const { contracts } = vmContract!
-    const haveContract = contracts && contracts.length > 0
+    const { contracts, pendingContracts } = vmContract!
+    const haveContract = (contracts && contracts.length > 0) || (pendingContracts && pendingContracts.length > 0)
 
     return (
       <Fragment>
@@ -123,7 +125,17 @@ export class VmContractList extends React.Component<Props> {
         )}
         {haveContract && (
           <div className={classes.contractsList}>
-            {contracts.map((contract, index) => {
+            {/* {pendingContracts.map((contract, index) => {
+              return (
+                <StyleContractItem
+                  labels={labels}
+                  contract={contract}
+                  key={index}
+                  ifCurrent={false}
+                />
+              )
+            })} */}
+            {this.contracts.map((contract, index) => {
               return (
                 <StyleContractItem
                   jumpToCall={this.jumpToCall}

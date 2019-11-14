@@ -9,7 +9,7 @@ import styles from './styles'
 
 interface Props extends WithStyles<typeof styles> {
   onClose: () => void
-  onConfirm: (password: string) => void
+  onConfirm: (password?: string) => void
   title: string
   label: string
   btnText: string
@@ -17,7 +17,7 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 @observer
-class PasswordConfirm extends React.Component<Props> {
+export class DialogConfirm extends React.Component<Props> {
   @observable
   value: string = ''
 
@@ -59,4 +59,4 @@ class PasswordConfirm extends React.Component<Props> {
   }
 }
 
-export default withStyles(styles)(PasswordConfirm)
+export default withStyles(styles)(DialogConfirm)

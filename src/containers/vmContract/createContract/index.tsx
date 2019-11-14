@@ -1,11 +1,11 @@
-import { observable, action, runInAction } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React, { Fragment } from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
 import debounce from 'lodash/debounce'
-import isFloat from 'validator/lib/isFloat'
+// import isFloat from 'validator/lib/isFloat'
 import isInt from 'validator/lib/isInt'
 import classNames from 'classnames'
 
@@ -23,7 +23,8 @@ import SelectedFile from '@/images/select-file-ed.png'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
-import { helper, Utils } from '@dipperin/dipperin.js'
+import { helper } from '@dipperin/dipperin.js'
+import { isVmContractAddress } from '@/utils'
 
 interface WrapProps extends RouteComponentProps<{}> {
   account?: AccountStore
@@ -34,46 +35,87 @@ interface WrapProps extends RouteComponentProps<{}> {
 interface IProps extends WithStyles<typeof styles>, WrapProps {
   labels: I18nCollectionContract['contract']
 }
-interface IParamsValue {
-  [param: string]: string
-}
 
 @inject('wallet', 'vmContract', 'account')
 @observer
 export class CreateContract extends React.Component<IProps> {
-  @observable
-  code: string = ''
-  @observable
-  abi: string = ''
-  @observable
-  amount: string = '0'
-  @observable
-  gas: string = ''
-  @observable
-  gasPrice: string = ''
-  @observable
-  params: string = ''
-  @observable
-  showDialog: boolean = false
-  @observable
-  isCreated: boolean = true
-  @observable
-  contractAddress: string = ''
-  @observable
-  showDetailParams: boolean = false
-  @observable
-  paramsValue: IParamsValue = {}
-  @observable
-  estimateGas: number
+  // @observable
+  // estimateGas: number
   inputABI: HTMLInputElement | null
-  @observable
-  inputABIPlaceholder: string = ''
   inputWasm: HTMLInputElement | null
+
+  /**
+   * if use register list? that's a question
+   */
+
+  // REGISTER_STRING_INPUT = ['code','abi','amount','gas','gasPrice','param']
+  // * consider set the state into private
   @observable
-  inputWasmPlaceholder: string = ''
+  private stringField: Map<string, string> = new Map()
+  @observable
+  flags: Map<string, boolean> = new Map()
+
+  constructor(props) {
+    super(props)
+    this.initState()
+  }
+
+  @computed
+  get jsonAbi() {
+    const abiString = this.stringField.get('abi')
+    if (abiString) {
+      return JSON.parse(helper.Bytes.toString(abiString))
+    } else {
+      return []
+    }
+  }
 
   @action
-  codeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  setStringField = (key: string, value: string) => {
+    // pre validator or process
+    this.stringField.set(key, value)
+  }
+
+  @action
+  setFlags = (key: string, value: boolean) => {
+    this.flags.set(key, value)
+  }
+
+  getStringField = (key: string): string => {
+    return this.stringField.get(key) || ''
+  }
+
+  getFlag = (key: string): boolean => {
+    return Boolean(this.flags.get(key))
+  }
+
+  /**
+   * call the function when start and leave
+   */
+  initState = () => {
+    this.setStringField('code', '')
+    this.setStringField('inputWasmPlaceholder', '')
+    this.setStringField('abi', '')
+    this.setStringField('inputABIPlaceholder', '')
+    this.setStringField('gas', '')
+    this.setStringField('gasPrice', '')
+    this.setStringField('params', '')
+    this.setStringField('estimateGas', '')
+    this.setStringField('contractAddress', '')
+    this.setFlags('showDialog', false)
+    this.setFlags('isCreated', true)
+    this.setFlags('showDetailParams', false)
+  }
+
+  handleJumpToCreated = () => {
+    this.setFlags('isCreated', true)
+  }
+
+  handleJumpToFavorite = () => {
+    this.setFlags('isCreated', false)
+  }
+
+  handleChangeCode = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       if (e.target.files[0].name.split('.').reverse()[0] !== 'wasm') {
         await swal.fire({
@@ -82,29 +124,27 @@ export class CreateContract extends React.Component<IProps> {
         })
         return
       }
-      this.inputWasmPlaceholder = e.target.files[0].name
+      this.setStringField('inputWasmPlaceholder', e.target.files[0].name)
       const reader = new FileReader()
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
-        runInAction(() => {
-          this.code = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
-        })
+        const code = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
+        this.setStringField('code', code)
       }
     }
   }
 
-  @action
-  jumpToCreated = () => {
-    this.isCreated = true
+  validateAbi = (rawAbi: string) => {
+    try {
+      // TODO: validate the inner Content of file
+      JSON.parse(helper.Bytes.toString(rawAbi))
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
-  @action
-  jumpToFavorite = () => {
-    this.isCreated = false
-  }
-
-  @action
-  abiChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleChangeAbi = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       // console.log(e.target.files[0].name.split('.').reverse())
       if (e.target.files[0].name.split('.').reverse()[0] !== 'json') {
@@ -114,123 +154,131 @@ export class CreateContract extends React.Component<IProps> {
         })
         return
       }
-      this.inputABIPlaceholder = e.target.files[0].name
+      this.setStringField('inputABIPlaceholder', e.target.files[0].name)
       const reader = new FileReader()
       await reader.readAsArrayBuffer(e.target.files[0])
       reader.onloadend = () => {
-        runInAction(() => {
-          this.abi = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
-        })
+        const abi = helper.Bytes.fromUint8Array(new Uint8Array(reader.result as ArrayBuffer))
+        if (this.validateAbi(abi)) {
+          this.setStringField('abi', abi)
+        } else {
+          this.inputABI!.value = ''
+          this.setStringField('inputABIPlaceholder', '')
+          swal.fire({
+            type: 'error',
+            title: this.props.labels.errorAbiFile
+          })
+        }
       }
     }
   }
 
-  @action
-  amountChange = (e: React.ChangeEvent<{ value: string }>) => {
-    if (isFloat(e.target.value) || e.target.value === '') {
-      this.amount = e.target.value
-    }
+  handleChangeParams = (e: React.ChangeEvent<{ value: string }>) => {
+    this.setStringField('params', e.target.value)
   }
 
-  @action
-  gasChange = (e: React.ChangeEvent<{ value: string }>) => {
+  handleToggleDetailParam = () => {
+    const newFlag = !this.flags.get('showDetailParams')
+    this.setFlags('showDetailParams', newFlag)
+  }
+
+  handleChangeGas = (e: React.ChangeEvent<{ value: string }>) => {
     if (isInt(e.target.value) || e.target.value === '') {
-      this.gas = e.target.value
+      this.setStringField('gas', e.target.value)
     }
   }
 
-  @action
-  gasPriceChange = (e: React.ChangeEvent<{ value: string }>) => {
+  handleChangeGasPrice = (e: React.ChangeEvent<{ value: string }>) => {
     if (isInt(e.target.value) || e.target.value === '') {
-      this.gasPrice = e.target.value
+      this.setStringField('gasPrice', e.target.value)
     }
   }
 
-  @action
-  contractAddressChange = (e: React.ChangeEvent<{ value: string }>) => {
+  handleChangeContractAddress = (e: React.ChangeEvent<{ value: string }>) => {
     const address = e.target.value
-    const hexAddress = `0x${address.replace('0x', '')}`
-    if (Utils.isAddress(hexAddress)) {
-      this.contractAddress = address
+    const pureAddress = `${address.replace('0x', '')}`
+    if (/^[0-9a-fA-F]{0,44}$/.test(pureAddress)) {
+      this.setStringField('contractAddress', address)
     }
   }
 
-  @action
-  paramsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.params = e.target.value
-  }
-
-  @action
-  toggleDetailParam = () => {
-    this.showDetailParams = !this.showDetailParams
-  }
-
-  @action
   getContractGas = async () => {
-    const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
-      this.code,
-      this.abi,
-      this.gas,
-      this.gasPrice,
-      this.amount,
-      this.params.split(',').map(param => param.trim())
-    )
+    // TODO: add validator for every input of createContractEstimateGas
+    const code = this.getStringField('code')
+    const abi = this.getStringField('abi')
+    const amount = '0'
+    const params = this.stringField
+      .get('params')!
+      .split(',')
+      .map(param => param.trim())
+    const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(code, abi, amount, params)
     // console.log('createContractEstimateGas', estimateGasRes)
-    if (estimateGasRes.success) {
-      try {
-        const estimateGas = Number(estimateGasRes.info)
-        runInAction(() => {
-          this.estimateGas = estimateGas
-        })
-      } catch (e) {
-        console.error('estimate gas error', e)
-      }
+    if (!estimateGasRes.success) {
+      return
+    }
+    try {
+      // TODO: add validator for estimateGas
+      const estimateGas = estimateGasRes.info || ''
+      this.setStringField('estimateGas', estimateGas)
+    } catch (e) {
+      console.error('estimate gas error', e)
     }
   }
 
-  paramsValueChange = (param: string) => (e: React.ChangeEvent<{ value: string }>) => {
-    runInAction(() => {
-      this.paramsValue[param] = e.target.value
-    })
+  handleChangeParam(param: string, e: React.ChangeEvent<{ value: string }>) {
+    this.setStringField(param, e.target.value)
+  }
+
+  validateParams = () => {
+    const label = this.props.labels.createSwal
+    // validates params' length
+    const params = (this.stringField.get('params') || '').split(',')
+    const initFunc = (this.jsonAbi.find(
+      abi => abi.name === 'init' && abi.type === 'function'
+    ) as unknown) as VmcontractAbi
+    if (params.length !== initFunc.inputs.length) {
+      throw new Error(label.paramsLengthErr)
+    }
+    // TODO: validates parameters' type
   }
 
   handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault()
-    this.handleShowDialog()
+    if (this.flags.get('isCreated')) {
+      try {
+        this.validateParams()
+        this.handleShowDialog()
+      } catch (e) {
+        const label = this.props.labels.createSwal
+        swal.fire(label.createErr, e.message, 'error')
+      }
+    } else {
+      this.handleAddContract()
+    }
   }
 
   dialogConfirm = async (password: string) => {
     const { labels } = this.props
     const res = this.props.wallet!.checkPassword(password)
     if (res) {
-      // const estimateGasRes = await this.props.vmContract!.createContractEstimateGas(
-      //   this.code,
-      //   this.abi,
-      //   this.gas,
-      //   this.gasPrice,
-      //   this.amount,
-      //   this.params.split(',').map(param => param.trim())
-      // )
-      // console.log('createContractEstimateGas', estimateGasRes)
+      // TODO: add validator for every input of createContractEstimateGas
+      const code = this.getStringField('code')
+      const abi = this.getStringField('abi')
+      const gas = this.getStringField('gas')
+      const gasPrice = this.getStringField('gasPrice')
+      const amount = '0'
+      const params = this.getStringField('params')
+        .split(',')
+        .map(param => param.trim())
+      const contractRes = await this.props.vmContract!.confirmCreateContract(code, abi, gas, gasPrice, amount, params)
 
-      const contractRes = await this.props.vmContract!.confirmCreateContract(
-        this.code,
-        this.abi,
-        this.gas,
-        this.gasPrice,
-        this.amount,
-        this.params.split(',').map(param => param.trim())
-      )
       if (contractRes.success) {
         await swal.fire({
           title: labels.createSwal.createSuccess,
           type: 'success',
           timer: 1000
         })
-        runInAction(() => {
-          this.showDialog = false
-        })
-        // this.switchToList()
+        this.handleCloseDialog()
       } else {
         this.handleCloseDialog()
         swal.fire({
@@ -249,119 +297,165 @@ export class CreateContract extends React.Component<IProps> {
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
 
-  addContract = async (e: React.MouseEvent) => {
-    e.preventDefault()
+  validateContractAddress = (address: string) => {
     const { labels } = this.props
-    const contractRes = this.props.vmContract!.addContract(this.abi, this.contractAddress)
-    if (contractRes.success) {
-      await swal.fire({
-        title: labels.createSwal.createSuccess,
-        type: 'success',
-        timer: 1000
-      })
-    } else {
+    if (!isVmContractAddress(address)) {
+      throw new Error(labels.createSwal.contractAddressErr)
+    }
+  }
+
+  handleAddContract = async () => {
+    // e: React.MouseEvent
+    // e.preventDefault()
+    const { labels } = this.props
+    try {
+      const contractAddress = this.getStringField('contractAddress')
+      this.validateContractAddress(contractAddress)
+      const abi = this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`)
+      if (abi.length === 0) {
+        try {
+          await this.getAbi()
+          if (this.getStringField(`abi:${contractAddress.toLocaleLowerCase()}`).length === 0) {
+            throw new Error()
+          }
+        } catch (e) {
+          swal.fire({
+            title: labels.createSwal.createErr,
+            text: labels.createSwal.getAbi,
+            type: 'error'
+          })
+          return
+        }
+      }
+      // if (abi.length === 0) {
+      //   swal.fire({
+      //     title: labels.createSwal.createErr,
+      //     text: labels.createSwal.getAbi,
+      //     type: 'error'
+      //   })
+      //   return
+      // }
+      const contractRes = await this.props.vmContract!.addContract(abi, contractAddress)
+      if (contractRes.success) {
+        await swal.fire({
+          title: labels.createSwal.createSuccess,
+          type: 'success',
+          timer: 1000
+        })
+      } else {
+        swal.fire({
+          title: labels.createSwal.createErr,
+          text: contractRes.info,
+          type: 'error'
+        })
+      }
+    } catch (e) {
       swal.fire({
         title: labels.createSwal.createErr,
-        text: contractRes.info,
+        text: e.message,
         type: 'error'
       })
     }
   }
 
-  @action
-  handleCloseDialog = () => (this.showDialog = false)
-
-  @action
-  handleShowDialog = () => (this.showDialog = true)
-
-  switchToList = () => {
-    this.props.history.push('/main/vm_contract/list')
+  handleCloseDialog = () => {
+    this.setFlags('showDialog', false)
   }
 
-  @action
-  genParams = () => {
-    this.params = Object.values(this.paramsValue).join(',')
-    this.showDetailParams = false
+  handleShowDialog = () => {
+    this.setFlags('showDialog', true)
+  }
+
+  handleOnShowDetailParams = () => {
+    this.setFlags('showDetailParams', false)
+  }
+
+  handleConfirmGenParams(initFunc: VmcontractAbi) {
+    const params = initFunc.inputs.map(input => this.stringField.get(input.name)).join(',')
+    this.setStringField('params', params)
+    this.handleOnShowDetailParams()
+    this.getContractGas()
   }
 
   addfile = () => {
-    this.inputABI!.click()
+    if (this.inputABI) {
+      this.inputABI.click()
+    }
   }
 
   addWasmFile = () => {
-    this.inputWasm!.click()
+    if (this.inputWasm) {
+      this.inputWasm.click()
+    }
   }
 
   getAbi = async () => {
-    const res = await this.props.vmContract!.getABI(this.contractAddress)
-    runInAction(() => {
+    const contractAddress = this.getStringField('contractAddress')
+    if (isVmContractAddress(contractAddress)) {
+      const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
-        this.abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
+        const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
+        console.log(`getAbi`, abi)
+        this.setStringField(`abi:${contractAddress.toLocaleLowerCase()}`, abi)
       }
-    })
-    // console.log(res2)
-    // const res3 = helper.Bytes.toString(res2)
-    // console.log(res3)
+    }
   }
 
   render() {
     const { classes, labels } = this.props
-    let abis
     let initFunc: VmcontractAbi | undefined
     let placeholder: string | '' = ''
-    if (this.abi) {
-      abis = JSON.parse(helper.Bytes.toString(this.abi))
-      if (abis instanceof Array) {
-        initFunc = (abis.find(abi => abi.name === 'init' && abi.type === 'function') as unknown) as VmcontractAbi
-        // console.log(initFunc)
-        if (initFunc.inputs) {
-          placeholder = initFunc.inputs.map(input => `${input.type} ${input.name}`).join(',')
-        }
+    const abis = this.jsonAbi
+    if (abis.length) {
+      initFunc = (abis.find(abi => abi.name === 'init' && abi.type === 'function') as unknown) as VmcontractAbi
+      // console.log(initFunc)
+      if (initFunc.inputs) {
+        placeholder = initFunc.inputs.map(input => `${input.type} ${input.name}`).join(',')
       }
     }
-    // console.log('placeholder', placeholder)
 
-    // initFunc= JSON.parse(helper.Bytes.toString(this.abi)).filter(abi=>(abi.name==='init')&&(abi.type==='function'))
     return (
       <Fragment>
         <div className={classes.tab}>
-          <div className={classes.tabLeft} data-tour="created-btn">
+          <div className={classes.tabLeft}>
             <Button
-              onClick={this.jumpToCreated}
+              onClick={this.handleJumpToCreated}
               variant="contained"
-              className={classNames(classes.tabButton, { [classes.active]: this.isCreated })}
+              className={classNames(classes.tabButton, { [classes.active]: this.flags.get('isCreated') })}
             >
               {labels.created}
             </Button>
           </div>
-          <div className={classes.tabRight} data-tour="receive-btn">
+          <div className={classes.tabRight}>
             <Button
-              onClick={this.jumpToFavorite}
+              onClick={this.handleJumpToFavorite}
               variant="contained"
-              className={classNames(classes.tabButton, { [classes.active]: !this.isCreated })}
+              className={classNames(classes.tabButton, { [classes.active]: !this.flags.get('isCreated') })}
             >
               {labels.favorite}
             </Button>
           </div>
         </div>
         <form onSubmit={this.handleConfirm} className={classes.form}>
-          {this.isCreated && (
+          {this.flags.get('isCreated') && (
             <Fragment>
               <div className={classes.inputRow}>
                 <span>{labels.abi}</span>
                 <div
-                  style={this.inputABIPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
+                  style={this.stringField.get('inputABIPlaceholder') ? { color: 'rgba(10,23,76,1)' } : {}}
                   className={classes.selectFile}
                   onClick={this.addfile}
                 >
-                  {this.inputABIPlaceholder ? this.inputABIPlaceholder : labels.selectFile}
-                  <img src={this.inputABIPlaceholder ? SelectedFile : SelctFile} />
+                  {this.stringField.get('inputABIPlaceholder')
+                    ? this.stringField.get('inputABIPlaceholder')
+                    : labels.selectFile}
+                  <img src={this.stringField.get('inputABIPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
-                  required={false}
-                  onChange={this.abiChange}
+                  required={true}
+                  onChange={this.handleChangeAbi}
                   ref={input => {
                     this.inputABI = input
                   }}
@@ -370,18 +464,20 @@ export class CreateContract extends React.Component<IProps> {
               <div className={classes.inputRow}>
                 <span>{labels.code}</span>
                 <div
-                  style={this.inputWasmPlaceholder ? { color: 'rgba(10,23,76,1)' } : {}}
+                  style={this.stringField.get('inputWasmPlaceholder') ? { color: 'rgba(10,23,76,1)' } : {}}
                   className={classes.selectFile}
                   onClick={this.addWasmFile}
                 >
-                  {this.inputWasmPlaceholder ? this.inputWasmPlaceholder : labels.selectFile}
-                  <img src={this.inputWasmPlaceholder ? SelectedFile : SelctFile} />
+                  {this.stringField.get('inputWasmPlaceholder')
+                    ? this.stringField.get('inputWasmPlaceholder')
+                    : labels.selectFile}
+                  <img src={this.stringField.get('inputWasmPlaceholder') ? SelectedFile : SelctFile} />
                 </div>
                 <input
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
                   required={true}
-                  onChange={this.codeChange}
+                  onChange={this.handleChangeCode}
                   ref={input => {
                     this.inputWasm = input
                   }}
@@ -393,57 +489,74 @@ export class CreateContract extends React.Component<IProps> {
                   <input
                     type="text"
                     className={classes.initParamsInput}
-                    disabled={this.showDetailParams}
-                    value={this.params}
+                    disabled={this.flags.get('showDetailParams')}
+                    value={this.stringField.get('params') || ''}
                     placeholder={placeholder}
                     required={initFunc && initFunc.inputs.length > 0}
-                    onChange={this.paramsChange}
+                    onChange={this.handleChangeParams}
                     onBlur={this.getContractGas}
                   />
                   {initFunc && initFunc.inputs.length > 0 && (
-                    <span className={classes.arrow} onClick={this.toggleDetailParam}>
-                      {this.showDetailParams ? '▲' : '▼'}
+                    <span className={classes.arrow} onClick={this.handleToggleDetailParam}>
+                      {this.flags.get('showDetailParams') ? '▲' : '▼'}
                     </span>
                   )}
-                  {this.showDetailParams && initFunc && initFunc.inputs.length > 0 && (
-                    <div className={classes.detailInputs}>
-                      {initFunc.inputs.map(input => (
-                        <div key={input.name} className={classes.paramRow}>
-                          <span>{input.name}:</span>
-                          <input
-                            type="text"
-                            // className={classes.inputText}
-                            placeholder={input.type}
-                            value={this.paramsValue[input.name]}
-                            onChange={this.paramsValueChange(input.name)}
-                          />
-                        </div>
-                      ))}
-                      <Button
-                        disabled={false}
-                        variant="contained"
-                        color="primary"
-                        // style={{ background: color }}
-                        className={classes.paramBtn}
-                        onClick={this.genParams}
-                      >
-                        {labels.confirm}
-                      </Button>
-                    </div>
-                  )}
+                  <Fragment>
+                    {this.flags.get('showDetailParams') && initFunc && initFunc.inputs.length > 0 && (
+                      <div className={classes.detailInputs}>
+                        {initFunc.inputs.map((input, index) => (
+                          <div key={index} className={classes.paramRow}>
+                            <span>{input.name}:</span>
+                            <input
+                              type="text"
+                              // className={classes.inputText}
+                              placeholder={input.type}
+                              value={this.stringField.get(input.name) || ''}
+                              onChange={this.handleChangeParam.bind(this, input.name)}
+                            />
+                          </div>
+                        ))}
+                        <Button
+                          disabled={false}
+                          variant="contained"
+                          color="primary"
+                          // style={{ background: color }}
+                          className={classes.paramBtn}
+                          // type="submit"
+                          onClick={this.handleConfirmGenParams.bind(this, initFunc)}
+                        >
+                          {labels.confirm}
+                        </Button>
+                      </div>
+                    )}
+                  </Fragment>
                 </div>
               </div>
               <div className={classes.inputRow}>
                 <span>{labels.gas}</span>
-                <input type="text" value={this.gas} required={true} onChange={this.gasChange} />
+                <input
+                  type="text"
+                  value={this.stringField.get('gas') || ''}
+                  required={true}
+                  onChange={this.handleChangeGas}
+                />
               </div>
               <div className={classes.inputRow}>
                 <span>{labels.gasPrice}</span>
-                <input type="text" value={this.gasPrice} required={true} onChange={this.gasPriceChange} />
+                <input
+                  type="text"
+                  value={this.stringField.get('gasPrice') || ''}
+                  required={true}
+                  onChange={this.handleChangeGasPrice}
+                />
               </div>
               <div className={classes.inputRow}>
-                <span>{labels.estimateGas}</span>
-                <span>{this.estimateGas}</span>
+                <span style={{ width: 80, fontSize: 10 }}>{labels.estimateGas}</span>
+                <span style={{ width: 220, fontSize: 10 }}>
+                  {this.stringField.get('estimateGas')
+                    ? Number(this.stringField.get('estimateGas')).toLocaleString()
+                    : ''}
+                </span>
               </div>
 
               <Button variant="contained" color="primary" className={classes.button} type="submit">
@@ -452,26 +565,28 @@ export class CreateContract extends React.Component<IProps> {
             </Fragment>
           )}
 
-          {!this.isCreated && (
+          {!this.flags.get('isCreated') && (
             <Fragment>
               <div className={classes.inputRow}>
                 <span>{labels.address}</span>
                 <input
                   type="text"
-                  value={this.contractAddress}
+                  value={this.stringField.get('contractAddress') || ''}
                   required={true}
-                  onChange={this.contractAddressChange}
-                  onBlur={this.getAbi}
+                  onChange={this.handleChangeContractAddress}
+                  // onBlur={this.getAbi}
                 />
               </div>
-              <Button variant="contained" color="primary" className={classes.button} onClick={this.addContract}>
+              <Button variant="contained" color="primary" className={classes.button} type="submit">
                 {labels.add}
               </Button>
             </Fragment>
           )}
         </form>
 
-        {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
+        {this.flags.get('showDialog') && (
+          <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />
+        )}
       </Fragment>
     )
   }

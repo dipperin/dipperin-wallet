@@ -1,5 +1,5 @@
-import BN from 'bignumber.js'
-import { action, observable, reaction, runInAction, computed } from 'mobx'
+// import BN from 'bignumber.js'
+import { action, observable, reaction, computed, runInAction } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
@@ -11,10 +11,11 @@ import { I18nCollectionTransaction } from '@/i18n/i18n'
 import AccountStore from '@/stores/account'
 import TransactionStore from '@/stores/transaction'
 import WalletStore from '@/stores/wallet'
-import { isValidAmount } from '@/utils'
+import { isValidAmount, formatAmount } from '@/utils'
 import { Button, FormControl, Input, InputLabel } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/styles'
 import { Utils } from '@dipperin/dipperin.js'
+import BN from 'bignumber.js'
 
 import styles from './sendStyle'
 
@@ -58,52 +59,153 @@ export class Send extends React.Component<IProps> {
     reaction(() => props.account!.activeAccount, this.initState)
   }
 
-  verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
-    const { labels } = this.props
-    const hexAddress = `0x${address.replace('0x', '')}`
-    if (!Utils.isAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    if (Utils.isContractAddress(hexAddress)) {
-      return labels.swal.invalidAddress
-    }
-
-    const amountUnit = new BN(Utils.toUnit(amount))
-    const bnUnit = new BN(balance)
-
-    if (bnUnit.lt(amountUnit, 10)) {
-      return labels.swal.insufficientFunds
+  @action
+  setEstimateGas = (newGas: string | undefined) => {
+    // console.log('setEstimateGas', newGas)
+    if (newGas && /^[0-9]*$/.test(newGas) && Number(newGas) >= 21000) {
+      this.estimateGas = newGas
     }
   }
 
+  @action
+  setWaitConfirm = (flag: boolean) => {
+    this.waitConfirm = flag
+  }
+
+  @action
+  setShowDialog = (flag: boolean) => {
+    this.showDialog = flag
+  }
+
+  // verifyGetTxFee = (amount: string, address: string, balance: string): string | void => {
+  //   const { labels } = this.props
+  //   const hexAddress = `0x${address.replace('0x', '')}`
+  //   if (!Utils.isAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   if (Utils.isContractAddress(hexAddress)) {
+  //     return labels.swal.invalidAddress
+  //   }
+
+  //   const amountUnit = new BN(Utils.toUnit(amount))
+  //   const bnUnit = new BN(balance)
+
+  //   if (bnUnit.lt(amountUnit, 10)) {
+  //     return labels.swal.insufficientFunds
+  //   }
+  // }
+
   handleGetEstimateGas = async () => {
+    runInAction(() => {
+      this.amount = formatAmount(this.amount)
+      console.log(this.amount)
+    })
     const hexAddress = `0x${this.address.replace('0x', '')}`
-    const res2 = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
-    console.log('estimateGas', res2)
-    if (res2.success && res2.info && /^[0-9]*$/.test(res2.info)) {
-      runInAction(() => {
-        if (res2.info! !== '0') {
-          this.estimateGas = res2.info!
-        }
-        this.waitConfirm = true
-      })
+    try {
+      this.validateAddress(hexAddress)
+      this.validateAmount(this.amount)
+      const res = await this.props.transaction!.estimateGas(hexAddress, this.amount, this.memo)
+      if (res.success) {
+        this.setEstimateGas(res.info)
+        this.setWaitConfirm(true)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+
+    // console.log('estimateGas', res2)
+  }
+
+  validateAddress = (address: string) => {
+    if (!Utils.isAddress(address)) {
+      const label = this.props.labels
+      throw new Error(label.swal.invalidAddress)
+    }
+  }
+
+  validateAmount = (amount: string) => {
+    if (!isValidAmount(amount)) {
+      const label = this.props.labels
+      throw new Error(label.swal.invalidAmount)
+    }
+  }
+
+  validateBalance = () => {
+    const label = this.props.labels
+    const balance = this.props.account!.activeAccount.balance
+    // console.log(balance)
+    const amountUnit = new BN(this.amount)
+    const bnUnit = new BN(balance)
+
+    if (bnUnit.lt(amountUnit, 10)) {
+      throw new Error(label.swal.insufficientFunds)
     }
   }
 
   handleSend = async (e: React.FormEvent) => {
-    const { labels } = this.props
+    // const { labels } = this.props
     e.preventDefault()
-    if (!isValidAmount(this.amount)) {
-      await swal.fire(labels.swal.invalidAmount, '', 'error')
-      return
+    try {
+      this.validateAddress(this.address)
+      this.validateAmount(this.amount)
+      this.validateBalance()
+      this.handleShowDialog()
+    } catch (e) {
+      swal.fire(e.message, '', 'error')
     }
-    this.handleShowDialog()
+    // if (!isValidAmount(this.amount)) {
+    //   await swal.fire(labels.swal.invalidAmount, '', 'error')
+    //   return
+    // }
+    // this.handleShowDialog()
   }
 
-  @action
   handleCloseDialog = () => {
-    this.showDialog = false
+    this.setShowDialog(false)
+  }
+
+  // mock transaction.confirmTransaction timeout
+  // mockTimeout = (
+  //   address: string,
+  //   amount: string,
+  //   memo: string,
+  //   gas: string,
+  //   gasPrice: string
+  // ): Promise<{ success: boolean; info?: string }> => {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(() => {
+  //       resolve({
+  //         success: true,
+  //         info:
+  //           '0x' +
+  //           Buffer.alloc(44)
+  //             .fill('a')
+  //             .toString()
+  //       })
+  //     }, 3000)
+  //   })
+  // }
+
+  wrappedConfirmTransaction = (
+    address: string,
+    amount: string,
+    memo: string,
+    gas: string,
+    gasPrice: string
+  ): Promise<{ success: boolean; info?: string }> => {
+    return new Promise((resolve, reject) => {
+      const timeoutTimer = setTimeout(() => {
+        reject(this.props.labels.swal.timeout)
+      }, 3000)
+      this.props
+        .transaction!.confirmTransaction(address, amount, memo, gas, gasPrice)
+        .then(res => {
+          clearTimeout(timeoutTimer)
+          resolve(res)
+        })
+        .catch(e => reject(e))
+    })
   }
 
   send = async () => {
@@ -113,25 +215,34 @@ export class Send extends React.Component<IProps> {
     if (this.estimateGas && /^[0-9]*$/.test(this.estimateGas)) {
       gas = String(Number(this.estimateGas) * 2)
     } else {
-      gas = '120000'
+      gas = '21000'
     }
     // const gas: string = String(Number(this.estimateGas)! * 2) | '120000'
-    const res = await this.props.transaction!.confirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
-    if (res.success) {
-      this.handleCloseDialog()
-      this.initState()
-      await swal.fire({
-        text: labels.swal.success,
-        type: 'success',
-        confirmButtonText: labels.swal.confirm,
-        timer: 1000
-      })
-      this.props.transaction!.updateTransactionType()
-    } else {
-      this.handleCloseDialog()
+    try {
+      const res = await this.wrappedConfirmTransaction(hexAddress, this.amount, this.memo, gas, this.gasPrice)
+      if (res.success) {
+        this.handleCloseDialog()
+        this.initState()
+        await swal.fire({
+          text: labels.swal.success,
+          type: 'success',
+          confirmButtonText: labels.swal.confirm,
+          timer: 1000
+        })
+        this.props.transaction!.updateTransactionType()
+      } else {
+        this.handleCloseDialog()
+        await swal.fire({
+          title: labels.swal.fail,
+          text: res.info,
+          type: 'error',
+          confirmButtonText: labels.swal.confirm
+        })
+      }
+    } catch (e) {
       await swal.fire({
         title: labels.swal.fail,
-        text: res.info,
+        text: e,
         type: 'error',
         confirmButtonText: labels.swal.confirm
       })
@@ -156,16 +267,18 @@ export class Send extends React.Component<IProps> {
   @action
   initState = () => {
     this.waitConfirm = false
-    this.gasPrice = ''
+    this.gasPrice = '1'
     this.address = ''
     this.memo = ''
     this.amount = ''
-    this.estimateGas = '1'
+    this.estimateGas = '21000'
   }
 
   @action
   addressChange = (e: React.ChangeEvent<{ value: string }>) => {
-    this.address = e.target.value
+    if (/^(0x)?[0-9a-f]{0,44}$/i.test(e.target.value.toLowerCase())) {
+      this.address = e.target.value
+    }
   }
 
   @action
@@ -194,13 +307,19 @@ export class Send extends React.Component<IProps> {
   @action
   handleAddGasPrice = () => {
     this.gasPrice = String(Number(this.gasPrice) + 1)
-    console.log('gasPrice', this.gasPrice)
+    // console.log('gasPrice', this.gasPrice)
   }
 
   @action
   handleSubGasPrice = () => {
     if (Number(this.gasPrice) > 1) {
       this.gasPrice = String(Number(this.gasPrice) - 1)
+    }
+  }
+
+  handleAmountKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.keyCode === 13) {
+      e.preventDefault()
     }
   }
 
@@ -215,7 +334,13 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.amount}</InputLabel>
-            <Input type="number" value={this.amount} onChange={this.amountChange} onBlur={this.handleGetEstimateGas} />
+            <Input
+              type="number"
+              onKeyDown={this.handleAmountKeyUp}
+              value={this.amount}
+              onChange={this.amountChange}
+              onBlur={this.handleGetEstimateGas}
+            />
           </FormControl>
           <FormControl fullWidth={true} className={classes.item} margin="dense">
             <InputLabel>{labels.note}</InputLabel>
@@ -236,7 +361,7 @@ export class Send extends React.Component<IProps> {
           </FormControl>
           {/* <p className={classes.min}>{this.estimateGas && `${labels.estimateGas}: ${this.estimateGas}`}</p> */}
           <Button
-            disabled={!this.waitConfirm || !this.gasPrice}
+            // disabled={!this.address || !this.amount}
             variant="contained"
             color="primary"
             className={classes.confirmButton}

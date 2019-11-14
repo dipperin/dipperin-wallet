@@ -74,7 +74,7 @@ describe('setting', () => {
   it('handleChangeNet same', () => {
     const mockReloadData = jest.fn()
     root.reloadData = mockReloadData
-    instance.handleChangeNet('mercury')()
+    instance.handleChangeNet('venus')()
     expect(mockReloadData).not.toHaveBeenCalled()
   })
 
@@ -115,7 +115,7 @@ describe('setting', () => {
 
   it('selectLocal', () => {
     instance.selectLocal()
-    expect(instance.netEnv).toBe('mercury')
+    expect(instance.netEnv).toBe('test')
   })
 
   // it('setMiner', async () => {

@@ -1,9 +1,9 @@
 import BIP39 from 'bip39'
 import i18next from 'i18next'
 import classNames from 'classnames'
-import { observable, reaction, action, runInAction } from 'mobx'
+import { observable, reaction, action, runInAction, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
-import React from 'react'
+import React, { Fragment } from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import Tour from 'reactour'
@@ -14,10 +14,15 @@ import LoadingStore from '@/stores/loading'
 import WalletStore from '@/stores/wallet'
 import { isValidPassword } from '@/utils'
 import settings from '@/utils/settings'
-import { Button, Fab, FormControl, Input, InputLabel } from '@material-ui/core'
+import { Button, FormControl } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
 import Add from '../../images/add-icon.png'
+import Curtain from '@/images/curtain.png'
+import CorrectIcon from '@/images/correct.png'
+import ErrorIcon from '@/images/error.png'
+// import En from '@/images/en.png'
+// import Cn from '@/images/cn.png'
 import styles from './importStyle'
 import { I18nCollectionWallet } from '@/i18n/i18n'
 
@@ -89,6 +94,24 @@ export class Import extends React.Component<IImportProps> {
     this.password = e.target.value
   }
 
+  @computed
+  get passwordStrength() {
+    let result = 0
+    if (/[a-z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[A-Z]/.test(this.password)) {
+      result += 1
+    }
+    if (/[0-9]/.test(this.password)) {
+      result += 1
+    }
+    if (/[`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]/.test(this.password)) {
+      result += 1
+    }
+    return result
+  }
+
   @action
   repeatPasswordInput = e => {
     this.repeatPassword = e.target.value
@@ -108,6 +131,27 @@ export class Import extends React.Component<IImportProps> {
     } else {
       this.showTour = false
     }
+  }
+
+  @computed
+  get validateMnemonic(): boolean {
+    return BIP39.validateMnemonic(this.mnemonic)
+  }
+
+  @computed
+  get validatePassword(): string {
+    if (!this.password || this.password.length < 8) {
+      return this.props.labels.swal.passwordLength
+    }
+    if (!isValidPassword(this.password)) {
+      return this.props.labels.swal.invalidPassword
+    }
+    return ''
+  }
+
+  @computed
+  get validateRptPassword(): boolean {
+    return this.password === this.repeatPassword
   }
 
   verifyInputs = (
@@ -159,8 +203,8 @@ export class Import extends React.Component<IImportProps> {
     runInAction(() => {
       this.mnemonic = ''
     })
-    wallet.save()
 
+    wallet.save()
     for (let i = 0; i < 14; i++) {
       await this.props.account.addAccount()
     }
@@ -181,9 +225,7 @@ export class Import extends React.Component<IImportProps> {
         break
       }
     }
-    // this.props.account.addAccount()
-    this.props.account.showDbAccounts()
-    // next operate in reaction
+    // this.props.account.showDbAccounts()
   }
 
   ToCreate = () => {
@@ -203,7 +245,7 @@ export class Import extends React.Component<IImportProps> {
 
   render() {
     const { labels, classes } = this.props
-    const disable = !this.mnemonic || !this.password || !this.repeatPassword || this.password !== this.repeatPassword
+    // const disable = !this.mnemonic || !this.password || !this.repeatPassword || this.password !== this.repeatPassword
     const isChinese = this.props.language === 'zh-CN'
     const steps = [
       {
@@ -219,39 +261,105 @@ export class Import extends React.Component<IImportProps> {
     ]
     return (
       <div className={classes.import}>
+        <img src={Curtain} />
         <div className={classes.globalWrap}>
-          <Fab className={classes.global} onClick={this.handleChangeLang}>
-            <span>{labels.langAb}</span>
-          </Fab>
-          <p>{labels.lang}</p>
+          <Button
+            className={classNames({
+              [classes.langBtn]: true,
+              [classes.langCn]: isChinese,
+              [classes.langEn]: !isChinese
+            })}
+            onClick={this.handleChangeLang}
+          >
+            ''
+          </Button>
         </div>
         <form className={classes.form} onSubmit={this.handleConfirm}>
           <p className={classes.title}>{labels.title}</p>
           <div data-tour={'first'}>
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.mnemonic}</InputLabel>
-              <Input value={this.mnemonic} onChange={this.mnemonicInput} />
+              <label className={classes.inputLabel}>
+                <span>{labels.mnemonic}</span>
+                {this.mnemonic && (
+                  <Tip type={this.validateMnemonic} msg={!this.validateMnemonic ? labels.swal.invalidMnemonic : ''} />
+                )}
+              </label>
+              <textarea
+                className={classNames([classes.textInput, classes.mnemonicInput])}
+                value={this.mnemonic}
+                onChange={this.mnemonicInput}
+              />
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.setPassword}</InputLabel>
-              <Input type="password" value={this.password} onChange={this.passwordInput} />
+              <label className={classes.inputLabel}>
+                <span>{labels.setPassword}</span>
+                {this.password && <Tip type={!this.validatePassword} msg={this.validatePassword} />}
+              </label>
+              <input
+                className={classNames([classes.textInput, classes.pswInput])}
+                type="password"
+                value={this.password}
+                onChange={this.passwordInput}
+              />
             </FormControl>
+            {this.password && (
+              <div className={classes.pswStr}>
+                <div className={classes.rankbar}>
+                  <div className={classes.weakPswActive} />
+                  <div className={this.passwordStrength > 1 ? classes.mediumPswActive : classes.mediumPsw} />
+                  <div className={this.passwordStrength > 3 ? classes.strongPswActive : classes.strongPsw} />
+                </div>
+                <div className={classes.rankbar}>
+                  <span className={classes.weakText}>{labels.weak}</span>
+                  <span className={this.passwordStrength > 1 ? classes.mediumText : classes.strengthTextDefault}>
+                    {labels.medium}
+                  </span>
+                  <span className={this.passwordStrength > 3 ? classes.strongText : classes.strengthTextDefault}>
+                    {labels.strong}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <FormControl fullWidth={true} className={classes.item}>
-              <InputLabel>{labels.repeatPassword}</InputLabel>
-              <Input type="password" value={this.repeatPassword} onChange={this.repeatPasswordInput} />
+              <label className={classes.inputLabel}>
+                <span>{labels.repeatPassword}</span>
+                {this.repeatPassword && (
+                  <Tip
+                    type={this.validateRptPassword}
+                    msg={!this.validateRptPassword ? labels.swal.diffPassword : ''}
+                  />
+                )}
+              </label>
+              <input
+                className={classNames([classes.textInput, classes.pswInput])}
+                type="password"
+                value={this.repeatPassword}
+                onChange={this.repeatPasswordInput}
+              />
             </FormControl>
-            <Button disabled={disable} variant="contained" color="primary" className={classes.button} type="submit">
+            <Button variant="contained" color="primary" className={classes.button} type="submit">
               {labels.recovery}
+            </Button>
+            <div className={classes.note}>{labels.note}</div>
+          </div>
+          <div className={classes.create} data-tour={'second'}>
+            <Button className={classes.addBtn} variant="contained" color="primary" onClick={this.ToCreate}>
+              <p className={classNames({ ['cn']: isChinese })}>
+                <span className={classes.addIcon}>+</span>
+                {labels.create}
+              </p>
             </Button>
           </div>
         </form>
-        <div className={classes.create}>
-          <Button className={classes.addBtn} onClick={this.ToCreate}>
-            <img src={Add} alt="" data-tour={'second'} />
-          </Button>
-          <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
-          {/* <p className={classNames({ ['cn']: isChinese })}>{labels.howToCreate}</p> */}
-        </div>
+        {false && (
+          <div className={classes.create}>
+            <Button className={classes.addBtn} onClick={this.ToCreate}>
+              <img src={Add} alt="" data-tour={'second'} />
+            </Button>
+            <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
+          </div>
+        )}
         <Tour
           steps={steps}
           isOpen={this.showTour}
@@ -280,4 +388,28 @@ export default withTranslation()(ImportWrap)
 
 const tourStyles = {
   borderRadius: '4px'
+}
+
+interface TipProps {
+  type: boolean
+  msg?: string
+}
+
+const Tip = (props: TipProps) => {
+  // console.log(`url(${props.type === 'correct' ? CorrectIcon : ErrorIcon})`)
+  return (
+    <Fragment>
+      <span
+        style={{
+          width: 14,
+          height: 14,
+          display: 'inline-block',
+          backgroundImage: `url(${props.type ? CorrectIcon : ErrorIcon})`,
+          marginLeft: '18px'
+          // transform: 'translateY(2px)'
+        }}
+      />
+      {props.msg && <span style={{ color: '#981733', marginLeft: '5px' }}>{props.msg}</span>}
+    </Fragment>
+  )
 }

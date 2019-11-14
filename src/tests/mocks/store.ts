@@ -1,5 +1,4 @@
 import Account from '@/stores/account'
-import Contract from '@/stores/contract'
 import Loading from '@/stores/loading'
 import Root from '@/stores/root'
 import Timer from '@/stores/timer'
@@ -54,8 +53,6 @@ const mockRootBuilder = (autoInit?: boolean): MockRoot => {
     initWallet()
   }
 
-  const mockContract = new Contract(mockRoot)
-  mockRoot.contract = mockContract
   mockRoot.reconnect = jest.fn()
   return mockRoot
 }

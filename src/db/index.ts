@@ -3,7 +3,8 @@ import Nedb from 'nedb'
 import { AccountObj } from '@/models/account'
 import { ContractObj } from '@/models/contract'
 import { WalletObj } from '@/models/wallet'
-import { OwnerAddressDb } from '@/stores/contract'
+import ReceiptModel from '@/models/receipt'
+// import { OwnerAddressDb } from '@/stores/contract'
 import {
   ACCOUNT_DB,
   CONTRACT_DB,
@@ -13,7 +14,9 @@ import {
   TRANSACTION_DB,
   TRANSACTION_STATUS_SUCCESS,
   WALLET_DB,
-  VM_CONTRACT_DB
+  VM_CONTRACT_DB,
+  RECEIPT_DB,
+  MINE_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
@@ -283,20 +286,95 @@ export const insertOwnerAddress = (
   db.insert({ accountAddress, contractAddress, ownerAddress, net })
 }
 
-export const getOwnerAddress = async (
-  accountAddress: string,
-  contractAddress: string,
-  net: string
-): Promise<OwnerAddressDb[]> => {
-  const db = getDB(OWNER_DB)
-  let ownerAddress: OwnerAddressDb[] = []
-  await new Promise(resolve => {
-    db.find({ accountAddress, contractAddress, net }, (_, res) => {
-      ownerAddress = res
-      resolve()
+/**
+ * receipt
+ */
+export const insertReceipt = (receipt: ReceiptModel, address: string, net: string = DEFAULT_NET) => {
+  const db = getDB(RECEIPT_DB)
+  db.update({ txHash: receipt.transactionHash }, { $set: { ...receipt, address, net } }, { upsert: true })
+}
+
+export const getReceipt = async (net: string = DEFAULT_NET): Promise<ReceiptModel[]> => {
+  const db = getDB(RECEIPT_DB)
+  const receipts = (await new Promise((resolve, reject) => {
+    db.find({ net }, (err, res) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })) as ReceiptModel[]
+
+  return receipts
+}
+
+// export const getOwnerAddress = async (
+//   accountAddress: string,
+//   contractAddress: string,
+//   net: string
+// ): Promise<OwnerAddressDb[]> => {
+//   const db = getDB(OWNER_DB)
+//   let ownerAddress: OwnerAddressDb[] = []
+//   await new Promise(resolve => {
+//     db.find({ accountAddress, contractAddress, net }, (_, res) => {
+//       ownerAddress = res
+//       resolve()
+//     })
+//   })
+//   return ownerAddress
+// }
+
+/**
+ * mine db
+ */
+export const insertMinerData = async (mnemonic: string) => {
+  const db = getDB(MINE_DB)
+  const minerData = {
+    mnemonic,
+    updateTime: new Date().valueOf()
+  }
+  await new Promise((resolve, reject) => {
+    db.insert(minerData, (err, res) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(true)
     })
   })
-  return ownerAddress
+}
+
+export const removeMinerData = async () => {
+  const db = getDB(MINE_DB)
+  await new Promise((resolve, reject) => {
+    db.remove({}, (err, res) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(true)
+    })
+  })
+}
+
+export const getMiner = (): Promise<{ mnemonic: string; updateTime: number }> => {
+  const db = getDB(MINE_DB)
+
+  return new Promise((resolve, reject) => {
+    db.find({}).exec((err, res: any[]) => {
+      if (err) {
+        reject(err)
+      }
+      if (res.length > 0) {
+        const result = {
+          mnemonic: res[0]!.mnemonic as string,
+          updateTime: res[0].updateTime as number
+        }
+        resolve(result)
+      } else {
+        resolve(undefined)
+      }
+    })
+  })
 }
 
 export const resetDB = () => {
@@ -307,4 +385,5 @@ export const resetDB = () => {
   getDB(FAVORITE_CONTRACT).remove({}, { multi: true })
   getDB(OWNER_DB).remove({}, { multi: true })
   getDB(VM_CONTRACT_DB).remove({}, { multi: true })
+  getDB(MINE_DB).remove({}, { multi: true })
 }

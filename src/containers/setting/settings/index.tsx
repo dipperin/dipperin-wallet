@@ -5,10 +5,14 @@ import React from 'react'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
+import _ from 'lodash'
 
 import PackageJson from '@/../package.json'
 import Loading from '@/components/loading'
 import Accounts from '@/containers/accounts'
+import PasswordConfirm from '@/components/passwordConfirm'
+import DialogConfirm from '@/components/privateConfirm'
+
 // import Help from '@/images/setting-help.png'
 // import Reset from '@/images/setting-reset.png'
 // import Update from '@/images/setting-update.png'
@@ -33,7 +37,7 @@ import { Button, Fab, WithStyles, withStyles, Tooltip } from '@material-ui/core'
 
 import { I18nCollectionWallet } from '@/i18n/i18n'
 import RootStore from '@/stores/root'
-import { DEFAULT_NET, MERCURY, TEST, LOCAL, REMOTE_TEST, REMOTE_MECURY } from '@/utils/constants'
+import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ } from '@/utils/constants'
 import SwitchButton from '@/components/switchButton'
 
 import styles from './settingStyle'
@@ -59,6 +63,18 @@ export class Setting extends React.Component<Props> {
   netEnv: string = DEFAULT_NET
   @observable
   progress: number = 0.005
+  @observable
+  showDialog: boolean = false
+  @observable
+  showPrivateKey: boolean = false
+  @observable
+  privateKey: string = ''
+  @observable
+  showTip: boolean = true
+  @observable
+  chainDataDir: string = ''
+
+  chainDataDirInput: HTMLInputElement
 
   constructor(props: Props) {
     super(props)
@@ -103,6 +119,33 @@ export class Setting extends React.Component<Props> {
   @action
   handleClose = () => {
     this.showAccounts = false
+  }
+
+  @action
+  setShowDialog = (flag: boolean) => {
+    this.showDialog = flag
+  }
+
+  @action
+  setChainDataDir = (path: string) => {
+    this.chainDataDir = path
+  }
+
+  chainDataDirRef = (instance: HTMLInputElement) => {
+    if (instance) {
+      instance.setAttribute('webkitdirectory', '')
+      instance.setAttribute('directory', '')
+      instance.setAttribute('multiple', '')
+    }
+    this.chainDataDirInput = instance
+  }
+
+  handleCloseDialog = () => {
+    this.setShowDialog(false)
+  }
+
+  handleShowDialog = () => {
+    this.setShowDialog(true)
   }
 
   handleReset = async () => {
@@ -181,7 +224,12 @@ export class Setting extends React.Component<Props> {
       // stop local node
       sendStopNode()
       // default select REMOTE_MECURY
-      this.selectRemote(REMOTE_MECURY)
+      if (this.netEnv in NET_HOST_OBJ) {
+        this.selectRemote(this.netEnv)
+      } else {
+        this.selectRemote(VENUS)
+      }
+      // this.selectRemote(VENUS)
       this.props.root!.reconnect()
     } else {
       this.selectLocal()
@@ -212,7 +260,7 @@ export class Setting extends React.Component<Props> {
     // update isRemote in settings
     setIsRemoteNode(false)
     // default select MERCURY
-    this.netEnv = MERCURY
+    // this.netEnv = VENUS
     // update net in settings
     setCurrentNet(this.netEnv)
     sendStartNode()
@@ -277,6 +325,61 @@ export class Setting extends React.Component<Props> {
     this.progress = progress
   }
 
+  handleConsoleEncry = () => {
+    console.log(this.props.wallet!.hdAccount)
+  }
+
+  @action
+  setPrivateKay = (key: string) => {
+    this.privateKey = key
+  }
+
+  handleGeneratePrivateKey = async (password: string) => {
+    const res = await this.props.wallet!.checkPassword(password)
+    let pri = ''
+    if (res) {
+      this.handleCloseDialog()
+      pri = this.props.account!.exportPrivateKey(password)
+      this.setPrivateKay(pri)
+      console.log(pri)
+      this.handleShowPrivateKey()
+    } else {
+      swal.fire({
+        type: 'error',
+        title: this.props.labels.swal.incorrectPassword,
+        timer: 1000
+      })
+    }
+  }
+
+  handleDialogConfirm = _.debounce(this.handleGeneratePrivateKey, 1000)
+
+  @action
+  setShowPrivateKey(flag: boolean) {
+    this.showPrivateKey = flag
+  }
+
+  handleShowPrivateKey = () => {
+    this.setShowPrivateKey(true)
+  }
+
+  handleClosePrivateKey = () => {
+    this.setPrivateKay('')
+    this.setShowPrivateKey(false)
+  }
+
+  @action
+  handleCLoseTip = () => {
+    this.showTip = false
+  }
+
+  handleChangeDir = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files)
+    if (e.target.files && e.target.files.length > 0) {
+      this.setChainDataDir(e.target.files[0].path)
+    }
+  }
+
   render() {
     const {
       labels,
@@ -291,6 +394,7 @@ export class Setting extends React.Component<Props> {
     if (!activeAccount) {
       return null
     }
+
     return (
       <div>
         <div className={classes.setting}>
@@ -305,6 +409,13 @@ export class Setting extends React.Component<Props> {
               <img src={Help} alt="" />
               {t('btn.help')}
             </Button> */}
+            <div className={classes.version}>
+              <p>
+                {labels.about.label.version} : {PackageJson.version}
+              </p>
+            </div>
+            <input type="file" onChange={this.handleChangeDir} ref={this.chainDataDirRef} />
+            {this.chainDataDir}
           </div>
           <div className={classes.right}>
             <Tooltip title={isRemoteNode ? labels.net.closeRemote : labels.net.connectRemote}>
@@ -315,7 +426,7 @@ export class Setting extends React.Component<Props> {
             <p className={classes.title}>{isRemoteNode ? labels.net.remoteTitle : labels.net.title}</p>
             {isRemoteNode ? (
               <div className={classes.netWrap}>
-                {[REMOTE_MECURY, REMOTE_TEST].map(net => {
+                {[VENUS, TEST].map(net => {
                   return (
                     <Fab
                       className={classNames(classes.netBtn, { [classes.netBtnActive]: this.netEnv === net })}
@@ -330,7 +441,7 @@ export class Setting extends React.Component<Props> {
               </div>
             ) : (
               <div className={classes.netWrap}>
-                {[MERCURY, TEST, LOCAL].map(net => {
+                {[VENUS, TEST, LOCAL].map(net => {
                   if (!isAlpha && net === TEST) {
                     return
                   }
@@ -347,15 +458,37 @@ export class Setting extends React.Component<Props> {
                 })}
               </div>
             )}
-            <p className={classes.title}>{labels.about.title}</p>
-            <div className={classes.aboutInfo}>
+            {this.showTip && (
+              <div className={classes.tip}>
+                <span className={classes.hornIcon} />
+                <span className={classes.tipContent}>
+                  {isRemoteNode ? labels.net.remoteHint : labels.net.localHint}
+                </span>
+                <span className={classes.tipClose} onClick={this.handleCLoseTip}>
+                  ×
+                </span>
+              </div>
+            )}
+            <p className={classes.title} style={{ position: 'absolute', top: '150px' }}>
+              {labels.walletManagement}
+            </p>
+            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '190px' }}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>
               </div> */}
               <div>
-                <p>{labels.about.label.version}:</p>
-                <p>{PackageJson.version}</p>
+                <Fab
+                  className={classNames(classes.netBtn)}
+                  variant="extended"
+                  style={{ width: 140 }}
+                  onClick={this.handleShowDialog}
+                >
+                  <span style={{ textTransform: 'none' }}>{labels.exportPrivateKey}</span>
+                </Fab>
+                {/* <Button variant="contained" onClick={this.handleConsoleEncry}>
+                  打印秘钥
+                </Button> */}
               </div>
               {/* <div>
                 <p>{t('about.label.copyright')}:</p>
@@ -400,6 +533,18 @@ export class Setting extends React.Component<Props> {
         </div>
         {this.showAccounts && <Accounts handleClose={this.handleClose} history={this.props.history} />}
         {this.loading && <Loading title={labels.loading} progress={this.progress} />}
+        {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
+        {this.showPrivateKey && (
+          <DialogConfirm
+            onClose={this.handleClosePrivateKey}
+            prk={this.privateKey}
+            title={labels.privateKey.title}
+            label={labels.privateKey.label}
+            note={labels.privateKey.notes}
+            btnText={labels.privateKey.confirm}
+            swal={labels.swal.copySuccess}
+          />
+        )}
       </div>
     )
   }
@@ -415,3 +560,13 @@ const SettingWrap = (props: WrapProps & WithTranslation) => {
 export default withTranslation()(SettingWrap)
 
 // export default withStyles(styles)(withNamespaces('setting')(Setting))
+
+// export const mockFile = {
+//   lastModified: 1564729958000,
+//   lastModifiedDate: 'Fri Aug 02 2019 15:12:38 GMT+0800 (CST)',
+//   name: 'build',
+//   path: '/home/liuboheng/Desktop/chrome-extension/build',
+//   size: 4096,
+//   type: '',
+//   webkitRelativePath: 'chrome-extension/build'
+// }

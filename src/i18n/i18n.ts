@@ -27,7 +27,9 @@ export const zhCN = {
         resetConfirm: '确定',
         warnText:
           '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
-        warn: '警告'
+        warn: '警告',
+        backupMnemonic:
+          '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。'
       }
     },
     import: {
@@ -44,20 +46,26 @@ export const zhCN = {
         success: '导入成功!',
         mnemonicLength: '请提供至少12位助记词',
         invalidMnemonic: '助记词不合法',
-        passwordLength: '密码长度至少8位',
+        passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
-        diffPassword: '两次密码不一致！',
+        diffPassword: '两次密码不一致',
         confirm: '确认'
       },
       tour: {
         create: '如果您还没有钱包，点击这里去创建钱包！',
         import: '如果您已有钱包，在这里输入助记词并设置您的密码来恢复钱包！'
-      }
+      },
+      weak: '弱',
+      medium: '中',
+      strong: '强',
+      note:
+        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。'
     },
     sidebar: {
       wallet: '钱包',
       contract: '智能合约',
       vmContract: '智能合约',
+      mine: '挖矿',
       setting: '设置',
       title: 'Dipperin 钱包',
       walletVersion: '钱包版本',
@@ -76,10 +84,14 @@ export const zhCN = {
         test: '测试网',
         local: '本地',
         mercury: '水星',
+        venus: '金星',
         remoteTest: '测试网',
         remoteMecury: '水星',
+        remoteVenus: '金星',
         closeRemote: '断开远程节点',
-        connectRemote: '连接远程节点'
+        connectRemote: '连接远程节点',
+        localHint: '连接本地节点需要同步区块，需要等待同步至最新高度才能发送交易',
+        remoteHint: '远程连接需信任节点，无需同步区块'
       },
       about: {
         title: '关于钱包',
@@ -104,7 +116,14 @@ export const zhCN = {
       },
       connectFail: '未连接到节点',
       loading: '更新中',
-
+      walletManagement: '钱包管理',
+      exportPrivateKey: '导出秘钥',
+      privateKey: {
+        title: '私钥显示',
+        label: '这是你的私钥（点击复制）',
+        notes: '注意：请保管好这个私钥。任何人拥有了你的私钥都可以窃取你帐户中的所有资产。',
+        confirm: '确认'
+      },
       swal: {
         updateSuccess: '更新成功!',
         cancel: '取消',
@@ -113,7 +132,9 @@ export const zhCN = {
           '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
         warn: '警告',
         startUpdate: '开始更新?',
-        documentTitle: 'Dipperin 钱包'
+        documentTitle: 'Dipperin 钱包',
+        copySuccess: '复制成功',
+        incorrectPassword: '密码错误'
       }
     }
   },
@@ -129,20 +150,23 @@ export const zhCN = {
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致！',
         confirm: '确定'
-      }
+      },
+      weak: '弱',
+      medium: '中',
+      strong: '强'
     },
     backup: {
       return: '返回',
       title: '备份助记词',
       hint:
-        '我们强烈建议您将助记词记录在纸上，放置在一个安全的地方。任何人得到这些助记词都可以进入您的钱包使用您的资产！',
+        '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。',
       bottomHint: '请记下您的助记词。千万不要截屏！',
       confirm: '确定'
     },
     backupConfirm: {
       return: '返回',
       title: '确认助记词',
-      hint: '请按顺序选择助记词',
+      hint: '请按顺序依次选择助记词，确保助记词与您保存的一致。',
       confirm: '确定',
       dialogText: '您的助记词将从本机删除！',
       cancel: '取消',
@@ -178,6 +202,7 @@ export const zhCN = {
         insufficientFunds: '余额不足',
         invalidAmount: '无效数量',
         invalidFee: '无效交易费',
+        timeout: '远程节点响应时间过长',
         success: '发送成功!',
         fail: '发送失败!',
         incorrectPassword: '密码错误!',
@@ -223,7 +248,16 @@ export const zhCN = {
       add: '添加账户',
       account: '账户',
       copySuccess: '复制成功!',
-      currentAccount: CurrentAccountCN
+      currentAccount: CurrentAccountCN,
+      privateKeyImport: '私钥导入',
+      label: '请输入您的秘钥',
+      title: '秘钥导入',
+      confirm: '确认',
+      cancel: '取消',
+      importSuccessTitle: '导入成功',
+      importErrorTitle: '导入失败',
+      importError: '请输入正确私钥!',
+      addressReimportError: '导入账户已存在!'
     },
     account: {
       transfer: '转账',
@@ -248,8 +282,8 @@ export const zhCN = {
   contract: {
     contract: {
       selectFile: '请选择一个文件',
-      errorAbiFile: '这不是一个abi文件',
-      errorWasmFile: '这不是一个Wasm文件',
+      errorAbiFile: 'ABI文件格式错误',
+      errorWasmFile: '代码文件格式错误',
       add: '添加',
       call: '调用',
       favoriteContract: '收藏合约',
@@ -311,6 +345,9 @@ export const zhCN = {
         createErr: '创建合约出错',
         incorrectPassword: '密码错误',
         decimalLength: '精度不能超过18',
+        paramsLengthErr: '输入参数数量错误',
+        contractAddressErr: '合约地址错误',
+        getAbi: '获取ABI失败',
         feeMax: '手续费不足'
       },
       labs: {
@@ -337,9 +374,11 @@ export const zhCN = {
         tryAgain: '请重新提交!',
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
-        insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
-        confirm: '确定'
+        insufficientFunds: '账户余额不足!',
+        invalidAddress: '地址格式不正确!',
+        confirm: '确定',
+        extraDataTooLong: '备注内容过多，请优化备注内容',
+        networkError: '当前网络不可用，请检查网络'
       }
     },
     approve: {
@@ -415,6 +454,33 @@ export const zhCN = {
       cancel: '取消',
       confirm: '确认'
     }
+  },
+  mine: {
+    main: {
+      easyMine: '一键挖矿',
+      loading: '启动中',
+      stopMining: '停止挖矿',
+      mineReward: '挖矿奖励',
+      withdrawBalance: '提取余额',
+      startFailure: '启动失败',
+      remoteNodeError: '请开启本地节点后启动.',
+      unstartNodeError: '请启动节点后开启挖矿'
+    },
+    tips: {
+      title: '注意事项',
+      tipContent: '当启动钱包挖矿功能时，钱包网络节点会切换至本地节点，等待本地节点同步至最新区块高度后即开始挖矿。',
+      done: '确认'
+    },
+    withdraw: {
+      withdraw: '提现',
+      receipt: '收款地址',
+      withdrawAmount: '提款金额',
+      availableAmount: '可提现金额：',
+      cancel: '取消',
+      confirm: '提款',
+      success: '提现成功',
+      inPoolError: '交易已经发出，请等待'
+    }
   }
 }
 
@@ -431,6 +497,8 @@ export type I18nCollectionDialog = typeof zhCN.dialog
 export type I18nCollectionWallet = typeof zhCN.wallet
 
 export type I18nCollectionCreate = typeof zhCN.create
+
+export type I18nCollectionMine = typeof zhCN.mine
 
 export const enUS: I18nCollection = {
   wallet: {
@@ -458,7 +526,9 @@ export const enUS: I18nCollection = {
         resetConfirm: 'Confirm',
         warnText:
           'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
-        warn: 'Warning'
+        warn: 'Warning',
+        backupMnemonic:
+          'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.'
       }
     },
     import: {
@@ -475,20 +545,26 @@ export const enUS: I18nCollection = {
         success: 'Success!',
         mnemonicLength: 'You should provide 12 words of mnemonics',
         invalidMnemonic: 'Invalid mnemonics',
-        passwordLength: 'Please fill in a password greater than or equal to 8 digits in length',
+        passwordLength: 'Password must be 8~24 characters in length',
         invalidPassword: 'Invalid password',
-        diffPassword: 'The first password is not equal to the second password!',
+        diffPassword: `Passwords don't match`,
         confirm: 'Ok'
       },
       tour: {
         create: `If you don't already have a wallet, click here to create one!`,
         import: 'If you already have a wallet, enter a mnemonic here and set your password to restore the wallet!'
-      }
+      },
+      weak: 'week',
+      medium: 'medium',
+      strong: 'strong',
+      note:
+        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
     },
     sidebar: {
       wallet: 'Wallet',
       contract: 'Contract',
       vmContract: 'Contract',
+      mine: 'Mining',
       setting: 'Setting',
       title: 'Dipperin Wallet',
       walletVersion: 'Wallet Version',
@@ -507,10 +583,16 @@ export const enUS: I18nCollection = {
         test: 'test',
         local: 'local',
         mercury: 'mecury',
+        venus: 'venus',
+        remoteVenus: 'venus',
         remoteTest: 'test',
         remoteMecury: 'mecury',
         closeRemote: 'disconnect remote node',
-        connectRemote: 'connect remote node'
+        connectRemote: 'connect remote node',
+        localHint:
+          'Running a client connecting to a local node, need to download the blockchain to your local machine. To send a transaction, please weit until the node is fully synced',
+        remoteHint:
+          "Running a client connecting to a remote node, don't need to download the blockchain to your local machine, but need to trust the remote node."
       },
       about: {
         title: 'About Wallet',
@@ -518,13 +600,13 @@ export const enUS: I18nCollection = {
           developer: 'Developer',
           version: 'Version',
           copyright: 'Copyright',
-          function: '版本功能'
+          function: 'Features'
         },
         value: {
-          developer: '开发商',
-          version: '版本',
-          copyright: '版权所属',
-          function: '版本功能'
+          developer: 'Developer',
+          version: 'version',
+          copyright: 'Copyright',
+          function: 'Features'
         }
       },
       btn: {
@@ -535,7 +617,15 @@ export const enUS: I18nCollection = {
       },
       connectFail: `can't connect to dipperin node`,
       loading: 'Loading',
-
+      walletManagement: 'Wallet Management',
+      exportPrivateKey: 'Private Key Export',
+      privateKey: {
+        title: 'Show Private Keys',
+        label: "It's your private key(click to copy)",
+        notes:
+          'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+        confirm: 'Done'
+      },
       swal: {
         updateSuccess: 'update success',
         cancel: 'Cancel',
@@ -544,7 +634,9 @@ export const enUS: I18nCollection = {
           'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
         warn: 'Warning',
         startUpdate: 'Start update',
-        documentTitle: 'Dipperin Wallet'
+        documentTitle: 'Dipperin Wallet',
+        copySuccess: 'Copy Success',
+        incorrectPassword: 'Incorrect password'
       }
     }
   },
@@ -561,20 +653,23 @@ export const enUS: I18nCollection = {
         invalidPassword: 'Invalid password',
         diffPassword: 'The first password is not equal to the second password!',
         confirm: 'OK'
-      }
+      },
+      weak: 'week',
+      medium: 'medium',
+      strong: 'strong'
     },
     backup: {
       return: 'Return',
       title: 'Backup mnemonic',
       hint:
-        'We highly recommend you write down the mnemonic words on paper and keep it in a safe place. Anyone who gets it can access and spend your assets.',
+        'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.',
       bottomHint: 'Remember your mnemonic. DO NOT SCREENSHOT!',
       confirm: 'Confirm'
     },
     backupConfirm: {
       return: 'Return',
       title: 'Confirm mnemonic',
-      hint: 'Please select mnemonic words in correct order.',
+      hint: 'Please select Mnemonic Phrase in correct order.',
       confirm: 'Confirm',
       dialogText: 'Your mnemonic words will be removed from this device!',
       cancel: 'Cancel',
@@ -610,6 +705,7 @@ export const enUS: I18nCollection = {
         insufficientFunds: 'Insufficient funds',
         invalidAmount: 'Invalid amount',
         invalidFee: 'Invalid poundage',
+        timeout: 'Remote node react too late',
         success: 'Send transaction successful!',
         fail: 'Send transaction fail!',
         incorrectPassword: 'Incorrect password!',
@@ -655,7 +751,16 @@ export const enUS: I18nCollection = {
       add: 'Add account',
       account: 'Account',
       copySuccess: 'Replicating Success!',
-      currentAccount: CurrentAccountUS
+      currentAccount: CurrentAccountUS,
+      privateKeyImport: 'Private Key Import',
+      label: 'Paste your private key string here',
+      title: 'Enter Private Key',
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      importSuccessTitle: 'Import Success',
+      importErrorTitle: 'Import Failure',
+      importError: 'Please enter correct private key!',
+      addressReimportError: 'The account has already existed.'
     },
     account: {
       transfer: 'Transfer',
@@ -680,8 +785,8 @@ export const enUS: I18nCollection = {
   contract: {
     contract: {
       selectFile: 'Please select a file',
-      errorAbiFile: 'Error abi File',
-      errorWasmFile: 'Error Wasm File',
+      errorAbiFile: 'Incorrect ABI file format',
+      errorWasmFile: 'Incorrect wasm file format',
       add: 'Add',
       call: 'Call',
       favoriteContract: 'favorite contract',
@@ -743,6 +848,9 @@ export const enUS: I18nCollection = {
         createErr: 'Create contract error',
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
+        paramsLengthErr: 'Number of input parameter is wrong',
+        contractAddressErr: 'The contract address is wrong',
+        getAbi: 'Get ABI error',
         feeMax: 'Fee is less than the minimum fee'
       },
       labs: {
@@ -769,8 +877,10 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
-        confirm: 'OK'
+        invalidAddress: 'Recipient address is invalid!',
+        confirm: 'OK',
+        extraDataTooLong: 'The entered text is too long, please optimize your content',
+        networkError: 'Current network is unreachable, please check your network connection'
       }
     },
     approve: {
@@ -845,6 +955,35 @@ export const enUS: I18nCollection = {
       password: 'Password',
       cancel: 'Cancel',
       confirm: 'Confirm'
+    }
+  },
+
+  mine: {
+    main: {
+      easyMine: 'Start Mining',
+      loading: 'Loading',
+      stopMining: 'Stop Mining',
+      mineReward: 'Mining Reward',
+      withdrawBalance: 'Withdraw Balance',
+      startFailure: 'Start Failure',
+      remoteNodeError: 'please restart after switching to local node.',
+      unstartNodeError: 'please restart after booting booting node'
+    },
+    tips: {
+      title: 'Attentions',
+      tipContent:
+        'When the wallet starts mining, it will automatically switch to the local node and wait for the local node to synchronize to the latest block height before mining.',
+      done: 'Done'
+    },
+    withdraw: {
+      withdraw: 'Withdraw Balance',
+      receipt: 'Receipt Address',
+      withdrawAmount: 'Withdraw Amount',
+      availableAmount: 'Available Amount: ',
+      cancel: 'Cancel',
+      confirm: 'Withdraw',
+      success: 'Withdraw Success',
+      inPoolError: 'The transaction has already in pool, please wait a moment.'
     }
   }
 }

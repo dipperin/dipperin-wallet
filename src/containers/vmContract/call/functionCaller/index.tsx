@@ -26,7 +26,7 @@ interface InputValue {
 // }
 
 @observer
-class FunctionCaller extends React.Component<Props> {
+export class FunctionCaller extends React.Component<Props> {
   @observable
   inputValue: InputValue = {}
   @observable
@@ -137,10 +137,6 @@ class FunctionCaller extends React.Component<Props> {
             </div>
           </div>
         )}
-        {/* <div className={classes.resultBox}>
-          <div>Result:</div>
-          <div>content</div>
-        </div> */}
       </div>
     )
   }

@@ -17,7 +17,7 @@ const styles = createStyles({
     left: 0,
     background: `url(${Bg})`,
     backgroundSize: 'cover',
-    zIndex: 3000
+    zIndex: 2
   },
   shadow: {
     width: '100%',
@@ -25,13 +25,18 @@ const styles = createStyles({
     background: 'rgba(0,0,0,0.7)',
     overflow: 'hidden'
   },
+  importBtnBox: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   add: {
     display: 'block',
     width: '262px',
     height: '36px',
-    left: '50%',
-    marginLeft: '-131px',
-    margin: '60px auto 50px',
+    // left: '50%',
+    // marginLeft: '-131px',
+    margin: '60px 50px',
     padding: 0,
     textTransform: 'none',
     fontSize: '16px',

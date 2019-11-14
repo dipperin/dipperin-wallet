@@ -23,11 +23,15 @@ interface ItemProps extends WithStyles {
 @observer
 export class ContractItem extends React.Component<ItemProps> {
   jumpToCall = () => {
-    this.props.jumpToCall(this.props.contract.contractAddress, this.props.contract.txHash)
+    if (this.props.contract.contractAddress) {
+      this.props.jumpToCall(this.props.contract.contractAddress, this.props.contract.txHash)
+    }
   }
 
   jumpToDetail = () => {
-    this.props.jumpToDetail(this.props.contract.contractAddress)
+    if (this.props.contract.contractAddress) {
+      this.props.jumpToDetail(this.props.contract.contractAddress)
+    }
   }
 
   copyAddress = (address: string, e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -58,20 +62,21 @@ export class ContractItem extends React.Component<ItemProps> {
         })}
       >
         <div className={classes.rowLeft}>
-          {/* {!(contract.status === TRANSACTION_STATUS_SUCCESS) && (
-            <div className={classes.item}>{labels[contract.status]}</div>
-          )} */}
+          {/* TODO: if no jumpToCall cursor is default */}
           <div className={classes.address} onClick={this.jumpToCall}>
             {!(contract.status === TRANSACTION_STATUS_SUCCESS) && <span>{labels[contract.status]}</span>}
             {contract.contractAddress}
-            <Button className={classes.copy} onClick={this.copyAddress.bind(this, contract.contractAddress)}>
-              <img src={Copy} alt="" title="copy" />
-            </Button>
+            {contract.status === TRANSACTION_STATUS_SUCCESS && (
+              <Button className={classes.copy} onClick={this.copyAddress.bind(this, contract.contractAddress)}>
+                <img src={Copy} alt="" title="copy" />
+              </Button>
+            )}
           </div>
           <div className={classes.date}>{format(new Date(contract.timestamp), 'YYYY/MM/DD HH:mm')}</div>
         </div>
 
         <div className={classes.rowRight}>
+          {/* TODO: if no jumpToDetail cursor is default */}
           <div className={classes.detail} onClick={this.jumpToDetail} />
         </div>
       </div>

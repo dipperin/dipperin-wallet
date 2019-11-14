@@ -1,12 +1,27 @@
 import { observable, computed, runInAction, action } from 'mobx'
 import { Utils } from '@dipperin/dipperin.js'
+import { EncryptResult } from '@dipperin/dipperin.js/build/module/dr/accounts'
 import BigNumber from 'bignumber.js'
+
+export enum AccountType {
+  hd,
+  privateKey
+}
+
+export interface Opt {
+  nonce?: string
+  type?: number
+  encryptKey?: EncryptResult
+}
 
 export default class AccountModel {
   private _address: string
-  private _nonce: string
+  private _nonce: string = '0'
   private _id: string
   private _path: string
+  private _type: number = AccountType.hd
+  private _privateKey: string = ''
+  private _encryptKey: EncryptResult | undefined
 
   @observable
   private _balance: BigNumber = new BigNumber(0)
@@ -18,15 +33,19 @@ export default class AccountModel {
    * @param obj
    */
   static fromObj(obj: AccountObj) {
-    return new AccountModel(obj.id.toString(), obj.path, obj.address, obj.nonce)
+    return new AccountModel(obj.id.toString(), obj.path, obj.address, { nonce: obj.nonce })
   }
 
-  constructor(id: string, path: string, address: string, nonce?: string) {
+  constructor(id: string, path: string, address: string, opt?: Opt) {
     runInAction(() => {
       this._id = id
       this._path = path
       this._address = address
-      this._nonce = nonce || '0'
+      if (opt) {
+        this._nonce = opt.nonce || '0'
+        this._type = opt.type || AccountType.hd
+        this._encryptKey = opt.encryptKey
+      }
     })
   }
 
@@ -51,6 +70,19 @@ export default class AccountModel {
   }
 
   @computed
+  get type() {
+    return this._type
+  }
+
+  isHDWallet() {
+    return this._type === AccountType.hd
+  }
+
+  isPrivateKey() {
+    return this._type === AccountType.privateKey
+  }
+
+  @computed
   get balance() {
     return Utils.fromUnit(this._balance.toString(10))
   }
@@ -63,6 +95,11 @@ export default class AccountModel {
   @computed
   get balanceUnit() {
     return this._balance.toString(10)
+  }
+
+  @computed
+  get encrypt() {
+    return this._encryptKey
   }
 
   /**
@@ -102,14 +139,43 @@ export default class AccountModel {
     this._nonce = new BigNumber(this._nonce).plus(1).toString(10)
   }
 
+  @action
+  updatePrivateKey(key: string) {
+    // TODO: use dipperin.js utils
+    if (/^[0-9a-f]{64}$/.test(key.replace('0x', ''))) {
+      this._privateKey = key
+    } else {
+      throw new Error('Invalid Private Key!')
+    }
+  }
+
+  @computed
+  get privateKey() {
+    return this._privateKey
+  }
+
+  @action
+  updateAccountType(type: number) {
+    if (type in AccountType) {
+      this._type = type
+    }
+  }
+
   /**
    * Transfer account model to Javascript object
    */
   toJS(): AccountObj {
+    const opt: Opt = {}
+    if (this._type !== AccountType.hd) {
+      opt.type = this._type
+      opt.encryptKey = this._encryptKey
+    }
+
     return {
+      opt,
       address: this.address,
       id: Number(this.id),
-      nonce: this._nonce || '0',
+      nonce: this._nonce,
       path: this.path
     }
   }
@@ -120,4 +186,5 @@ export interface AccountObj {
   id: number
   nonce: string
   path: string
+  opt?: Opt
 }

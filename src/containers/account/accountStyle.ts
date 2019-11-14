@@ -11,7 +11,15 @@ const styles = createStyles({
     padding: '32px 24px 26px',
     verticalAlign: 'top',
     borderRadius: '6px',
-    background: '#fff'
+    background: '#fff',
+    overflow: 'auto',
+    '&::-webkit-scrollbar': {
+      width: '4px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '2px',
+      background: '#bbb'
+    }
   },
   title: {
     fontSize: 18,
