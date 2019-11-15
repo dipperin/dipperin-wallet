@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron'
+import settings from 'electron-settings'
 import { ChildProcess, spawn } from 'child_process'
 import log from 'electron-log'
 import fs from 'fs'
@@ -14,6 +15,7 @@ import { START_MINER_NODE_FAILURE, START_NODE_FAILURE, START_MINER_NODE_SUCCESS,
 import { getOs } from '../utils/dipperinPath'
 
 export const DEFAULT_NET = 'venus'
+export const CHAIN_DATA_DIR = 'chainDataDir'
 
 const fsChmod = util.promisify(fs.chmod)
 const fsExists = util.promisify(fs.stat)
@@ -24,10 +26,22 @@ let dipperinIpcPath: string
 
 const MAX_LOG_SIZE = 100 * 1024 * 1024
 
-export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
+interface DipperinOpt {
+  chainDataDir: string
+}
+
+export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: DipperinOpt) => {
+  let chainDataDir: string
+  if (opt) {
+    chainDataDir = path.join(opt.chainDataDir, `${getNodeEnv(net)}`, `wallet`)
+  } else {
+    chainDataDir =
+      path.join(settings.get(CHAIN_DATA_DIR) as string, `${getNodeEnv(net)}`, `wallet`) ||
+      path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+  }
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
-  const chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+  // chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
   const chainLogPath = path.join(chainDataDir, `dipperin.log`)
   const chainIpcPath = path.join(chainDataDir, `dipperin.ipc`)
 

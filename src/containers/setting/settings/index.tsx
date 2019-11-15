@@ -6,6 +6,8 @@ import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
 import _ from 'lodash'
+import os from 'os'
+import pathModule from 'path'
 
 import PackageJson from '@/../package.json'
 import Loading from '@/components/loading'
@@ -37,7 +39,7 @@ import { Button, Fab, WithStyles, withStyles, Tooltip } from '@material-ui/core'
 
 import { I18nCollectionWallet } from '@/i18n/i18n'
 import RootStore from '@/stores/root'
-import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ } from '@/utils/constants'
+import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ, CHAIN_DATA_DIR } from '@/utils/constants'
 import SwitchButton from '@/components/switchButton'
 
 import styles from './settingStyle'
@@ -103,6 +105,10 @@ export class Setting extends React.Component<Props> {
     })
 
     onStartNodeSuccess(this.nodeStartSuccess)
+
+    this.setChainDataDir(
+      (settings.get(CHAIN_DATA_DIR) as string) || pathModule.join(os.homedir(), 'tmp', 'dipperin_apps')
+    )
   }
 
   nodeStartSuccess = () => {
@@ -377,6 +383,13 @@ export class Setting extends React.Component<Props> {
     console.log(e.target.files)
     if (e.target.files && e.target.files.length > 0) {
       this.setChainDataDir(e.target.files[0].path)
+      settings.set(CHAIN_DATA_DIR, e.target.files[0].path)
+    }
+  }
+
+  handleSelectChangeDir = () => {
+    if (this.chainDataDirInput) {
+      this.chainDataDirInput.click()
     }
   }
 
@@ -414,8 +427,19 @@ export class Setting extends React.Component<Props> {
                 {labels.about.label.version} : {PackageJson.version}
               </p>
             </div>
-            <input type="file" onChange={this.handleChangeDir} ref={this.chainDataDirRef} />
-            {this.chainDataDir}
+            <div className={classes.dirSelectorBox}>
+              <p>{labels.left.dataDir}</p>
+              <input
+                type="file"
+                onChange={this.handleChangeDir}
+                ref={this.chainDataDirRef}
+                style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
+              />
+              <div className={classes.dirSelector} onClick={this.handleSelectChangeDir}>
+                {this.chainDataDir}
+                <div className={classes.selectorIcon} />
+              </div>
+            </div>
           </div>
           <div className={classes.right}>
             <Tooltip title={isRemoteNode ? labels.net.closeRemote : labels.net.connectRemote}>

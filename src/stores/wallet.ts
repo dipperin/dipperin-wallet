@@ -593,6 +593,10 @@ export default class WalletStore {
       return e.message
     }
   }
+
+  /**
+   * the following content is about setting chainDataDir
+   */
 }
 
 // animal enter candy frame garbage thought whip obvious artefact mean tuition pepper

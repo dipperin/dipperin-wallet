@@ -5,6 +5,7 @@ import Reset from '@/images/setting-reset.png'
 import ResetActive from '@/images/reset-active.png'
 import UpdateActive from '@/images/update-active.png'
 import Horn from '@/images/horn.png'
+import ChangeDir from '@/images/changeDir.png'
 
 const styles = createStyles({
   setting: {
@@ -42,8 +43,8 @@ const styles = createStyles({
     fontWeight: 'bold'
   },
   version: {
-    position: 'absolute',
-    bottom: '16px',
+    // position: 'absolute',
+    // top: '90px',
     '& p': {
       fontSize: 12
     }
@@ -336,6 +337,36 @@ const styles = createStyles({
     '&:hover': {
       cursor: 'pointer'
     }
+  },
+  dirSelectorBox: {
+    position: 'absolute',
+    bottom: '20px'
+  },
+  dirSelector: {
+    marginTop: '5px',
+    width: '258px',
+    height: '24px',
+    borderRadius: '12px',
+    border: '1px solid rgba(120,139,179,1)',
+    background: '#fff',
+    // opacity:0.7,
+    color: '#838899',
+    lineHeight: '24px',
+    cursor: 'pointer',
+    paddingLeft: '10px',
+    position: 'relative',
+    paddingRight: '25px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  selectorIcon: {
+    height: '16px',
+    width: '16px',
+    background: `url(${ChangeDir})`,
+    position: 'absolute',
+    right: '8px',
+    top: '3px'
   }
 })
 
