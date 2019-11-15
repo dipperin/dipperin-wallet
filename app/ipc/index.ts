@@ -6,7 +6,7 @@ import packageJSON from '../../package.json'
 import doesDipperinExist from '../operations/doesDipperinExist'
 import fetchDipperin from '../operations/fetchDipperin'
 import handleError from '../operations/handleError'
-import { openDipperin, openTmp, deleteCSWallet, getChainDataDir } from '../operations/openFile'
+import { openDipperin, openTmp, deleteCSWallet, getChainDataDir, moveFiles } from '../operations/openFile'
 import {
   killDipperin,
   runDipperin,
@@ -39,6 +39,7 @@ const DIPPERIN_IPC = 'dipperinIpc'
 const DIPPERIN_IPC_RESPONSE = 'dipperinIpcResponse'
 const CHAIN_IPC_PATH = 'chainIpcPath'
 const CHAIN_DATA_DIR = 'chainDataDir'
+const MOVE_CHAIN_DATA_DIR = 'moveChainDataDir'
 
 export const START_MINER_NODE_FAILURE = 'startMinerNodeFailure'
 export const START_NODE_FAILURE = 'startNodeFailure'
@@ -99,9 +100,14 @@ const initIPC = (mainWindow: BrowserWindow) => {
     const response = getChainIpcPath() || ''
     event.sender.send(CHAIN_IPC_PATH, response)
   })
+
   ipcMain.on(CHAIN_DATA_DIR, (event: Event) => {
     const chainDataDir = getChainDataDir() || ''
     event.sender.send(CHAIN_DATA_DIR, chainDataDir)
+  })
+  
+  ipcMain.on(MOVE_CHAIN_DATA_DIR, (_: Event, oldPath: string, newPath: string) => {
+    moveFiles(oldPath, newPath)
   })
 }
 

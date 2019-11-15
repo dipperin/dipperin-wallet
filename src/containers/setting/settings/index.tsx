@@ -32,14 +32,14 @@ import {
 import WalletStore from '@/stores/wallet'
 // import RootStore from '@/stores/root'
 import AccountStore from '@/stores/account'
-import { isAlpha } from '@/utils'
+import { isAlpha, sleep } from '@/utils'
 import { getCurrentNet, setCurrentNet, setIsRemoteNode } from '@/utils/node'
 import settings from '@/utils/settings'
 import { Button, Fab, WithStyles, withStyles, Tooltip } from '@material-ui/core'
 
 import { I18nCollectionWallet } from '@/i18n/i18n'
 import RootStore from '@/stores/root'
-import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ, CHAIN_DATA_DIR } from '@/utils/constants'
+import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ, CHAIN_DATA_DIR, IS_REMOTE } from '@/utils/constants'
 import SwitchButton from '@/components/switchButton'
 
 import styles from './settingStyle'
@@ -384,6 +384,12 @@ export class Setting extends React.Component<Props> {
     if (e.target.files && e.target.files.length > 0) {
       this.setChainDataDir(e.target.files[0].path)
       settings.set(CHAIN_DATA_DIR, e.target.files[0].path)
+      if (!settings.get(IS_REMOTE)) {
+        sendStopNode()
+        this.props.root!.stopConnectNode()
+        await sleep(1000)
+        sendStartNode()
+      }
     }
   }
 
