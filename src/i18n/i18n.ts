@@ -76,7 +76,8 @@ export const zhCN = {
     setting: {
       left: {
         title: '设置',
-        info: '设置您的钱包账户信息'
+        info: '设置您的钱包账户信息',
+        dataDir: '数据储存路径'
       },
       net: {
         title: '选择本地节点',
@@ -97,7 +98,7 @@ export const zhCN = {
         title: '关于钱包',
         label: {
           developer: '开发商',
-          version: '版本',
+          version: '钱包版本',
           copyright: '版权所属',
           function: '版本功能'
         },
@@ -575,7 +576,8 @@ export const enUS: I18nCollection = {
     setting: {
       left: {
         title: 'Setting',
-        info: 'Set up your wallet infomation'
+        info: 'Set up your wallet infomation',
+        dataDir: 'Chain Data Dictionary'
       },
       net: {
         title: 'Select Local Node',

@@ -16,7 +16,8 @@ import {
   WALLET_DB,
   VM_CONTRACT_DB,
   RECEIPT_DB,
-  MINE_DB
+  MINE_DB // FIXME: to remove
+  // CONFIG_DB
 } from '@/utils/constants'
 
 import { TransactionInterface } from '../models/transaction'
@@ -377,6 +378,60 @@ export const getMiner = (): Promise<{ mnemonic: string; updateTime: number }> =>
   })
 }
 
+/**
+ * config db
+ */
+// interface ConfigData {
+//   type: number
+//   content: string
+//   ut?: number
+// }
+
+// export const insertConfigData = async (config: ConfigData) => {
+//   const db = getDB(CONFIG_DB)
+//   const minerData = {
+//     ...config,
+//     ut: new Date().valueOf()
+//   }
+//   await new Promise((resolve, reject) => {
+//     db.insert(minerData, (err, res) => {
+//       if (err) {
+//         reject(err)
+//       }
+//       resolve(true)
+//     })
+//   })
+// }
+
+// export const removeConfigData = async (type: number) => {
+//   const db = getDB(CONFIG_DB)
+//   await new Promise((resolve, reject) => {
+//     db.remove({type}, (err, res) => {
+//       if (err) {
+//         reject(err)
+//       }
+//       resolve(true)
+//     })
+//   })
+// }
+
+// export const getConfigData = (type: number): Promise<ConfigData> => {
+//   const db = getDB(CONFIG_DB)
+
+//   return new Promise((resolve, reject) => {
+//     db.findOne({type},(err, res: ConfigData) => {
+//       if (err) {
+//         reject(err)
+//       }
+//       if (res) {
+//         resolve(res)
+//       } else {
+//         resolve(undefined)
+//       }
+//     })
+//   })
+// }
+
 export const resetDB = () => {
   getDB(ACCOUNT_DB).remove({}, { multi: true })
   getDB(TRANSACTION_DB).remove({}, { multi: true })
@@ -386,4 +441,5 @@ export const resetDB = () => {
   getDB(OWNER_DB).remove({}, { multi: true })
   getDB(VM_CONTRACT_DB).remove({}, { multi: true })
   getDB(MINE_DB).remove({}, { multi: true })
+  // getDB(CONFIG_DB).remove({}, { multi: true })
 }
