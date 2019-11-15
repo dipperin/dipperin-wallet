@@ -96,6 +96,7 @@ export const DIPPERIN_IPC = 'dipperinIpc'
 export const DIPPERIN_IPC_RESPONSE = 'dipperinIpcResponse'
 export const CHAIN_IPC_PATH = 'chainIpcPath'
 export const CHAIN_DATA_DIR = 'chainDataDir'
+export const MOVE_CHAIN_DATA_DIR = 'moveChainDataDir'
 
 /**
  * node net

@@ -1,5 +1,6 @@
 import { shell } from 'electron'
 import settings from 'electron-settings'
+import log from 'electron-log'
 import os from 'os'
 import path from 'path'
 import fs from 'fs'
@@ -37,4 +38,13 @@ export const getChainDataDir = () => {
   const net: string = settings.get('netEnv') as string
   const chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
   return chainDataDir
+}
+
+export const moveFiles = (oldPath: string, newPath: string) => {
+  fsExtra.move(oldPath, newPath, (err) => {
+    if (err) {
+      log.error(err)
+    }
+    log.info('move files success!')
+  })
 }
