@@ -160,6 +160,9 @@ export class Import extends React.Component<IImportProps> {
     repeatPassword: string,
     labels: I18nCollectionWallet['import']
   ): string | void => {
+    if (mnemonic === '') {
+      return labels.swal.emptyMnemonic
+    }
     if (mnemonic.trim().split(' ').length < 12) {
       return labels.swal.mnemonicLength
     }
