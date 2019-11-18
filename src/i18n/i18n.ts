@@ -348,6 +348,10 @@ export const zhCN = {
         decimalLength: '精度不能超过18',
         paramsLengthErr: '输入参数数量错误',
         contractAddressErr: '合约地址错误',
+        noAbi: '未导入合约ABI文件',
+        noWASM: '未导入合约WASM文件',
+        noGas: '未输入Gas上限',
+        noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
         feeMax: '手续费不足'
       },
@@ -848,6 +852,10 @@ export const enUS: I18nCollection = {
       createSwal: {
         createSuccess: 'Create contract success',
         createErr: 'Create contract error',
+        noAbi: 'Please import the ABI file of your contract',
+        noWASM: 'Please import the WASM file of your contract',
+        noGas: 'Please input the gas limit',
+        noGasPrice: 'Please input the gas price',
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
         paramsLengthErr: 'Number of input parameter is wrong',
