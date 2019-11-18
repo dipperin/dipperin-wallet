@@ -84,13 +84,25 @@ export const styles = createStyles({
   },
   pagination: {
     position: 'absolute',
-    width: '100%',
+    // width: '100%',
+    width: 510,
     bottom: 15,
     textAlign: 'center',
     '& ul': {
-      display: 'inline-block',
+      display: 'flex',
+      justifyContent: 'center',
       '& li': {
         outline: 'none'
+      },
+      '& li:first-child': {
+        position: 'absolute',
+        top: 0,
+        left: 50
+      },
+      '& li:last-child': {
+        position: 'absolute',
+        top: 0,
+        right: 50
       }
     }
   },
