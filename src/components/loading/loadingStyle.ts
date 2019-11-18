@@ -31,6 +31,19 @@ const style = createStyles({
   svg: {
     display: 'block',
     margin: '0 auto'
+  },
+  cancel: {
+    width: '310px',
+    height: '36px',
+    fontSize: '18px',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+    background: '#aaa',
+    color: 'white',
+    fontWeight: 600,
+    marginTop: '30px',
+    borderRadius: '4px'
   }
 })
 

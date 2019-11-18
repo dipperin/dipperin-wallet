@@ -21,7 +21,8 @@ import {
   DIPPERIN_IPC_RESPONSE,
   CHAIN_IPC_PATH,
   CHAIN_DATA_DIR,
-  MOVE_CHAIN_DATA_DIR
+  MOVE_CHAIN_DATA_DIR,
+  CANCEL_DIPPERIN_DOWNLOAD
 } from '@/utils/constants'
 import { getIsRemoteNode } from '@/utils/node'
 
@@ -195,4 +196,8 @@ export const getChainDataDir = (): Promise<string> => {
  */
 export const moveChainData = (oldPath: string, newPath: string) => {
   ipcRenderer.send(MOVE_CHAIN_DATA_DIR, oldPath, newPath)
+}
+
+export const cancelDipperinDownload = () => {
+  ipcRenderer.send(CANCEL_DIPPERIN_DOWNLOAD)
 }
