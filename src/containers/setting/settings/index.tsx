@@ -27,7 +27,8 @@ import {
   updateNode,
   sendStopNode,
   sendStartNode,
-  onStartNodeSuccess
+  onStartNodeSuccess,
+  cancelDipperinDownload
 } from '@/ipc'
 import WalletStore from '@/stores/wallet'
 // import RootStore from '@/stores/root'
@@ -399,6 +400,12 @@ export class Setting extends React.Component<Props> {
     }
   }
 
+  @action
+  handleCancelDownload = () => {
+    cancelDipperinDownload()
+    this.loading = false
+  }
+
   render() {
     const {
       labels,
@@ -562,7 +569,14 @@ export class Setting extends React.Component<Props> {
           )}
         </div>
         {this.showAccounts && <Accounts handleClose={this.handleClose} history={this.props.history} />}
-        {this.loading && <Loading title={labels.loading} progress={this.progress} />}
+        {this.loading && (
+          <Loading
+            title={labels.loading}
+            progress={this.progress}
+            onCancel={this.handleCancelDownload}
+            cancelText={this.props.labels.swal.cancel}
+          />
+        )}
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
         {this.showPrivateKey && (
           <DialogConfirm

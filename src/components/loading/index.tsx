@@ -8,6 +8,8 @@ import { primaryColor } from '@/styles/appStyle'
 interface Props extends WithStyles<typeof styles> {
   progress: number
   title: string
+  onCancel: () => void
+  cancelText: string
 }
 
 // const Loading = (props: Props) => {
@@ -63,6 +65,9 @@ const Loading = (props: Props) => {
           {title}
           ...
         </div>
+        <button className={classes.cancel} onClick={props.onCancel}>
+          {props.cancelText}
+        </button>
       </div>
     </div>
   )

@@ -4,7 +4,7 @@ import settings from 'electron-settings'
 
 import packageJSON from '../../package.json'
 import doesDipperinExist from '../operations/doesDipperinExist'
-import fetchDipperin from '../operations/fetchDipperin'
+import fetchDipperin, { cancelDipperinDownload } from '../operations/fetchDipperin'
 import handleError from '../operations/handleError'
 import { openDipperin, openTmp, deleteCSWallet, getChainDataDir, moveFiles } from '../operations/openFile'
 import {
@@ -17,6 +17,7 @@ import {
 import updateDipperin from '../operations/updateDipperin'
 
 const UPDATE_VERSION = 'updateVersion'
+const CANCEL_DIPPERIN_DOWNLOAD = 'cancelDipperinDownload'
 const UPDATE_NODE = 'updateNode'
 const SET_NODE_NET = 'setNodeNet'
 const NODE_RESTART_SUCCESS = 'nodeRestartSuccess'
@@ -50,6 +51,10 @@ const initIPC = (mainWindow: BrowserWindow) => {
   // Check dipperin version and update
   ipcMain.on(UPDATE_VERSION, async (event: Event) => {
     await handleUpdateVersion(event, mainWindow)
+  })
+
+  ipcMain.on(CANCEL_DIPPERIN_DOWNLOAD, ()=>{
+    cancelDipperinDownload()
   })
 
   // Update dipperin version
@@ -105,7 +110,7 @@ const initIPC = (mainWindow: BrowserWindow) => {
     const chainDataDir = getChainDataDir() || ''
     event.sender.send(CHAIN_DATA_DIR, chainDataDir)
   })
-  
+
   ipcMain.on(MOVE_CHAIN_DATA_DIR, (_: Event, oldPath: string, newPath: string) => {
     moveFiles(oldPath, newPath)
   })
