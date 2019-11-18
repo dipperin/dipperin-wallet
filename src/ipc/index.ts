@@ -189,6 +189,10 @@ export const getChainDataDir = (): Promise<string> => {
   })
 }
 
+/**
+ * @param oldPath
+ * @param newPath
+ */
 export const moveChainData = (oldPath: string, newPath: string) => {
   ipcRenderer.send(MOVE_CHAIN_DATA_DIR, oldPath, newPath)
 }
