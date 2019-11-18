@@ -8,15 +8,18 @@ import fsExtra from 'fs-extra'
 import util from 'util'
 
 import dipperinPath from '../utils/dipperinPath'
-import { getNodeEnv } from './runDipperin'
+import { getNodeEnv, CHAIN_DATA_DIR } from './runDipperin'
 
 const fsExists = util.promisify(fs.stat)
 const noop = () => null
 
 export const openTmp = () => {
   const net: string = settings.get('netEnv') as string
-  const chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+  const chainDataDir =
+    path.join(settings.get(CHAIN_DATA_DIR) as string, `${getNodeEnv(net)}`, `wallet`) ||
+    path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
   const chainLogPath = path.join(`${chainDataDir}`, `dipperin.log`)
+
   shell.showItemInFolder(chainLogPath)
 }
 
@@ -40,8 +43,13 @@ export const getChainDataDir = () => {
   return chainDataDir
 }
 
+/**
+ * the function serves for the requirement that user need to change
+ * @param oldPath
+ * @param newPath
+ */
 export const moveFiles = (oldPath: string, newPath: string) => {
-  fsExtra.move(oldPath, newPath, (err) => {
+  fsExtra.move(oldPath, newPath, err => {
     if (err) {
       log.error(err)
     }
