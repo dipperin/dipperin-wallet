@@ -296,9 +296,10 @@ export class CreateContract extends React.Component<IProps> {
         this.handleCloseDialog()
       } else {
         this.handleCloseDialog()
+        const errorText = this.transformErrorInfo(contractRes.info as string)
         swal.fire({
           title: labels.createSwal.createErr,
-          text: contractRes.info,
+          text: errorText,
           type: 'error'
         })
       }
@@ -308,6 +309,14 @@ export class CreateContract extends React.Component<IProps> {
         title: labels.createSwal.incorrectPassword
       })
     }
+  }
+
+  transformErrorInfo = (info: string): string => {
+    const labels = this.props.labels
+    if (info === 'Error: Network Error' || info.includes('InvalidConnectionError')) {
+      return labels.createSwal.networkError
+    }
+    return info
   }
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)

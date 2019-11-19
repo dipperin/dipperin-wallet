@@ -357,7 +357,8 @@ export const zhCN = {
         noGas: '未输入Gas上限',
         noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
-        feeMax: '手续费不足'
+        feeMax: '手续费不足',
+        networkError: '网络连接异常，请检查您的网络！'
       },
       labs: {
         transfer: '合约转账',
@@ -869,7 +870,8 @@ export const enUS: I18nCollection = {
         paramsLengthErr: 'Number of input parameter is wrong',
         contractAddressErr: 'The contract address is wrong',
         getAbi: 'Get ABI error',
-        feeMax: 'Fee is less than the minimum fee'
+        feeMax: 'Fee is less than the minimum fee',
+        networkError: 'The network connection is abnormal, please check your network！'
       },
       labs: {
         transfer: 'Transfer',
