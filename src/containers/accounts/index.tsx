@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { WithTranslation, withTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
+import _ from 'lodash'
 
 import AccountStore from '@/stores/account'
 import { Button } from '@material-ui/core'
@@ -108,6 +109,7 @@ export class Accounts extends React.Component<Props> {
   }
 
   addAccount = async () => {
+    console.log('add account')
     try {
       this.props.account!.addAccount()
     } catch (err) {
@@ -116,6 +118,8 @@ export class Accounts extends React.Component<Props> {
     }
     // await this.props.account!.showDbAccounts()
   }
+
+  handleAddAccount = _.throttle(this.addAccount, 3000)
 
   importPrivateKey = async (privateKey: string) => {
     try {
@@ -251,7 +255,7 @@ export class Accounts extends React.Component<Props> {
       <div className={classes.changeAccount}>
         <div className={classes.shadow}>
           <div className={classes.importBtnBox}>
-            <Button variant="contained" className={classNames(classes.add, 'tour-add')} onClick={this.addAccount}>
+            <Button variant="contained" className={classNames(classes.add, 'tour-add')} onClick={this.handleAddAccount}>
               <AddIcon className={classes.btnIcon} />
               {labels.add}
             </Button>
