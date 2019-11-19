@@ -4,7 +4,8 @@ import { inject, observer } from 'mobx-react'
 import React from 'react'
 import { WithTranslation, withTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
-import _ from 'lodash'
+// import _ from 'lodash'
+import throttle from 'lodash/throttle'
 
 import AccountStore from '@/stores/account'
 import { Button } from '@material-ui/core'
@@ -109,7 +110,6 @@ export class Accounts extends React.Component<Props> {
   }
 
   addAccount = async () => {
-    console.log('add account')
     try {
       this.props.account!.addAccount()
     } catch (err) {
@@ -119,7 +119,7 @@ export class Accounts extends React.Component<Props> {
     // await this.props.account!.showDbAccounts()
   }
 
-  handleAddAccount = _.throttle(this.addAccount, 3000)
+  handleAddAccount = throttle(this.addAccount, 1500)
 
   importPrivateKey = async (privateKey: string) => {
     try {
