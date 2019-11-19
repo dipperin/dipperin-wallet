@@ -35,9 +35,8 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
   if (opt) {
     chainDataDir = path.join(opt.chainDataDir, `${getNodeEnv(net)}`, `wallet`)
   } else {
-    chainDataDir =
-      path.join(settings.get(CHAIN_DATA_DIR) as string, `${getNodeEnv(net)}`, `wallet`) ||
-      path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+    const appDir = settings.get(CHAIN_DATA_DIR) as string|undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+    chainDataDir =path.join(appDir, `${getNodeEnv(net)}`, `wallet`) 
   }
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
