@@ -140,7 +140,6 @@ export class Send extends React.Component<IProps> {
 
     if (bnUnit.lt(amountUnit, 10)) {
       throw new Error(label.swal.insufficientFunds)
-
     }
   }
 
@@ -188,6 +187,8 @@ export class Send extends React.Component<IProps> {
   //   })
   // }
 
+  // transformError = ()
+
   wrappedConfirmTransaction = (
     address: string,
     amount: string,
@@ -197,8 +198,8 @@ export class Send extends React.Component<IProps> {
   ): Promise<{ success: boolean; info?: string }> => {
     return new Promise((resolve, reject) => {
       const timeoutTimer = setTimeout(() => {
-        reject(this.props.labels.swal.timeout)
-      }, 3000)
+        reject(new Error(this.props.labels.swal.timeout))
+      }, 5000)
       this.props
         .transaction!.confirmTransaction(address, amount, memo, gas, gasPrice)
         .then(res => {
@@ -233,9 +234,23 @@ export class Send extends React.Component<IProps> {
         this.props.transaction!.updateTransactionType()
       } else {
         this.handleCloseDialog()
+        let errorText: string
+        switch (res.info) {
+          case `ResponseError: Returned error: "this transaction already in tx pool"`:
+            errorText = labels.swal.alreadyInTxPool
+            break
+          case `ResponseError: Returned error: "tx nonce is invalid"`:
+            errorText = labels.swal.invalidNonce
+            break
+          case `ResponseError: Returned error: "new fee is too low to replace the old one"`:
+            errorText = labels.swal.invalidNonce
+            break
+          default:
+            errorText = res.info || ''
+        }
         await swal.fire({
           title: labels.swal.fail,
-          text: res.info,
+          text: errorText,
           type: 'error',
           confirmButtonText: labels.swal.confirm
         })

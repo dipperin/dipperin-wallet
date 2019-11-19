@@ -208,7 +208,10 @@ export const zhCN = {
         success: '发送成功!',
         fail: '发送失败!',
         incorrectPassword: '密码错误!',
-        confirm: '确认'
+        confirm: '确认',
+        alreadyInTxPool: '此交易已经进入交易池，请等待！',
+        invalidNonce: '请等待账号nonce值同步后发送交易!',
+        tooLowfee: '请等待上笔交易上链后发送!'
       }
     },
     txList: {
@@ -717,7 +720,10 @@ export const enUS: I18nCollection = {
         success: 'Send transaction successful!',
         fail: 'Send transaction fail!',
         incorrectPassword: 'Incorrect password!',
-        confirm: 'Ok'
+        confirm: 'Ok',
+        alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+        invalidNonce: 'Please wait for the account synchronize the nonce number!',
+        tooLowfee: 'Please wait until the last transaction finishes!'
       }
     },
     txList: {
