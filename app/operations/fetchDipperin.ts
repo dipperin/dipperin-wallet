@@ -13,7 +13,7 @@ import { getOs } from '../utils/dipperinPath'
 const DOWNLOAD_PROGRESS = 'downloadProgress'
 
 let isDownloading = false
-let downloadItem: any
+let downloadItem: Electron.DownloadItem | undefined
 
 const fsChmod = util.promisify(fs.chmod)
 
@@ -33,6 +33,10 @@ const fetchDipperin = (mainWindow: BrowserWindow) => {
       onStarted: item => {
         isDownloading = true
         downloadItem = item
+      },
+      onCancel: item => {
+        isDownloading = false
+        log.info('stop downloading dipperin.')
       }
     }
   )

@@ -1,6 +1,6 @@
 {
   "name": "dipperin-wallet",
-  "version": "v1.2.3",
+  "version": "v1.3.1",
   "description": "Dipperin Offcial Wallet",
   "private": false,
   "license": "MIT",
@@ -51,7 +51,8 @@
     "publish:all": "yarn clean:dist && yarn build:process && electron-builder -mwl -p always",
     "publish:linux": "yarn clean:dist && yarn build:process && electron-builder -l -p always",
     "publish:mac": "yarn clean:dist && yarn build:process && electron-builder -m -p always",
-    "publish:win": "yarn clean:dist && yarn build:process && electron-builder -w -p always"
+    "publish:win": "yarn clean:dist && yarn build:process && electron-builder -w -p always",
+    "count:code": "node scripts/codeCount.js"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",

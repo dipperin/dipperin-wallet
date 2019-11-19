@@ -46,6 +46,7 @@ export const zhCN = {
         success: '导入成功!',
         mnemonicLength: '请提供至少12位助记词',
         invalidMnemonic: '助记词不合法',
+        emptyMnemonic: '助记词不能为空',
         passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致',
@@ -65,6 +66,7 @@ export const zhCN = {
       wallet: '钱包',
       contract: '智能合约',
       vmContract: '智能合约',
+      mine: '挖矿',
       setting: '设置',
       title: 'Dipperin 钱包',
       walletVersion: '钱包版本',
@@ -75,7 +77,8 @@ export const zhCN = {
     setting: {
       left: {
         title: '设置',
-        info: '设置您的钱包账户信息'
+        info: '设置您的钱包账户信息',
+        dataDir: '数据储存路径'
       },
       net: {
         title: '选择本地节点',
@@ -96,7 +99,7 @@ export const zhCN = {
         title: '关于钱包',
         label: {
           developer: '开发商',
-          version: '版本',
+          version: '钱包版本',
           copyright: '版权所属',
           function: '版本功能'
         },
@@ -205,7 +208,10 @@ export const zhCN = {
         success: '发送成功!',
         fail: '发送失败!',
         incorrectPassword: '密码错误!',
-        confirm: '确认'
+        confirm: '确认',
+        alreadyInTxPool: '此交易已经进入交易池，请等待！',
+        invalidNonce: '请等待账号nonce值同步后发送交易!',
+        tooLowfee: '请等待上笔交易上链后发送!'
       }
     },
     txList: {
@@ -346,6 +352,10 @@ export const zhCN = {
         decimalLength: '精度不能超过18',
         paramsLengthErr: '输入参数数量错误',
         contractAddressErr: '合约地址错误',
+        noAbi: '未导入合约ABI文件',
+        noWASM: '未导入合约WASM文件',
+        noGas: '未输入Gas上限',
+        noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
         feeMax: '手续费不足'
       },
@@ -453,6 +463,33 @@ export const zhCN = {
       cancel: '取消',
       confirm: '确认'
     }
+  },
+  mine: {
+    main: {
+      easyMine: '一键挖矿',
+      loading: '启动中',
+      stopMining: '停止挖矿',
+      mineReward: '挖矿奖励',
+      withdrawBalance: '提取余额',
+      startFailure: '启动失败',
+      remoteNodeError: '请开启本地节点后启动.',
+      unstartNodeError: '请启动节点后开启挖矿'
+    },
+    tips: {
+      title: '注意事项',
+      tipContent: '当启动钱包挖矿功能时，钱包网络节点会切换至本地节点，等待本地节点同步至最新区块高度后即开始挖矿。',
+      done: '确认'
+    },
+    withdraw: {
+      withdraw: '提现',
+      receipt: '收款地址',
+      withdrawAmount: '提款金额',
+      availableAmount: '可提现金额：',
+      cancel: '取消',
+      confirm: '提款',
+      success: '提现成功',
+      inPoolError: '交易已经发出，请等待'
+    }
   }
 }
 
@@ -469,6 +506,8 @@ export type I18nCollectionDialog = typeof zhCN.dialog
 export type I18nCollectionWallet = typeof zhCN.wallet
 
 export type I18nCollectionCreate = typeof zhCN.create
+
+export type I18nCollectionMine = typeof zhCN.mine
 
 export const enUS: I18nCollection = {
   wallet: {
@@ -515,6 +554,7 @@ export const enUS: I18nCollection = {
         success: 'Success!',
         mnemonicLength: 'You should provide 12 words of mnemonics',
         invalidMnemonic: 'Invalid mnemonics',
+        emptyMnemonic: 'Please enter your mnemonics',
         passwordLength: 'Password must be 8~24 characters in length',
         invalidPassword: 'Invalid password',
         diffPassword: `Passwords don't match`,
@@ -534,6 +574,7 @@ export const enUS: I18nCollection = {
       wallet: 'Wallet',
       contract: 'Contract',
       vmContract: 'Contract',
+      mine: 'Mining',
       setting: 'Setting',
       title: 'Dipperin Wallet',
       walletVersion: 'Wallet Version',
@@ -544,7 +585,8 @@ export const enUS: I18nCollection = {
     setting: {
       left: {
         title: 'Setting',
-        info: 'Set up your wallet infomation'
+        info: 'Set up your wallet infomation',
+        dataDir: 'Chain Data Dictionary'
       },
       net: {
         title: 'Select Local Node',
@@ -678,7 +720,10 @@ export const enUS: I18nCollection = {
         success: 'Send transaction successful!',
         fail: 'Send transaction fail!',
         incorrectPassword: 'Incorrect password!',
-        confirm: 'Ok'
+        confirm: 'Ok',
+        alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+        invalidNonce: 'Please wait for the account synchronize the nonce number!',
+        tooLowfee: 'Please wait until the last transaction finishes!'
       }
     },
     txList: {
@@ -815,6 +860,10 @@ export const enUS: I18nCollection = {
       createSwal: {
         createSuccess: 'Create contract success',
         createErr: 'Create contract error',
+        noAbi: 'Please import the ABI file of your contract',
+        noWASM: 'Please import the WASM file of your contract',
+        noGas: 'Please input the gas limit',
+        noGasPrice: 'Please input the gas price',
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
         paramsLengthErr: 'Number of input parameter is wrong',
@@ -924,6 +973,35 @@ export const enUS: I18nCollection = {
       password: 'Password',
       cancel: 'Cancel',
       confirm: 'Confirm'
+    }
+  },
+
+  mine: {
+    main: {
+      easyMine: 'Start Mining',
+      loading: 'Loading',
+      stopMining: 'Stop Mining',
+      mineReward: 'Mining Reward',
+      withdrawBalance: 'Withdraw Balance',
+      startFailure: 'Start Failure',
+      remoteNodeError: 'please restart after switching to local node.',
+      unstartNodeError: 'please restart after booting booting node'
+    },
+    tips: {
+      title: 'Attentions',
+      tipContent:
+        'When the wallet starts mining, it will automatically switch to the local node and wait for the local node to synchronize to the latest block height before mining.',
+      done: 'Done'
+    },
+    withdraw: {
+      withdraw: 'Withdraw Balance',
+      receipt: 'Receipt Address',
+      withdrawAmount: 'Withdraw Amount',
+      availableAmount: 'Available Amount: ',
+      cancel: 'Cancel',
+      confirm: 'Withdraw',
+      success: 'Withdraw Success',
+      inPoolError: 'The transaction has already in pool, please wait a moment.'
     }
   }
 }

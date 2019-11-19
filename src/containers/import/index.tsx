@@ -17,7 +17,7 @@ import settings from '@/utils/settings'
 import { Button, FormControl } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
-import Add from '../../images/add-icon.png'
+// import Add from '../../images/add-icon.png'
 import Curtain from '@/images/curtain.png'
 import CorrectIcon from '@/images/correct.png'
 import ErrorIcon from '@/images/error.png'
@@ -160,6 +160,9 @@ export class Import extends React.Component<IImportProps> {
     repeatPassword: string,
     labels: I18nCollectionWallet['import']
   ): string | void => {
+    if (mnemonic === '') {
+      return labels.swal.emptyMnemonic
+    }
     if (mnemonic.trim().split(' ').length < 12) {
       return labels.swal.mnemonicLength
     }
@@ -352,14 +355,6 @@ export class Import extends React.Component<IImportProps> {
             </Button>
           </div>
         </form>
-        {false && (
-          <div className={classes.create}>
-            <Button className={classes.addBtn} onClick={this.ToCreate}>
-              <img src={Add} alt="" data-tour={'second'} />
-            </Button>
-            <p className={classNames({ ['cn']: isChinese })}>{labels.create}</p>
-          </div>
-        )}
         <Tour
           steps={steps}
           isOpen={this.showTour}

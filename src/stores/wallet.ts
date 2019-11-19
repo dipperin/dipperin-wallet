@@ -1,14 +1,36 @@
 import BIP39 from 'bip39'
 import { noop } from 'lodash'
 import { observable, reaction, computed, action, runInAction } from 'mobx'
-
-import settings from '@/utils/settings'
+import BN from 'bignumber.js'
+import path from 'path'
 import { Accounts, AccountObject } from '@dipperin/dipperin.js'
-import { getWallet, insertWallet, updateErrTimes, updateLockTime, updateActiveId } from '@/db'
+
+import { encrypt, decrypt } from '@/utils'
+import settings from '@/utils/settings'
+import { getCurrentNet } from '@/utils/node'
+import {
+  getWallet,
+  insertWallet,
+  updateErrTimes,
+  updateLockTime,
+  updateActiveId,
+  insertMinerData,
+  getMiner,
+  removeMinerData
+} from '@/db'
 
 import RootStore from './root'
 import WalletModel, { WalletObj } from '@/models/wallet'
-import { WALLET_ID, DEFAULT_ERR_TIMES, DEFAULT_LOCK_TIME, LOCKTIMES, FIRST_ACCOUNT_ID } from '@/utils/constants'
+import {
+  WALLET_ID,
+  DEFAULT_ERR_TIMES,
+  DEFAULT_LOCK_TIME,
+  LOCKTIMES,
+  FIRST_ACCOUNT_ID,
+  ACCOUNTS_PATH
+} from '@/utils/constants'
+import { sleep } from '@/utils'
+import { deleteCsWallet, dipperinIpc, getChainDataDir } from '@/ipc'
 
 export default class WalletStore {
   private _store: RootStore
@@ -48,6 +70,8 @@ export default class WalletStore {
         }
       }
     )
+
+    this.initMiner()
   }
 
   @computed
@@ -123,16 +147,16 @@ export default class WalletStore {
    *
    * @param path
    */
-  getPrivateKeyByPath(path: string): string {
-    return this.getAccountByPath(path).privateKey
+  getPrivateKeyByPath(cpath: string): string {
+    return this.getAccountByPath(cpath).privateKey
   }
 
   /**
    * Get derive account by path
    * @param path Derive path
    */
-  getAccountByPath(path: string) {
-    return this._hdAccount.derivePath(path)
+  getAccountByPath(cpath: string) {
+    return this._hdAccount.derivePath(cpath)
   }
 
   /**
@@ -342,6 +366,7 @@ export default class WalletStore {
     }
 
     try {
+      // console.log(this._currentWallet.encryptSeed)
       const account = Accounts.decrypt(this._currentWallet.encryptSeed, password)
       this._currentWallet.unlockErrTimes = DEFAULT_ERR_TIMES
       return account
@@ -352,6 +377,226 @@ export default class WalletStore {
       return
     }
   }
+
+  /**
+   * miner relate
+   */
+  @observable
+  mineState: string = 'init'
+  @observable
+  minerMnemonic: string = ''
+  /**
+   * init means the wallet hasn't mined before this time
+   * stop means the wallet has mined this time
+   */
+  @action
+  setMineState = (state: string) => {
+    const allowStates = ['init', 'stop', 'loading', 'mining']
+    if (allowStates.includes(state)) {
+      this.mineState = state
+    }
+  }
+
+  @action
+  setMinerMnemonic = (mnemonic: string) => {
+    this.minerMnemonic = mnemonic
+  }
+
+  restoreWallet = async (mnemonic: string) => {
+    try {
+      const chainDataDir = await getChainDataDir()
+      const cswalletPath = path.join(chainDataDir, `CSWallet`)
+      const walletIdentifier = {
+        walletType: 0,
+        path: cswalletPath,
+        walletName: 'CSWallet'
+      }
+      // await this._store.dipperin.dr.restoreWallet('123', mnemonic, '', walletIdentifier)
+      const password: string =
+        Math.random()
+          .toString(36)
+          .slice(2) +
+        Math.random()
+          .toString(36)
+          .slice(2)
+      const wrappedRpc = {
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'dipperin_restoreWallet',
+        params: [password, mnemonic, '', walletIdentifier]
+      }
+      await dipperinIpc(JSON.stringify(wrappedRpc))
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
+  startRemainingService = async () => {
+    // await this._store.dipperin.dr.startRemainingService()
+    try {
+      const wrappedRpc = {
+        id: 2,
+        jsonrpc: '2.0',
+        method: 'dipperin_startRemainingService',
+        params: []
+      }
+      await dipperinIpc(JSON.stringify(wrappedRpc))
+    } catch (e) {
+      throw e
+    }
+  }
+
+  startMine = async () => {
+    // const err = await this._store.dipperin.dr.startMine()
+    // return err
+    const wrappedRpc = {
+      id: 3,
+      jsonrpc: '2.0',
+      method: 'dipperin_startMine',
+      params: []
+    }
+    const err = await dipperinIpc(JSON.stringify(wrappedRpc))
+    return err
+  }
+
+  stopMine = async () => {
+    const wrappedRpc = {
+      id: 3,
+      jsonrpc: '2.0',
+      method: 'dipperin_stopMine',
+      params: []
+    }
+    const err = await dipperinIpc(JSON.stringify(wrappedRpc))
+    return err
+  }
+
+  initMine = async () => {
+    this.setMineState('loading')
+    try {
+      await this.initMiner()
+      // this.genMinerAccount()
+      await deleteCsWallet(getCurrentNet())
+      await sleep(1500)
+      await this.restoreWallet(this.minerMnemonic)
+      await sleep(1500)
+      await this.startRemainingService()
+      await sleep(1000)
+      await this.startMine()
+      this.setMineState('mining')
+    } catch (e) {
+      console.log(e.message)
+      this.setMineState('init')
+    }
+  }
+
+  initMiner = async () => {
+    try {
+      if (this.minerMnemonic === '') {
+        const miner = await getMiner()
+        if (miner) {
+          if (miner.mnemonic.split(' ').length === 12) {
+            this.setMinerMnemonic(miner.mnemonic)
+          } else {
+            const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+            const key = pub.substring(0, 32)
+            const iv = pub.substring(32, 48)
+            const mnemonic = decrypt(key, iv, miner.mnemonic)
+            this.setMinerMnemonic(mnemonic)
+          }
+        } else {
+          this.genMinerAccount()
+        }
+      }
+    } catch (e) {
+      console.log(`initMiner error:`, e.message)
+    }
+  }
+
+  queryBalance = async (address: string) => {
+    return await this._store.dipperin.dr.getBalance(address)
+  }
+
+  getAccountNonce = async (address: string): Promise<string> => {
+    try {
+      const res = await this._store.dipperin.dr.getNonce(address)
+      return res || '0'
+    } catch (err) {
+      return ''
+    }
+  }
+
+  genMinerAccount = () => {
+    const mnemonic = BIP39.generateMnemonic()
+    this.setMinerMnemonic(mnemonic)
+    const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+    const key = pub.substring(0, 32)
+    const iv = pub.substring(32, 48)
+    const encryptedMnemonic = encrypt(key, iv, mnemonic)
+    insertMinerData(encryptedMnemonic)
+  }
+
+  changeMinerAccount = async () => {
+    await removeMinerData()
+    this.genMinerAccount()
+  }
+
+  getMinerAccount = () => {
+    const seed = `0x${BIP39.mnemonicToSeedHex(this.minerMnemonic)}`
+    const hdAccount = Accounts.create(seed)
+    return hdAccount.derivePath(`${ACCOUNTS_PATH}/1`)
+  }
+
+  withdrawAll = async (to: string) => {
+    try {
+      const hdAccount = this.getMinerAccount()
+      const minerAddress = hdAccount.address
+      const balance = await this.queryBalance(minerAddress)
+      const nonce = await this.getAccountNonce(minerAddress)
+      const value = new BN(balance).minus(new BN(21000)).toString(10)
+      console.log('send value', value)
+      const tx = this._store.transaction.createTransaction(minerAddress, to, value, '', '21000', '1', nonce, '')
+      const chainId = this._store.transaction.getChainId()
+      tx.signTranaction(hdAccount.privateKey, chainId)
+      const res = await this._store.dipperin.dr.sendSignedTransaction(tx.signedTransactionData)
+      console.log(res)
+    } catch (e) {
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          console.log('this transaction already in tx pool')
+          break
+        default:
+          console.log(`handleWithdrawBalance error:`, e.message)
+      }
+    }
+  }
+
+  withdrawAmount = async (to: string, amount: string) => {
+    try {
+      const hdAccount = this.getMinerAccount()
+      const minerAddress = hdAccount.address
+      const nonce = await this.getAccountNonce(minerAddress)
+      const value = new BN(amount).minus(new BN(21000)).toString(10)
+      console.log('send value', value)
+      const tx = this._store.transaction.createTransaction(minerAddress, to, value, '', '21000', '1', nonce, '')
+      const chainId = this._store.transaction.getChainId()
+      tx.signTranaction(hdAccount.privateKey, chainId)
+      const res = await this._store.dipperin.dr.sendSignedTransaction(tx.signedTransactionData)
+      console.log(res)
+    } catch (e) {
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          console.log('this transaction already in tx pool')
+          break
+        default:
+          console.log(`handleWithdrawBalance error:`, e.message)
+      }
+      return e.message
+    }
+  }
+
+  /**
+   * the following content is about setting chainDataDir
+   */
 }
 
 // animal enter candy frame garbage thought whip obvious artefact mean tuition pepper
