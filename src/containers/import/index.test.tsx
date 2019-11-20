@@ -58,7 +58,7 @@ describe('import', () => {
         value: 'value'
       }
     }
-    im.repeatPasswordInput(e)
+    im.repeatPasswordInput(e as any)
     expect(im.repeatPassword).toBe('value')
   })
 

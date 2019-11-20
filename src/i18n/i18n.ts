@@ -360,7 +360,8 @@ export const zhCN = {
         noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
         feeMax: '手续费不足',
-        networkError: '当前网络不可用，请检查网络！'
+        networkError: '当前网络不可用，请检查网络！',
+        noEnoughBalance: '账户余额不足'
       },
       labs: {
         transfer: '合约转账',
@@ -875,7 +876,8 @@ export const enUS: I18nCollection = {
         contractAddressErr: 'The contract address is wrong',
         getAbi: 'Get ABI error',
         feeMax: 'Fee is less than the minimum fee',
-        networkError: 'Current network is unreachable, please check your network connection.'
+        networkError: 'Current network is unreachable, please check your network connection.',
+        noEnoughBalance: 'Insufficient balance'
       },
       labs: {
         transfer: 'Transfer',

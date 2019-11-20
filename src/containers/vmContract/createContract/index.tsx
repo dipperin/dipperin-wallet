@@ -316,6 +316,9 @@ export class CreateContract extends React.Component<IProps> {
     if (info === 'Error: Network Error' || info.includes('InvalidConnectionError')) {
       return labels.createSwal.networkError
     }
+    if (info === 'insufficient balance') {
+      return labels.createSwal.noEnoughBalance
+    }
     return info
   }
 
