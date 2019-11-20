@@ -10,6 +10,7 @@ import { I18nCollectionCreate } from '@/i18n/i18n'
 
 interface WrapProps {
   pathname: string
+  turnFunc?: [boolean, () => void | null, boolean, () => void | null]
 }
 
 interface Props extends WithStyles<typeof styles>, WrapProps {
@@ -20,11 +21,26 @@ export class ProcessBar extends React.Component<Props> {
     const { labels, classes, pathname } = this.props
     return (
       <div className={classes.process}>
-        <p className={classNames(classes.step, { [classes.active]: pathname === '/create' })}>{labels.create}</p>
+        <p
+          className={classNames(classes.step, { [classes.active]: pathname === '/create' })}
+          onClick={this.props.turnFunc && this.props.turnFunc[0] ? this.props.turnFunc[1] : () => null}
+          style={{ cursor: `${this.props.turnFunc && this.props.turnFunc[0] ? 'pointer' : 'default'}` }}
+        >
+          {labels.create}
+        </p>
         <img className={classes.next} src={Next} alt="" />
-        <p className={classNames(classes.step, { [classes.active]: pathname === '/create/backup' })}>{labels.backup}</p>
+        <p
+          className={classNames(classes.step, { [classes.active]: pathname === '/create/backup' })}
+          onClick={this.props.turnFunc && this.props.turnFunc[2] ? this.props.turnFunc[3] : () => null}
+          style={{ cursor: `${this.props.turnFunc && this.props.turnFunc[2] ? 'pointer' : 'default'}` }}
+        >
+          {labels.backup}
+        </p>
         <img className={classes.next} src={Next} alt="" />
-        <p className={classNames(classes.step, { [classes.active]: pathname === '/create/backup_confirm' })}>
+        <p
+          className={classNames(classes.step, { [classes.active]: pathname === '/create/backup_confirm' })}
+          style={{ cursor: 'default' }}
+        >
           {labels.confirm}
         </p>
       </div>
