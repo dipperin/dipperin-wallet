@@ -117,7 +117,7 @@ export class Import extends React.Component<IImportProps> {
   @action
   repeatPasswordInput = (e: React.ChangeEvent<{ value: string }>) => {
     if (/^[a-zA-Z0-9`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]{0,24}$/.test(e.target.value)) {
-      this.password = e.target.value
+      this.repeatPassword = e.target.value
     }
   }
 
