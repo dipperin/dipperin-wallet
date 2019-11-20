@@ -25,8 +25,7 @@ export const zhCN = {
         confirm: '确认',
         cancel: '取消',
         resetConfirm: '确定',
-        warnText:
-          '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
+        warnText: '重置钱包，钱包所有记录将被删除。',
         warn: '警告',
         backupMnemonic:
           '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。'
@@ -131,8 +130,7 @@ export const zhCN = {
         updateSuccess: '更新成功!',
         cancel: '取消',
         confirm: '确定',
-        warnText:
-          '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
+        warnText: '重置钱包，钱包所有记录将被删除。',
         warn: '警告',
         startUpdate: '开始更新?',
         documentTitle: 'Dipperin 钱包',
@@ -202,8 +200,8 @@ export const zhCN = {
       gasPrice: 'gas费用',
       estimateGas: '预估Gas',
       swal: {
-        invalidAddress: '无效地址',
-        insufficientFunds: '余额不足',
+        invalidAddress: '地址格式不正确',
+        insufficientFunds: '账户余额不足',
         invalidAmount: '无效数量',
         invalidFee: '无效交易费',
         timeout: '远程节点响应时间过长',
@@ -213,7 +211,9 @@ export const zhCN = {
         confirm: '确认',
         alreadyInTxPool: '此交易已经进入交易池，请等待！',
         invalidNonce: '请等待账号nonce值同步后发送交易!',
-        tooLowfee: '请等待上笔交易上链后发送!'
+        tooLowfee: '请等待上笔交易上链后发送!',
+        tooMuchExtraData: '备注内容过多，请优化备注内容!',
+        networkError: '当前网络不可用，请检查网络'
       }
     },
     txList: {
@@ -360,7 +360,7 @@ export const zhCN = {
         noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
         feeMax: '手续费不足',
-        networkError: '网络连接异常，请检查您的网络！'
+        networkError: '当前网络不可用，请检查网络！'
       },
       labs: {
         transfer: '合约转账',
@@ -536,8 +536,7 @@ export const enUS: I18nCollection = {
         confirm: 'Ok',
         cancel: 'Cancel',
         resetConfirm: 'Confirm',
-        warnText:
-          'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
+        warnText: 'Reseting wallet will DELETE your entire wallet account, transaction records and profile.',
         warn: 'Warning',
         backupMnemonic:
           'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.'
@@ -645,8 +644,7 @@ export const enUS: I18nCollection = {
         updateSuccess: 'update success',
         cancel: 'Cancel',
         confirm: 'Confirm',
-        warnText:
-          'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
+        warnText: 'Reseting wallet will DELETE your entire wallet account, transaction records and profile.',
         warn: 'Warning',
         startUpdate: 'Start update',
         documentTitle: 'Dipperin Wallet',
@@ -717,8 +715,8 @@ export const enUS: I18nCollection = {
       gasPrice: 'Gas Price',
       estimateGas: 'Estimate Gas',
       swal: {
-        invalidAddress: 'Provided address is invalid',
-        insufficientFunds: 'Insufficient funds',
+        invalidAddress: 'Recipient address is invalid',
+        insufficientFunds: ' Insufficient balance',
         invalidAmount: 'Invalid amount',
         invalidFee: 'Invalid poundage',
         timeout: 'Remote node react too late',
@@ -728,7 +726,9 @@ export const enUS: I18nCollection = {
         confirm: 'Ok',
         alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
         invalidNonce: 'Please wait for the account synchronize the nonce number!',
-        tooLowfee: 'Please wait until the last transaction finishes!'
+        tooLowfee: 'Please wait until the last transaction finishes!',
+        tooMuchExtraData: 'The entered text is too long, please optimize your content.',
+        networkError: 'The network connection is abnormal, please check your network！'
       }
     },
     txList: {
@@ -875,7 +875,7 @@ export const enUS: I18nCollection = {
         contractAddressErr: 'The contract address is wrong',
         getAbi: 'Get ABI error',
         feeMax: 'Fee is less than the minimum fee',
-        networkError: 'The network connection is abnormal, please check your network！'
+        networkError: 'Current network is unreachable, please check your network connection.'
       },
       labs: {
         transfer: 'Transfer',

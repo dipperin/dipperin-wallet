@@ -131,6 +131,13 @@ export class Send extends React.Component<IProps> {
     }
   }
 
+  validateExtraData = (extraData: string) => {
+    if (extraData.length > 2048) {
+      const label = this.props.labels
+      throw new Error(label.swal.tooMuchExtraData)
+    }
+  }
+
   validateBalance = () => {
     const label = this.props.labels
     const balance = this.props.account!.activeAccount.balance
@@ -149,6 +156,7 @@ export class Send extends React.Component<IProps> {
     try {
       this.validateAddress(this.address)
       this.validateAmount(this.amount)
+      this.validateExtraData(this.memo)
       this.validateBalance()
       this.handleShowDialog()
     } catch (e) {
@@ -198,7 +206,7 @@ export class Send extends React.Component<IProps> {
   ): Promise<{ success: boolean; info?: string }> => {
     return new Promise((resolve, reject) => {
       const timeoutTimer = setTimeout(() => {
-        reject(new Error(this.props.labels.swal.timeout))
+        reject(new Error(this.props.labels.swal.networkError))
       }, 5000)
       this.props
         .transaction!.confirmTransaction(address, amount, memo, gas, gasPrice)
