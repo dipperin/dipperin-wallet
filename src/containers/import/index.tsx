@@ -90,8 +90,10 @@ export class Import extends React.Component<IImportProps> {
   }
 
   @action
-  passwordInput = e => {
-    this.password = e.target.value
+  passwordInput = (e: React.ChangeEvent<{ value: string }>) => {
+    if (/^[a-zA-Z0-9`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]{0,24}$/.test(e.target.value)) {
+      this.password = e.target.value
+    }
   }
 
   @computed
@@ -140,6 +142,9 @@ export class Import extends React.Component<IImportProps> {
 
   @computed
   get validatePassword(): string {
+    if (this.password === '') {
+      return this.props.labels.swal.emptyPassword
+    }
     if (!this.password || this.password.length < 8) {
       return this.props.labels.swal.passwordLength
     }
@@ -168,6 +173,9 @@ export class Import extends React.Component<IImportProps> {
     }
     if (!BIP39.validateMnemonic(mnemonic)) {
       return labels.swal.invalidMnemonic
+    }
+    if (password === '') {
+      return labels.swal.emptyPassword
     }
     if (!password || password.length < 8) {
       return labels.swal.passwordLength
@@ -296,7 +304,9 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.setPassword}</span>
-                {this.password && <Tip type={!this.validatePassword} msg={this.validatePassword} />}
+                {(this.password || this.repeatPassword) && (
+                  <Tip type={!this.validatePassword} msg={this.validatePassword} />
+                )}
               </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
@@ -346,8 +356,14 @@ export class Import extends React.Component<IImportProps> {
             </Button>
             <div className={classes.note}>{labels.note}</div>
           </div>
-          <div className={classes.create} data-tour={'second'}>
-            <Button className={classes.addBtn} variant="contained" color="primary" onClick={this.ToCreate}>
+          <div className={classes.create}>
+            <Button
+              className={classes.addBtn}
+              variant="contained"
+              color="primary"
+              onClick={this.ToCreate}
+              data-tour={'second'}
+            >
               <p className={classNames({ ['cn']: isChinese })}>
                 <span className={classes.addIcon}>+</span>
                 {labels.create}

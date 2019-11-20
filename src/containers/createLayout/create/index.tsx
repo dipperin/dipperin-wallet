@@ -65,6 +65,9 @@ export class Create extends React.Component<ICreateProps> {
     repeatPassword: string,
     labels: I18nCollectionCreate['create']
   ): string | void => {
+    if (password === '') {
+      return labels.swal.emptyPassword
+    }
     if (!password || password.length < 8) {
       return labels.swal.passwordLength
     }

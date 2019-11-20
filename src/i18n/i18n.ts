@@ -50,7 +50,8 @@ export const zhCN = {
         passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致',
-        confirm: '确认'
+        confirm: '确认',
+        emptyPassword: '密码不能为空'
       },
       tour: {
         create: '如果您还没有钱包，点击这里去创建钱包！',
@@ -148,10 +149,11 @@ export const zhCN = {
       repeatPassword: '确认密码',
       confirm: '确定',
       swal: {
-        passwordLength: '请输入至少８位密码！',
+        passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致！',
-        confirm: '确定'
+        confirm: '确定',
+        emptyPassword: '密码不能为空'
       },
       weak: '弱',
       medium: '中',
@@ -553,13 +555,14 @@ export const enUS: I18nCollection = {
       lang: 'English',
       swal: {
         success: 'Success!',
-        mnemonicLength: 'You should provide 12 words of mnemonics',
+        mnemonicLength: 'You should provide 12 words of mnemonics.',
         invalidMnemonic: 'Invalid mnemonics',
-        emptyMnemonic: 'Please enter your mnemonics',
-        passwordLength: 'Password must be 8~24 characters in length',
+        emptyMnemonic: 'Please enter your mnemonics.',
+        passwordLength: 'Password must be 8~24 characters in length.',
         invalidPassword: 'Invalid password',
-        diffPassword: `Passwords don't match`,
-        confirm: 'Ok'
+        diffPassword: `Passwords don't match.`,
+        confirm: 'Ok',
+        emptyPassword: 'The passwork should not be empty.'
       },
       tour: {
         create: `If you don't already have a wallet, click here to create one!`,
@@ -664,7 +667,8 @@ export const enUS: I18nCollection = {
         passwordLength: 'Please fill in a password greater than or equal to 8 digits in length!',
         invalidPassword: 'Invalid password',
         diffPassword: 'The first password is not equal to the second password!',
-        confirm: 'OK'
+        confirm: 'OK',
+        emptyPassword: 'The passwork should not be empty.'
       },
       weak: 'week',
       medium: 'medium',
