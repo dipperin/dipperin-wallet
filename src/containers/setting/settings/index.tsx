@@ -506,10 +506,10 @@ export class Setting extends React.Component<Props> {
                 </span>
               </div>
             )}
-            <p className={classes.title} style={{ position: 'absolute', top: '150px' }}>
+            <p className={classes.title} style={{ position: 'absolute', top: '170px' }}>
               {labels.walletManagement}
             </p>
-            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '190px' }}>
+            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '210px' }}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>
