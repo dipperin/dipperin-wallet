@@ -321,15 +321,39 @@ export class Import extends React.Component<IImportProps> {
               <div className={classes.pswStr}>
                 <div className={classes.rankbar}>
                   <div className={classes.weakPswActive} />
-                  <div className={this.passwordStrength > 1 ? classes.mediumPswActive : classes.mediumPsw} />
-                  <div className={this.passwordStrength > 3 ? classes.strongPswActive : classes.strongPsw} />
+                  <div
+                    className={
+                      this.passwordStrength > 1 && this.password.length >= 8
+                        ? classes.mediumPswActive
+                        : classes.mediumPsw
+                    }
+                  />
+                  <div
+                    className={
+                      this.passwordStrength > 3 && this.password.length >= 8
+                        ? classes.strongPswActive
+                        : classes.strongPsw
+                    }
+                  />
                 </div>
                 <div className={classes.rankbar}>
                   <span className={classes.weakText}>{labels.weak}</span>
-                  <span className={this.passwordStrength > 1 ? classes.mediumText : classes.strengthTextDefault}>
+                  <span
+                    className={
+                      this.passwordStrength > 1 && this.password.length >= 8
+                        ? classes.mediumText
+                        : classes.strengthTextDefault
+                    }
+                  >
                     {labels.medium}
                   </span>
-                  <span className={this.passwordStrength > 3 ? classes.strongText : classes.strengthTextDefault}>
+                  <span
+                    className={
+                      this.passwordStrength > 3 && this.password.length >= 8
+                        ? classes.strongText
+                        : classes.strengthTextDefault
+                    }
+                  >
                     {labels.strong}
                   </span>
                 </div>
