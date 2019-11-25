@@ -369,7 +369,13 @@ export const zhCN = {
         transferFrom: '任意转账'
       },
       swal: {
-        somethingWrong: '系统错误!'
+        somethingWrong: '系统错误!',
+        alreadyInTxPool: '此交易已经进入交易池，请等待！',
+        invalidNonce: '请等待账号nonce值同步后发送交易!',
+        tooLowfee: '请等待上笔交易上链后发送!',
+        tooMuchExtraData: '备注内容过多，请优化备注内容!',
+        networkError: '当前网络不可用，请检查网络',
+        insufficientFunds: '账户余额不足'
       }
     },
 
@@ -885,7 +891,13 @@ export const enUS: I18nCollection = {
         transferFrom: 'Transfer From'
       },
       swal: {
-        somethingWrong: 'Something wrong!'
+        somethingWrong: 'Something wrong!',
+        alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+        invalidNonce: 'Please wait for the account synchronize the nonce number!',
+        tooLowfee: 'Please wait until the last transaction finishes!',
+        tooMuchExtraData: 'The entered text is too long, please optimize your content.',
+        networkError: 'The network connection is abnormal, please check your network！',
+        insufficientFunds: ' Insufficient balance'
       }
     },
     transfer: {

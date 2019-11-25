@@ -193,6 +193,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
       // console.log(response)
       this.setMineBalance(Utils.fromUnit(response))
       this.setMineBalanceUnit(response)
+      console.log(accountAddress, response)
     } catch (e) {
       console.log(`updateMineBalance error:`, e.message)
     }

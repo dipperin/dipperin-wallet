@@ -252,7 +252,7 @@ export class Send extends React.Component<IProps> {
           errorText = labels.swal.invalidNonce
         }
         if (res.info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
-          errorText = labels.swal.invalidNonce
+          errorText = labels.swal.tooLowfee
         }
         if (errorText.includes('NoEnoughBalance') || errorText.includes('insufficient balance')) {
           errorText = labels.swal.insufficientFunds
