@@ -5,7 +5,7 @@ import BN from 'bignumber.js'
 import path from 'path'
 import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 
-import { encrypt, decrypt } from '@/utils'
+import { encrypt } from '@/utils'
 import settings from '@/utils/settings'
 import { getCurrentNet } from '@/utils/node'
 import {
@@ -15,7 +15,6 @@ import {
   updateLockTime,
   updateActiveId,
   insertMinerData,
-  getMiner,
   removeMinerData
 } from '@/db'
 
@@ -491,20 +490,23 @@ export default class WalletStore {
   initMiner = async () => {
     try {
       if (this.minerMnemonic === '') {
-        const miner = await getMiner()
-        if (miner) {
-          if (miner.mnemonic.split(' ').length === 12) {
-            this.setMinerMnemonic(miner.mnemonic)
-          } else {
-            const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
-            const key = pub.substring(0, 32)
-            const iv = pub.substring(32, 48)
-            const mnemonic = decrypt(key, iv, miner.mnemonic)
-            this.setMinerMnemonic(mnemonic)
-          }
-        } else {
-          this.genMinerAccount()
-        }
+        const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+        const mnemonic = BIP39.entropyToMnemonic(pub.slice(0, 64))
+        this.setMinerMnemonic(mnemonic)
+        // const miner = await getMiner()
+        // if (miner) {
+        //   if (miner.mnemonic.split(' ').length === 12) {
+        //     this.setMinerMnemonic(miner.mnemonic)
+        //   } else {
+        //     const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+        //     const key = pub.substring(0, 32)
+        //     const iv = pub.substring(32, 48)
+        //     const mnemonic = decrypt(key, iv, miner.mnemonic)
+        //     this.setMinerMnemonic(mnemonic)
+        //   }
+        // } else {
+        //   this.genMinerAccount()
+        // }
       }
     } catch (e) {
       console.log(`initMiner error:`, e.message)
