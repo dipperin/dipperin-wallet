@@ -298,8 +298,8 @@ class VmContractStore {
       const res = await this._store.transaction.confirmTransaction(address, '0', callData, gas, gasPrice)
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
-        this._contractTxsMap.set(address, [...txs, res.hash as string])
-        console.log('new tx', this._contractTxsMap.get(address)![0])
+        this._contractTxsMap.set(address, [...txs, res.info as string])
+        // console.log('new tx', [...this._contractTxsMap.get(address)])
         return generateTxResponse(true, res.info)
       } else {
         return generateTxResponse(false, res.info)
@@ -366,11 +366,12 @@ class VmContractStore {
 
   getContractReceipt() {
     this._contractTxsMap.forEach(async (txs, address) => {
-      console.log('removeTxs1')
+      // console.log('removeTxs1',txs)
       const removeTxs = await Promise.all(
         txs.map(async tx => {
           try {
             const res = await this._store.dipperin.dr.vmContract.getReceiptByTxHash(tx)
+            // console.log(tx,res)
             if (res) {
               const preReceipts = this._receipts.get(address) || []
               preReceipts.push(res)
@@ -384,7 +385,7 @@ class VmContractStore {
           }
         })
       )
-      console.log('removeTxs2', removeTxs)
+      // console.log('removeTxs2', removeTxs, this._receipts)
       const newTxs = txs.filter(tx => !removeTxs.find(t => tx === t))
       this._contractTxsMap.set(address, newTxs)
     })
@@ -420,7 +421,6 @@ class VmContractStore {
 
               if (contract.isOverTime(getNowTimestamp())) {
                 contract.setFail()
-                // ? why fail tx has contractAddress
                 // update contract in db
                 updateVmContractStatus(
                   contract.txHash,

@@ -55,6 +55,10 @@ export class Receipts extends React.Component<IProps> {
       }
     } = this.props
     const receipts = vmContract.receipts.get(address) || []
+    for (const r of vmContract.receipts.values()) {
+      console.log(r)
+    }
+    console.log(address)
 
     return (
       <div className={classes.container}>

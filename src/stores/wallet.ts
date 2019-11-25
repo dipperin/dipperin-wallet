@@ -70,8 +70,6 @@ export default class WalletStore {
         }
       }
     )
-
-    this.initMiner()
   }
 
   @computed
@@ -168,6 +166,7 @@ export default class WalletStore {
     const account = this.getHdAccount(password)
     if (account) {
       this._hdAccount = account
+      this.initMiner()
       return true
     }
     return false
