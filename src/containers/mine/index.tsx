@@ -1,7 +1,7 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { inject, observer } from 'mobx-react'
-import { observable, action, reaction } from 'mobx'
+import { observable, action } from 'mobx'
 import { I18nCollectionMine } from '@/i18n/i18n'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import swal from 'sweetalert2'
@@ -73,29 +73,29 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
 
   constructor(props) {
     super(props)
+    this.updateMineBalance()
+    // if (this.props.wallet.mineState === 'mining') {
+    //   this.updateMineBalance()
+    // } else {
+    //   const minerAddress = this.props.wallet.getMinerAccount().address
+    //   this.getBalanceAndUpdate(minerAddress)
+    // }
 
-    if (this.props.wallet.mineState === 'mining') {
-      this.updateMineBalance()
-    } else {
-      const minerAddress = this.props.wallet.getMinerAccount().address
-      this.getBalanceAndUpdate(minerAddress)
-    }
-
-    reaction(
-      () => this.props.wallet.mineState,
-      mineState => {
-        if (mineState === 'mining') {
-          if (this.updateMineBalanceTimer) {
-            clearInterval(this.updateMineBalanceTimer)
-          }
-          this.updateMineBalance()
-        } else if (mineState === 'stop') {
-          if (this.updateMineBalanceTimer) {
-            clearInterval(this.updateMineBalanceTimer)
-          }
-        }
-      }
-    )
+    // reaction(
+    //   () => this.props.wallet.mineState,
+    //   mineState => {
+    //     if (mineState === 'mining') {
+    //       if (this.updateMineBalanceTimer) {
+    //         clearInterval(this.updateMineBalanceTimer)
+    //       }
+    //       this.updateMineBalance()
+    //     } else if (mineState === 'stop') {
+    //       if (this.updateMineBalanceTimer) {
+    //         clearInterval(this.updateMineBalanceTimer)
+    //       }
+    //     }
+    //   }
+    // )
   }
 
   componentWillUnmount() {
