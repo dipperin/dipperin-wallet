@@ -28,6 +28,15 @@ export const TxResponseInfo = {
   [TxResponseCode.addressReimportError]: 'The address has already existed in wallet!'
 }
 
+export type stdResponse = [boolean, any]
+
+export const stdResponse2throwLike = async (fn: (...args: any[]) => stdResponse) => {
+  const result = await fn()
+  if (result[0]) {
+    throw new Error(String(result[1]))
+  }
+}
+
 interface TxResponse {
   success: boolean
   info?: string

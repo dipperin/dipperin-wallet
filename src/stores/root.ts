@@ -7,7 +7,7 @@ import { RespTransaction } from '@/workers/block.worker'
 import Dipperin, { WebsocketProvider, Utils } from '@dipperin/dipperin.js'
 
 import { resetDB } from '@/db'
-
+import { sendStopNode, onStartNodeSuccess, sendStartNode } from '@/ipc'
 import { getIsRemoteNode, getRemoteHost, getCurrentNet } from '@/utils/node'
 import LoadingStore from './loading'
 import TimerStore from './timer'
@@ -64,6 +64,7 @@ class RootStore {
         }
       }
     )
+    onStartNodeSuccess(this.nodeStartSuccess)
   }
 
   @computed
@@ -232,6 +233,13 @@ class RootStore {
     return LOCALHOST
   }
 
+  private nodeStartSuccess = () => {
+    setTimeout(() => {
+      this.reconnect()
+      this.wallet.startService()
+    }, 1000)
+  }
+
   /**
    * should Call the function manually:
    * 1. init
@@ -283,6 +291,20 @@ class RootStore {
    */
   private stopUpdate() {
     this.timer.stopUpdate()
+  }
+
+  stopNode() {
+    if (this._isConnecting) {
+      sendStopNode()
+      this.stopConnectNode()
+    }
+    this.wallet.setMineState('init')
+  }
+
+  startNode = async () => {
+    if (!this._isConnecting) {
+      sendStartNode()
+    }
   }
 }
 

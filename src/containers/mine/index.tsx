@@ -16,7 +16,7 @@ import Something from './something'
 import WithdrawModal from './withdrawModal'
 
 import styles from './mineStyles'
-import { getIsRemoteNode } from '@/utils/node'
+// import { getIsRemoteNode } from '@/utils/node'
 
 const LONG_TIMEOUT = 15000
 
@@ -108,81 +108,56 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   // ******************* handle the miner master *************************************
 
   handleStartMine = async () => {
-    // start loading
-    this.props.wallet.setMineState('loading')
-    // 1. try to send startMine command
-    try {
-      await this.props.wallet.startMine()
-      this.props.wallet.setMineState('mining')
-    } catch (e) {
-      switch (e.message) {
-        case `Returned error: "miner is mining"`:
-          console.log(`miner is mining`)
-          this.props.wallet.setMineState('mining')
-          break
-        default:
-          console.log(e.message)
+    const startMineResult = await this.props.wallet.startMine()
+    if (!startMineResult[0]) {
+      // console.log('startMineResult',startMineResult)
+      switch (startMineResult[1]) {
+        case 'remote node error': {
+          await swal.fire({
+            type: 'error',
+            text: this.props.labels.remoteNodeError,
+            title: this.props.labels.startFailure,
+            timer: 2000
+          })
+          return
+        }
+        case 'stop node error': {
+          await swal.fire({
+            type: 'error',
+            text: this.props.labels.remoteNodeError,
+            title: this.props.labels.unstartNodeError,
+            timer: 2000
+          })
+          return
+        }
+        default: {
+          console.log(`handleStartMine error:`, startMineResult[1])
+          return
+        }
       }
     }
   }
 
-  handleStartMineV2 = async () => {
-    if (getIsRemoteNode()) {
-      await swal.fire({
-        type: 'error',
-        text: this.props.labels.remoteNodeError,
-        title: this.props.labels.startFailure,
-        timer: 2000
-      })
-      return
-    } else if (!this.props.root.isConnecting) {
-      await swal.fire({
-        type: 'error',
-        text: this.props.labels.remoteNodeError,
-        title: this.props.labels.unstartNodeError,
-        timer: 2000
-      })
-      return
-    }
-    if (this.props.wallet.mineState === 'init') {
-      await this.props.wallet.initMine()
-    } else {
-      await this.handleStartMine()
-    }
-  }
+  // sendStartMineCommand = async () => {
+  //   try {
+  //     const isConnecting = await this.props.root.dipperin.net.isConnecting()
+  //     if (isConnecting) {
+  //       await this.props.wallet.startMine()
+  //       // FIXME: debug
+  //       console.log('start Mine success')
+  //       return true
+  //     } else {
+  //       console.log('the net is unconnecting')
+  //       return false
+  //     }
+  //   } catch (e) {
+  //     console.log('sendStartMineCommand error:', e.message)
+  //     return false
+  //   }
+  // }
 
-  sendStartMineCommand = async () => {
-    try {
-      const isConnecting = await this.props.root.dipperin.net.isConnecting()
-      if (isConnecting) {
-        await this.props.wallet.startMine()
-        // FIXME: debug
-        console.log('start Mine success')
-        return true
-      } else {
-        console.log('the net is unconnecting')
-        return false
-      }
-    } catch (e) {
-      console.log('sendStartMineCommand error:', e.message)
-      return false
-    }
-  }
-
-  handleStopMine = () => {
-    try {
-      this.props.wallet.stopMine()
-      this.props.wallet.setMineState('stop')
-    } catch (e) {
-      switch (e.message) {
-        case `Returned error: "mining had been stopped"`:
-          console.log('mining had been stopped')
-          this.props.wallet.setMineState('stop')
-          break
-        default:
-          console.log(e.message)
-      }
-    }
+  handleStopMine = async () => {
+    await this.props.wallet.stopMine()
   }
 
   // *************************************** handle miner account ***************************************************
@@ -231,7 +206,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
         <div className={`${wallet.mineState === 'mining' ? classes.smallBackgroundMining : classes.smallBackground}`} />
 
         {wallet.mineState !== 'mining' && (
-          <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMineV2}>
+          <button className={`${classes.btn} ${classes.mineBtn}`} onClick={this.handleStartMine}>
             {['stop', 'init'].includes(wallet.mineState) && labels.easyMine}
             {wallet.mineState === 'loading' && labels.loading}
           </button>
