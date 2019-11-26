@@ -15,11 +15,11 @@ import TransactionStore from './transaction'
 import WalletStore from './wallet'
 import VmContractStore from './vmContract'
 
-interface Window {
-  dipperin: any
-}
+// interface Window {
+//   dipperin: any
+// }
 
-declare var window: Window
+// declare var window: Window
 
 class RootStore {
   wallet: WalletStore
@@ -216,7 +216,7 @@ class RootStore {
 
   private initDipperin(): void {
     this.setDipperinProvide(this.getHost())
-    window.dipperin = this.dipperin
+    // window.dipperin = this.dipperin
   }
 
   private reconnectDipperin(): void {
