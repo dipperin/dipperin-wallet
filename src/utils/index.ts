@@ -1,4 +1,5 @@
 import format from 'date-fns/format'
+import { Utils } from '@dipperin/dipperin.js'
 import crypto from 'crypto'
 
 export const stringMapToPlainObject = (map: Map<string, any>): object => {
@@ -69,6 +70,12 @@ export const isVmContractAddress = (address: string): boolean => {
   //   default:
   //     return false
   // }
+}
+
+export const validateAddress = (address: string) => {
+  if (!Utils.isAddress(address)) {
+    throw new Error('invalid address')
+  }
 }
 
 export const isAlpha = version => version.includes('alpha')

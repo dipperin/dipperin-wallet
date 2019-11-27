@@ -155,13 +155,27 @@ export class Call extends React.Component<IProps> {
           timer: 1000
         })
         this.handleCloseDialog()
-        console.log('after swal fire', callRes)
+        // console.log('after swal fire', callRes)
         return callRes as CallRes
       } else {
         this.handleCloseDialog()
+        let errorText: string = callRes.info || ''
+        if (callRes.info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
+          errorText = labels.swal.alreadyInTxPool
+        }
+        if (callRes.info === `ResponseError: Returned error: "tx nonce is invalid"`) {
+          errorText = labels.swal.invalidNonce
+        }
+        if (callRes.info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
+          errorText = labels.swal.tooLowfee
+        }
+        if (errorText.includes('NoEnoughBalance') || errorText.includes('insufficient balance')) {
+          errorText = labels.swal.insufficientFunds
+        }
+
         await swal.fire({
           title: labels.callDialog.callFail,
-          text: String(callRes.info),
+          text: errorText,
           type: 'error'
         })
       }

@@ -8,6 +8,7 @@ import swal from 'sweetalert2'
 import { I18nCollectionMine } from '@/i18n/i18n'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
+import { validateAddress } from '@/utils'
 
 import styles from './styles'
 
@@ -81,30 +82,40 @@ export class WithdrawModal extends React.Component<IProps> {
   }
 
   handleOnConfrim = async () => {
-    const result = await this.props.onConfirm(this.targetAddress, this.withdrawAmountUnit)
-    if (result) {
-      let text: string
-      switch (result) {
-        case `Returned error: "this transaction already in tx pool"`:
-          text = this.props.labels.inPoolError
-          break
-        default:
-          text = result
+    try {
+      validateAddress(this.targetAddress)
+      const result = await this.props.onConfirm(this.targetAddress, this.withdrawAmountUnit)
+      if (result) {
+        throw new Error(result)
       }
-      swal.fire({
-        type: 'error',
-        timer: 3000,
-        text
-      })
-    } else {
       swal.fire({
         text: this.props.labels.success,
         type: 'success',
         // confirmButtonText: labels.swal.confirm,
         timer: 3000
       })
+      this.props.onClose()
+    } catch (e) {
+      let text: string
+      switch (e.message) {
+        case `Returned error: "this transaction already in tx pool"`:
+          text = this.props.labels.inPoolError
+          break
+        case `invalid address`:
+          text = this.props.labels.invalidAddress
+          break
+        case `noEnoughBalance`:
+          text = this.props.labels.noEnoughBalance
+          break
+        default:
+          text = e.message
+      }
+      swal.fire({
+        type: 'error',
+        timer: 3000,
+        text
+      })
     }
-    this.props.onClose()
   }
 
   render() {

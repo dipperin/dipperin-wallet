@@ -128,8 +128,8 @@ class TransactionStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
+      const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
       // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
       // const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
@@ -159,7 +159,7 @@ class TransactionStore {
         }
       }
     } catch (err) {
-      // console.error(String(err))
+      console.error(String(err))
       if (err instanceof Errors.NoEnoughBalanceError) {
         return {
           success: false,

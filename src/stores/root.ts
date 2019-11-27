@@ -7,7 +7,7 @@ import { RespTransaction } from '@/workers/block.worker'
 import Dipperin, { WebsocketProvider, Utils } from '@dipperin/dipperin.js'
 
 import { resetDB } from '@/db'
-
+import { sendStopNode, onStartNodeSuccess, sendStartNode } from '@/ipc'
 import { getIsRemoteNode, getRemoteHost, getCurrentNet } from '@/utils/node'
 import LoadingStore from './loading'
 import TimerStore from './timer'
@@ -15,11 +15,11 @@ import TransactionStore from './transaction'
 import WalletStore from './wallet'
 import VmContractStore from './vmContract'
 
-interface Window {
-  dipperin: any
-}
+// interface Window {
+//   dipperin: any
+// }
 
-declare var window: Window
+// declare var window: Window
 
 class RootStore {
   wallet: WalletStore
@@ -64,6 +64,7 @@ class RootStore {
         }
       }
     )
+    onStartNodeSuccess(this.nodeStartSuccess)
   }
 
   @computed
@@ -216,7 +217,7 @@ class RootStore {
 
   private initDipperin(): void {
     this.setDipperinProvide(this.getHost())
-    window.dipperin = this.dipperin
+    // window.dipperin = this.dipperin
   }
 
   private reconnectDipperin(): void {
@@ -230,6 +231,13 @@ class RootStore {
       return getRemoteHost(remoteNet)
     }
     return LOCALHOST
+  }
+
+  private nodeStartSuccess = () => {
+    setTimeout(() => {
+      this.reconnect()
+      this.wallet.startService()
+    }, 1000)
   }
 
   /**
@@ -283,6 +291,20 @@ class RootStore {
    */
   private stopUpdate() {
     this.timer.stopUpdate()
+  }
+
+  stopNode() {
+    if (this._isConnecting) {
+      sendStopNode()
+      this.stopConnectNode()
+    }
+    this.wallet.setMineState('init')
+  }
+
+  startNode = async () => {
+    if (!this._isConnecting) {
+      sendStartNode()
+    }
   }
 }
 

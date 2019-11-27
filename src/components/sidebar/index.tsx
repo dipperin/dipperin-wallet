@@ -80,9 +80,18 @@ export class Sidebar extends React.Component<Props> {
               activeClassName="active"
               key={key}
             >
-              <ListItem button={true} className={classNames(classes.itemLink, listItemClasses)}>
+              <ListItem button={false} className={classNames(classes.itemLink, listItemClasses)}>
                 <div className={classes.iconWrap}>
-                  <img className={classes.icon} src={isActive ? prop.iconActive : prop.icon} />
+                  {/* <div
+                    className={classes.icon}
+                    style={{
+                      width: 35,
+                      height: 32,
+                      background: `url(${isActive ? prop.iconActive : prop.icon}) no-repeat`,
+                      backgroundPosition: 'center center',
+                    }}
+                  /> */}
+                  <img className={classes.icon} draggable={false} src={isActive ? prop.iconActive : prop.icon} />
                 </div>
                 <ListItemText
                   primary={labels[prop.sidebarName]}

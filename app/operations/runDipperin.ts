@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron'
+import settings from 'electron-settings'
 import { ChildProcess, spawn } from 'child_process'
 import log from 'electron-log'
 import fs from 'fs'
@@ -14,6 +15,7 @@ import { START_MINER_NODE_FAILURE, START_NODE_FAILURE, START_MINER_NODE_SUCCESS,
 import { getOs } from '../utils/dipperinPath'
 
 export const DEFAULT_NET = 'venus'
+export const CHAIN_DATA_DIR = 'chainDataDir'
 
 const fsChmod = util.promisify(fs.chmod)
 const fsExists = util.promisify(fs.stat)
@@ -24,10 +26,21 @@ let dipperinIpcPath: string
 
 const MAX_LOG_SIZE = 100 * 1024 * 1024
 
-export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
+interface DipperinOpt {
+  chainDataDir: string
+}
+
+export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: DipperinOpt) => {
+  let chainDataDir: string
+  if (opt) {
+    chainDataDir = path.join(opt.chainDataDir, `${getNodeEnv(net)}`, `wallet`)
+  } else {
+    const appDir = settings.get(CHAIN_DATA_DIR) as string|undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+    chainDataDir =path.join(appDir, `${getNodeEnv(net)}`, `wallet`) 
+  }
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
-  const chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+  // chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
   const chainLogPath = path.join(chainDataDir, `dipperin.log`)
   const chainIpcPath = path.join(chainDataDir, `dipperin.ipc`)
 
@@ -105,7 +118,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow) => {
       dipperin.stderr.pipe(logStream)
     })
     .catch(err => {
-      handleError(err, 'An error occured while running Dipperin.')
+      // handleError(err, 'An error occured while running Dipperin.')
       mainWindow.webContents.send(START_NODE_FAILURE)
     })
 }
@@ -187,6 +200,7 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
         } else {
           // comment the following code to avoid user quit mainWindow unexportedly
           // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          log.info('dipperin close')
           // The following line is history code
           // mainWindow.close()
         }
@@ -233,6 +247,7 @@ export const dipperinIpcRequest = (rpcString: string): Promise<string> => {
         dipperinIpcSocket.write(rpcString)
       })
     } catch (e) {
+      log.error('dipperinIpcRequest error', e.message)
       reject(e)
     }
   })

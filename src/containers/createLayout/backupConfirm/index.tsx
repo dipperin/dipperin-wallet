@@ -117,13 +117,17 @@ export class BackupConfirm extends React.Component<IBackupProps> {
       classes,
       location: { pathname }
     } = this.props
+
+    const toCreate = () => {
+      this.props.history.push('/create')
+    }
     return (
       <div className={classes.backupConfirm}>
         <div className={classes.top}>
           <div className={classes.back} onClick={this.goBack}>
             {labels.return}
           </div>
-          <ProcessBar pathname={pathname} />
+          <ProcessBar pathname={pathname} turnFunc={[true, toCreate, true, this.goBack]} />
           <p className={classes.title}>{labels.title}</p>
           <p className={classes.hint}>{labels.hint}</p>
         </div>

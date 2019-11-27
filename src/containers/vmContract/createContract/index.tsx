@@ -98,7 +98,7 @@ export class CreateContract extends React.Component<IProps> {
     this.setStringField('abi', '')
     this.setStringField('inputABIPlaceholder', '')
     this.setStringField('gas', '')
-    this.setStringField('gasPrice', '')
+    this.setStringField('gasPrice', '1')
     this.setStringField('params', '')
     this.setStringField('estimateGas', '')
     this.setStringField('contractAddress', '')
@@ -220,6 +220,9 @@ export class CreateContract extends React.Component<IProps> {
       // TODO: add validator for estimateGas
       const estimateGas = estimateGasRes.info || ''
       this.setStringField('estimateGas', estimateGas)
+      if (!this.stringField.get('gas')) {
+        this.setStringField('gas', estimateGas)
+      }
     } catch (e) {
       console.error('estimate gas error', e)
     }
@@ -246,7 +249,19 @@ export class CreateContract extends React.Component<IProps> {
     e.preventDefault()
     if (this.flags.get('isCreated')) {
       try {
+        if (!this.stringField.get('abi')) {
+          throw new Error(this.props.labels.createSwal.noAbi)
+        }
+        if (!this.stringField.get('code')) {
+          throw new Error(this.props.labels.createSwal.noWASM)
+        }
         this.validateParams()
+        if (!this.stringField.get('gas')) {
+          throw new Error(this.props.labels.createSwal.noGas)
+        }
+        if (!this.stringField.get('gasPrice')) {
+          throw new Error(this.props.labels.createSwal.noGasPrice)
+        }
         this.handleShowDialog()
       } catch (e) {
         const label = this.props.labels.createSwal
@@ -281,9 +296,10 @@ export class CreateContract extends React.Component<IProps> {
         this.handleCloseDialog()
       } else {
         this.handleCloseDialog()
+        const errorText = this.transformErrorInfo(contractRes.info as string)
         swal.fire({
           title: labels.createSwal.createErr,
-          text: contractRes.info,
+          text: errorText,
           type: 'error'
         })
       }
@@ -293,6 +309,17 @@ export class CreateContract extends React.Component<IProps> {
         title: labels.createSwal.incorrectPassword
       })
     }
+  }
+
+  transformErrorInfo = (info: string): string => {
+    const labels = this.props.labels
+    if (info === 'Error: Network Error' || info.includes('InvalidConnectionError')) {
+      return labels.createSwal.networkError
+    }
+    if (info === 'insufficient balance') {
+      return labels.createSwal.noEnoughBalance
+    }
+    return info
   }
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
@@ -454,7 +481,7 @@ export class CreateContract extends React.Component<IProps> {
                 <input
                   style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
-                  required={true}
+                  // required={true}
                   onChange={this.handleChangeAbi}
                   ref={input => {
                     this.inputABI = input
@@ -476,7 +503,7 @@ export class CreateContract extends React.Component<IProps> {
                 <input
                   style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
                   type="file"
-                  required={true}
+                  // required={true}
                   onChange={this.handleChangeCode}
                   ref={input => {
                     this.inputWasm = input
@@ -492,7 +519,7 @@ export class CreateContract extends React.Component<IProps> {
                     disabled={this.flags.get('showDetailParams')}
                     value={this.stringField.get('params') || ''}
                     placeholder={placeholder}
-                    required={initFunc && initFunc.inputs.length > 0}
+                    // required={initFunc && initFunc.inputs.length > 0}
                     onChange={this.handleChangeParams}
                     onBlur={this.getContractGas}
                   />
@@ -537,7 +564,7 @@ export class CreateContract extends React.Component<IProps> {
                 <input
                   type="text"
                   value={this.stringField.get('gas') || ''}
-                  required={true}
+                  // required={true}
                   onChange={this.handleChangeGas}
                 />
               </div>
@@ -546,7 +573,7 @@ export class CreateContract extends React.Component<IProps> {
                 <input
                   type="text"
                   value={this.stringField.get('gasPrice') || ''}
-                  required={true}
+                  // required={true}
                   onChange={this.handleChangeGasPrice}
                 />
               </div>
@@ -572,7 +599,7 @@ export class CreateContract extends React.Component<IProps> {
                 <input
                   type="text"
                   value={this.stringField.get('contractAddress') || ''}
-                  required={true}
+                  // required={true}
                   onChange={this.handleChangeContractAddress}
                   // onBlur={this.getAbi}
                 />

@@ -5,18 +5,18 @@ import BN from 'bignumber.js'
 import path from 'path'
 import { Accounts, AccountObject } from '@dipperin/dipperin.js'
 
-import { encrypt, decrypt } from '@/utils'
+// import { encrypt } from '@/utils'
 import settings from '@/utils/settings'
-import { getCurrentNet } from '@/utils/node'
+import { getCurrentNet, getIsRemoteNode } from '@/utils/node'
+import { stdResponse } from '@/utils/errors'
 import {
   getWallet,
   insertWallet,
   updateErrTimes,
   updateLockTime,
-  updateActiveId,
-  insertMinerData,
-  getMiner,
-  removeMinerData
+  updateActiveId
+  // insertMinerData,
+  // removeMinerData
 } from '@/db'
 
 import RootStore from './root'
@@ -45,8 +45,8 @@ export default class WalletStore {
   @observable
   private _blockInfo: any
 
-  @observable
-  private _isConnecting: boolean = false
+  // @observable
+  // private _isConnecting: boolean = false
 
   destroyMnemonic: () => void = noop
 
@@ -70,8 +70,6 @@ export default class WalletStore {
         }
       }
     )
-
-    this.initMiner()
   }
 
   @computed
@@ -130,9 +128,9 @@ export default class WalletStore {
     return this._blockInfo
   }
 
-  get isConnecting() {
-    return this._isConnecting
-  }
+  // get isConnecting() {
+  //   return this._isConnecting
+  // }
 
   /**
    * Toggle wallet lock
@@ -168,6 +166,9 @@ export default class WalletStore {
     const account = this.getHdAccount(password)
     if (account) {
       this._hdAccount = account
+      if (this._store.isConnecting) {
+        this.startService()
+      }
       return true
     }
     return false
@@ -390,11 +391,8 @@ export default class WalletStore {
    * stop means the wallet has mined this time
    */
   @action
-  setMineState = (state: string) => {
-    const allowStates = ['init', 'stop', 'loading', 'mining']
-    if (allowStates.includes(state)) {
-      this.mineState = state
-    }
+  setMineState = (state: 'init' | 'stop' | 'loading' | 'mining') => {
+    this.mineState = state
   }
 
   @action
@@ -427,7 +425,7 @@ export default class WalletStore {
       }
       await dipperinIpc(JSON.stringify(wrappedRpc))
     } catch (e) {
-      console.log(e.message)
+      console.log(`restoreWallet error`, e.message)
     }
   }
 
@@ -446,69 +444,189 @@ export default class WalletStore {
     }
   }
 
-  startMine = async () => {
-    // const err = await this._store.dipperin.dr.startMine()
-    // return err
-    const wrappedRpc = {
-      id: 3,
-      jsonrpc: '2.0',
-      method: 'dipperin_startMine',
-      params: []
-    }
-    const err = await dipperinIpc(JSON.stringify(wrappedRpc))
-    return err
-  }
-
-  stopMine = async () => {
-    const wrappedRpc = {
-      id: 3,
-      jsonrpc: '2.0',
-      method: 'dipperin_stopMine',
-      params: []
-    }
-    const err = await dipperinIpc(JSON.stringify(wrappedRpc))
-    return err
-  }
-
-  initMine = async () => {
-    this.setMineState('loading')
+  private sendStartMineByIpc = async () => {
     try {
-      await this.initMiner()
-      // this.genMinerAccount()
-      await deleteCsWallet(getCurrentNet())
-      await sleep(1500)
-      await this.restoreWallet(this.minerMnemonic)
-      await sleep(1500)
-      await this.startRemainingService()
-      await sleep(1000)
-      await this.startMine()
-      this.setMineState('mining')
+      const wrappedRpc = {
+        id: 3,
+        jsonrpc: '2.0',
+        method: 'dipperin_startMine',
+        params: []
+      }
+      await dipperinIpc(JSON.stringify(wrappedRpc))
+      return [true, '']
     } catch (e) {
-      console.log(e.message)
-      this.setMineState('init')
+      console.log(`sendStartMineByIpc:`, e.message)
+      return [false, 'sendStartMineByIpc error']
     }
   }
 
-  initMiner = async () => {
+  private startMineFromInit = async (): Promise<stdResponse> => {
     try {
-      if (this.minerMnemonic === '') {
-        const miner = await getMiner()
-        if (miner) {
-          if (miner.mnemonic.split(' ').length === 12) {
-            this.setMinerMnemonic(miner.mnemonic)
-          } else {
-            const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
-            const key = pub.substring(0, 32)
-            const iv = pub.substring(32, 48)
-            const mnemonic = decrypt(key, iv, miner.mnemonic)
-            this.setMinerMnemonic(mnemonic)
+      this.setMineState('loading')
+      const startServiceResult = await this.startService()
+      if (!startServiceResult[0]) {
+        throw new Error('startService failure')
+      }
+      await sleep(500)
+      const startMineFromStopResult = await this.startMineFromStop()
+      if (!startMineFromStopResult[0]) {
+        throw new Error('startMineFromStop error')
+      }
+      return [true, '']
+    } catch (e) {
+      // * stop the node
+      this._store.stopNode()
+      console.log(`startMineFromInit error:`, e.message)
+      return [false, e.message]
+    }
+  }
+
+  private startMineFromStop = async (): Promise<stdResponse> => {
+    try {
+      this.setMineState('loading')
+      const sendStartMineByIpcResult = await this.sendStartMineByIpc()
+      if (!sendStartMineByIpcResult) {
+        throw new Error('sendStartMineByIpc error')
+      }
+      this.setMineState('mining')
+      return [true, '']
+    } catch (e) {
+      // * stop the node
+      this._store.stopNode()
+      return [false, e.message]
+    }
+  }
+
+  startMine = async () => {
+    try {
+      if (getIsRemoteNode()) {
+        return [false, 'remote node error']
+      }
+      if (!this._store.isConnecting) {
+        return [false, 'stop node error']
+      }
+      switch (this.mineState) {
+        case 'init': {
+          const startMineFromInitResult = this.startMineFromInit()
+          if (!startMineFromInitResult[0]) {
+            // TODO: handle different error
+            throw new Error('startMineFromInit error')
           }
-        } else {
-          this.genMinerAccount()
+          return [true, '']
+        }
+        case 'stop': {
+          const startMineFromStopResult = await this.startMineFromStop()
+          if (!startMineFromStopResult[0]) {
+            // TODO: handle different error
+            throw new Error('startMineFromStop error')
+          }
+          return [true, '']
+        }
+        default: {
+          return [false, 'mining or loading']
         }
       }
     } catch (e) {
+      console.log(`startMine error:`, e.message)
+      return [false, 'startMine error']
+    }
+  }
+
+  /**
+   * @returns [true, ''] | [false, Error]
+   */
+  private sendStopMineByIpc = async (): Promise<stdResponse> => {
+    try {
+      const wrappedRpc = {
+        id: 3,
+        jsonrpc: '2.0',
+        method: 'dipperin_stopMine',
+        params: []
+      }
+      await dipperinIpc(JSON.stringify(wrappedRpc))
+      return [true, '']
+    } catch (e) {
+      console.log(`sendStopMineFromIpc:`, e.message)
+      return [false, 'sendStopMineFromIpc error']
+    }
+  }
+
+  /**
+   * stopMine
+   */
+  stopMine = async (): Promise<stdResponse> => {
+    try {
+      const sendStopMineFromIpcResult = await this.sendStopMineByIpc()
+      if (!sendStopMineFromIpcResult[0]) {
+        // * if node is still running, restart it
+        this._store.stopNode()
+        this.setMineState('init')
+        throw new Error(sendStopMineFromIpcResult[1])
+      }
+      this.setMineState('stop')
+      return [true, '']
+    } catch (e) {
+      console.log(`stopMine error:`, e.message)
+      return [true, '']
+    }
+  }
+
+  startService = async (): Promise<stdResponse> => {
+    try {
+      if (this.mineState === 'stop') {
+        return [true, '']
+      }
+      const initMinerResult = this.initMiner()
+      if (!initMinerResult[0]) {
+        throw new Error(initMinerResult[1])
+      }
+      // this.genMinerAccount()
+      await deleteCsWallet(getCurrentNet())
+      await sleep(1000)
+      await this.restoreWallet(this.minerMnemonic)
+      await sleep(1000)
+      await this.startRemainingService()
+      this.setMineState('stop')
+      console.log('startDipperinService success')
+      return [true, '']
+    } catch (e) {
+      console.log(`startDipperinService error:`, e.message)
+      return [false, e.message]
+    }
+  }
+
+  /**
+   * if the minerMnemonic is empty, generate minerMnemonic, else do nothing
+   * the
+   */
+  initMiner = (): stdResponse => {
+    try {
+      if (this.minerMnemonic === '') {
+        if (!this._hdAccount) {
+          throw new Error("hdAccount doesn't exist")
+        }
+        const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/0`).publicKey.replace(/^0x/, '')
+        const mnemonic = BIP39.entropyToMnemonic(pub.slice(0, 64))
+        this.setMinerMnemonic(mnemonic)
+        // const miner = await getMiner()
+        // if (miner) {
+        //   if (miner.mnemonic.split(' ').length === 12) {
+        //     this.setMinerMnemonic(miner.mnemonic)
+        //   } else {
+        //     const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+        //     const key = pub.substring(0, 32)
+        //     const iv = pub.substring(32, 48)
+        //     const mnemonic = decrypt(key, iv, miner.mnemonic)
+        //     this.setMinerMnemonic(mnemonic)
+        //   }
+        // } else {
+        //   this.genMinerAccount()
+        // }
+      }
+      return [true, '']
+    } catch (e) {
       console.log(`initMiner error:`, e.message)
+      return [false, 'initMiner failure']
     }
   }
 
@@ -525,20 +643,20 @@ export default class WalletStore {
     }
   }
 
-  genMinerAccount = () => {
-    const mnemonic = BIP39.generateMnemonic()
-    this.setMinerMnemonic(mnemonic)
-    const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
-    const key = pub.substring(0, 32)
-    const iv = pub.substring(32, 48)
-    const encryptedMnemonic = encrypt(key, iv, mnemonic)
-    insertMinerData(encryptedMnemonic)
-  }
+  // genMinerAccount = () => {
+  //   const mnemonic = BIP39.generateMnemonic()
+  //   this.setMinerMnemonic(mnemonic)
+  //   const pub = this._hdAccount.derivePath(`${ACCOUNTS_PATH}/1`).publicKey.replace(/^0x/, '')
+  //   const key = pub.substring(0, 32)
+  //   const iv = pub.substring(32, 48)
+  //   const encryptedMnemonic = encrypt(key, iv, mnemonic)
+  //   insertMinerData(encryptedMnemonic)
+  // }
 
-  changeMinerAccount = async () => {
-    await removeMinerData()
-    this.genMinerAccount()
-  }
+  // changeMinerAccount = async () => {
+  //   await removeMinerData()
+  //   // this.genMinerAccount()
+  // }
 
   getMinerAccount = () => {
     const seed = `0x${BIP39.mnemonicToSeedHex(this.minerMnemonic)}`
@@ -593,6 +711,10 @@ export default class WalletStore {
       return e.message
     }
   }
+
+  /**
+   * the following content is about setting chainDataDir
+   */
 }
 
 // animal enter candy frame garbage thought whip obvious artefact mean tuition pepper
