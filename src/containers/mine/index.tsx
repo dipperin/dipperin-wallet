@@ -18,7 +18,7 @@ import WithdrawModal from './withdrawModal'
 import styles from './mineStyles'
 // import { getIsRemoteNode } from '@/utils/node'
 
-const LONG_TIMEOUT = 15000
+const LONG_TIMEOUT = 5000
 
 interface Props {
   wallet: WalletStore
@@ -73,7 +73,7 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
 
   constructor(props) {
     super(props)
-    this.updateMineBalance()
+
     // if (this.props.wallet.mineState === 'mining') {
     //   this.updateMineBalance()
     // } else {
@@ -96,6 +96,10 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
     //     }
     //   }
     // )
+  }
+
+  componentDidMount() {
+    this.updateMineBalance()
   }
 
   componentWillUnmount() {
