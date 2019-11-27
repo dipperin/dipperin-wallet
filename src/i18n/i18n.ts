@@ -500,7 +500,8 @@ export const zhCN = {
       success: '提现成功',
       inPoolError: '交易已经发出，请等待',
       invalidAddress: '地址格式不正确!',
-      noEnoughBalance: '矿工账户余额不足！'
+      noEnoughBalance: '矿工账户余额不足！',
+      newFeeTooLow: '请等待上一笔交易完成！'
     }
   }
 }
@@ -1025,7 +1026,8 @@ export const enUS: I18nCollection = {
       success: 'Withdraw Success',
       inPoolError: 'The transaction has already in pool, please wait a moment.',
       invalidAddress: 'Recipient address is invalid',
-      noEnoughBalance: 'Insufficient balance'
+      noEnoughBalance: 'Insufficient balance',
+      newFeeTooLow: 'Please wait util the last transaction finish.'
     }
   }
 }

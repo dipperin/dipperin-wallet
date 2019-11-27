@@ -101,6 +101,9 @@ export class WithdrawModal extends React.Component<IProps> {
         case `Returned error: "this transaction already in tx pool"`:
           text = this.props.labels.inPoolError
           break
+        case `ResponseError: Returned error: "new fee is too low to replace the old one"`:
+          text = this.props.labels.newFeeTooLow
+          break
         case `invalid address`:
           text = this.props.labels.invalidAddress
           break
