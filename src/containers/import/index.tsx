@@ -127,6 +127,11 @@ export class Import extends React.Component<IImportProps> {
   }
 
   @action
+  handleBlurMnemonic = () => {
+    this.mnemonic = this.mnemonic.replace(/^\s*|\s*$/g, '')
+  }
+
+  @action
   showGuide = async () => {
     if (!this.props.loading.downloading) {
       if (!settings.get('showImportGuide')) {
@@ -301,6 +306,7 @@ export class Import extends React.Component<IImportProps> {
                 className={classNames([classes.textInput, classes.mnemonicInput])}
                 value={this.mnemonic}
                 onChange={this.mnemonicInput}
+                onBlur={this.handleBlurMnemonic}
               />
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
