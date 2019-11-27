@@ -415,7 +415,7 @@ export const zhCN = {
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
         insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
+        invalidAddress: '地址格式不正确!',
         confirm: '确认'
       }
     },
@@ -437,7 +437,7 @@ export const zhCN = {
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
         insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
+        invalidAddress: '地址格式不正确!',
         addressAleadyExist: '账户已经存在',
         addSuccess: '添加成功',
         confirm: '确定'
@@ -498,7 +498,9 @@ export const zhCN = {
       cancel: '取消',
       confirm: '提款',
       success: '提现成功',
-      inPoolError: '交易已经发出，请等待'
+      inPoolError: '交易已经发出，请等待',
+      invalidAddress: '地址格式不正确!',
+      noEnoughBalance: '矿工账户余额不足！'
     }
   }
 }
@@ -936,7 +938,7 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
+        invalidAddress: 'Recipient address is invalid',
         confirm: 'OK'
       }
     },
@@ -958,7 +960,7 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
+        invalidAddress: 'Recipient address is invalid',
         addressAleadyExist: 'Address aleady exist',
         addSuccess: 'Add success',
         confirm: 'OK'
@@ -1021,7 +1023,9 @@ export const enUS: I18nCollection = {
       cancel: 'Cancel',
       confirm: 'Withdraw',
       success: 'Withdraw Success',
-      inPoolError: 'The transaction has already in pool, please wait a moment.'
+      inPoolError: 'The transaction has already in pool, please wait a moment.',
+      invalidAddress: 'Recipient address is invalid',
+      noEnoughBalance: 'Insufficient balance'
     }
   }
 }

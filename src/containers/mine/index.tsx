@@ -5,6 +5,7 @@ import { observable, action } from 'mobx'
 import { I18nCollectionMine } from '@/i18n/i18n'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import swal from 'sweetalert2'
+import BN from 'bignumber.js'
 
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import WalletStore from '@/stores/wallet'
@@ -190,6 +191,9 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   }
 
   withdrawBalance = async (address: string, value: string) => {
+    if (new BN(value).gt(new BN(this.mineBalanceUnit))) {
+      throw new Error('noEnoughBalance')
+    }
     const result = await this.props.wallet.withdrawAmount(address, value)
     return result
   }
