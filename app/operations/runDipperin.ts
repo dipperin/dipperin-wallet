@@ -89,7 +89,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
       dipperin.on('error', err => {
         log.info('dipperin error', err)
         // comment the following code to avoid user quit mainWindow unexportedly
-        handleError(err, 'An error occured while running Dipperin.')
+        // handleError(err, 'An error occured while running Dipperin.')
       })
 
       dipperin.on('close', exitCode => {
@@ -99,7 +99,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
           return
         } else {
           // comment the following code to avoid user quit mainWindow unexportedly
-          handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
           // The following line is history code
           // mainWindow.close()
         }
@@ -118,7 +118,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
       dipperin.stderr.pipe(logStream)
     })
     .catch(err => {
-      handleError(err, 'An error occured while running Dipperin.')
+      // handleError(err, 'An error occured while running Dipperin.')
       mainWindow.webContents.send(START_NODE_FAILURE)
     })
 }
@@ -189,7 +189,7 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
       dipperin.on('error', err => {
         log.info('dipperin error', err)
         // comment the following code to avoid user quit mainWindow unexportedly
-        handleError(err, 'An error occured while running Dipperin.')
+        // handleError(err, 'An error occured while running Dipperin.')
       })
 
       dipperin.on('close', exitCode => {
@@ -199,7 +199,8 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
           return
         } else {
           // comment the following code to avoid user quit mainWindow unexportedly
-          handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          log.info('dipperin close')
           // The following line is history code
           // mainWindow.close()
         }
@@ -246,6 +247,7 @@ export const dipperinIpcRequest = (rpcString: string): Promise<string> => {
         dipperinIpcSocket.write(rpcString)
       })
     } catch (e) {
+      log.error('dipperinIpcRequest error', e.message)
       reject(e)
     }
   })
