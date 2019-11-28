@@ -96,7 +96,7 @@ const initIPC = (mainWindow: BrowserWindow) => {
       const response = await dipperinIpcRequest(rpcString)
       event.sender.send(DIPPERIN_IPC_RESPONSE, response)
     } catch (e) {
-      log.error('dipperin ipc error:', e.message)
+      log.info('dipperin ipc error:', e.message)
       event.sender.send(DIPPERIN_IPC_RESPONSE, JSON.stringify({ error: { message: e.message } }))
     }
   })

@@ -460,26 +460,26 @@ export default class WalletStore {
     }
   }
 
-  private startMineFromInit = async (): Promise<stdResponse> => {
-    try {
-      this.setMineState('loading')
-      const startServiceResult = await this.startService()
-      if (!startServiceResult[0]) {
-        throw new Error('startService failure')
-      }
-      await sleep(500)
-      const startMineFromStopResult = await this.startMineFromStop()
-      if (!startMineFromStopResult[0]) {
-        throw new Error('startMineFromStop error')
-      }
-      return [true, '']
-    } catch (e) {
-      // * stop the node
-      this._store.stopNode()
-      console.log(`startMineFromInit error:`, e.message)
-      return [false, e.message]
-    }
-  }
+  // private startMineFromInit = async (): Promise<stdResponse> => {
+  //   try {
+  //     this.setMineState('loading')
+  //     const startServiceResult = await this.startService()
+  //     if (!startServiceResult[0]) {
+  //       throw new Error('startService failure')
+  //     }
+  //     await sleep(500)
+  //     const startMineFromStopResult = await this.startMineFromStop()
+  //     if (!startMineFromStopResult[0]) {
+  //       throw new Error('startMineFromStop error')
+  //     }
+  //     return [true, '']
+  //   } catch (e) {
+  //     // * stop the node
+  //     this._store.stopNode()
+  //     console.log(`startMineFromInit error:`, e.message)
+  //     return [false, e.message]
+  //   }
+  // }
 
   private startMineFromStop = async (): Promise<stdResponse> => {
     try {
@@ -505,14 +505,19 @@ export default class WalletStore {
       if (!this._store.isConnecting) {
         return [false, 'stop node error']
       }
+
       switch (this.mineState) {
         case 'init': {
-          const startMineFromInitResult = this.startMineFromInit()
-          if (!startMineFromInitResult[0]) {
-            // TODO: handle different error
-            throw new Error('startMineFromInit error')
-          }
-          return [true, '']
+          return [false, 'wait service start']
+          // this.setMineState('loading')
+          // await sleep(1100)
+
+          // const startMineFromInitResult = this.startMineFromInit()
+          // if (!startMineFromInitResult[0]) {
+          //   // TODO: handle different error
+          //   throw new Error('startMineFromInit error')
+          // }
+          // return [true, '']
         }
         case 'stop': {
           const startMineFromStopResult = await this.startMineFromStop()

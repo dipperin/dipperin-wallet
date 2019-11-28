@@ -129,8 +129,17 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
         case 'stop node error': {
           await swal.fire({
             type: 'error',
+            text: this.props.labels.unstartNodeError,
+            title: this.props.labels.startFailure,
+            timer: 2000
+          })
+          return
+        }
+        case `wait service start`: {
+          await swal.fire({
+            type: 'error',
             text: this.props.labels.remoteNodeError,
-            title: this.props.labels.unstartNodeError,
+            title: this.props.labels.startFailure,
             timer: 2000
           })
           return

@@ -483,7 +483,8 @@ export const zhCN = {
       withdrawBalance: '提取余额',
       startFailure: '启动失败',
       remoteNodeError: '请开启本地节点后启动.',
-      unstartNodeError: '请启动节点后开启挖矿'
+      unstartNodeError: '请启动节点后开启挖矿',
+      waitService: '请等待节点开启服务'
     },
     tips: {
       title: '注意事项',
@@ -1008,7 +1009,8 @@ export const enUS: I18nCollection = {
       withdrawBalance: 'Withdraw Balance',
       startFailure: 'Start Failure',
       remoteNodeError: 'please restart after switching to local node.',
-      unstartNodeError: 'please restart after booting booting node'
+      unstartNodeError: 'please restart after booting booting node',
+      waitService: 'please wait a moment, the node is start service soon'
     },
     tips: {
       title: 'Attentions',

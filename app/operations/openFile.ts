@@ -55,3 +55,5 @@ export const moveFiles = (oldPath: string, newPath: string) => {
     log.info('move files success!')
   })
 }
+
+
