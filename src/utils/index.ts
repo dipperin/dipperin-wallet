@@ -44,6 +44,14 @@ export const isValidAmount = (amount: string): boolean => {
   return true
 }
 
+export const validateEnteringAmount = (amount: string) => {
+  if (amount === '') {
+    return true
+  }
+
+  return /^[0-9]*(\.[0-9]{0,18})?$/.test(amount)
+}
+
 export const formatUTCTime = (time: string) => {
   if (!time) {
     return ''
@@ -138,6 +146,10 @@ export const getNowTimestamp = (): number => {
 }
 
 export const formatAmount = (amount: string) => {
+  // when '' return '0'
+  if (amount === '') {
+    return '0'
+  }
   // add 0 before . if . is first
   let formattedAmount = amount
   if (formattedAmount.slice(0, 1) === '.') {
