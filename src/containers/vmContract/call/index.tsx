@@ -18,6 +18,7 @@ import WalletStore from '@/stores/wallet'
 // components
 import PasswordConfirm from '@/components/passwordConfirm'
 import FunctionCaller from './functionCaller'
+import { validateEnteringAmount, formatAmount } from '@/utils'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import { helper } from '@dipperin/dipperin.js'
@@ -48,6 +49,8 @@ export class Call extends React.Component<IProps> {
   @observable
   showDialog: boolean = false
   @observable
+  amount: string = '0'
+  @observable
   gas: string = '1000000'
   @observable
   gasPrice: string = '1'
@@ -72,6 +75,19 @@ export class Call extends React.Component<IProps> {
         }
       }
     )
+  }
+
+  @action
+  handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (validateEnteringAmount(e.target.value)) {
+      this.amount = e.target.value
+    }
+  }
+
+  @action
+  handleBlurAmount = () => {
+    const formattedAmount = formatAmount(this.amount)
+    this.amount = formattedAmount
   }
 
   @action
@@ -144,6 +160,7 @@ export class Call extends React.Component<IProps> {
         callContract.contractAddress,
         callContract.contractAbi,
         this.name,
+        this.amount,
         this.gas,
         this.gasPrice,
         this.params.split(',').map(param => param.trim())
@@ -215,6 +232,16 @@ export class Call extends React.Component<IProps> {
       <Fragment>
         <div className={classes.title}>
           <span>{labels.contractCall}</span>
+        </div>
+        <div className={classes.inputRow}>
+          <span>{labels.value}</span>
+          <input
+            type="text"
+            value={this.amount}
+            // required={true}
+            onChange={this.handleChangeAmount}
+            onBlur={this.handleBlurAmount}
+          />
         </div>
         <div className={classes.inputRow}>
           <span>{labels.gas}</span>

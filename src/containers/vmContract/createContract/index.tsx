@@ -331,6 +331,19 @@ export class CreateContract extends React.Component<IProps> {
     if (info === 'insufficient balance') {
       return labels.createSwal.noEnoughBalance
     }
+
+    if (info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
+      return labels.swal.alreadyInTxPool
+    }
+    if (info === `ResponseError: Returned error: "tx nonce is invalid"`) {
+      return labels.swal.invalidNonce
+    }
+    if (info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
+      return labels.swal.tooLowfee
+    }
+    if (info.includes('NoEnoughBalance') || info.includes('insufficient balance')) {
+      return labels.swal.insufficientFunds
+    }
     return info
   }
 

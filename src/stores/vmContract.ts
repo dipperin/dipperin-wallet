@@ -288,6 +288,7 @@ class VmContractStore {
     address: string,
     abi: string,
     methodName: string,
+    amount: string,
     gas: string,
     gasPrice: string,
     params: string[] = []
@@ -295,7 +296,7 @@ class VmContractStore {
     try {
       const callData = VmContract.createCallMethod(abi, methodName, ...params)
 
-      const res = await this._store.transaction.confirmTransaction(address, '0', callData, gas, gasPrice)
+      const res = await this._store.transaction.confirmTransaction(address, amount, callData, gas, gasPrice)
       if (res.success) {
         const txs = this._contractTxsMap.get(address) || []
         this._contractTxsMap.set(address, [...txs, res.info as string])
