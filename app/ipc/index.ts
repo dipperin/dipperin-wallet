@@ -48,7 +48,7 @@ export const START_NODE_FAILURE = 'startNodeFailure'
 export const START_MINER_NODE_SUCCESS = 'startMinerNodeSuccess'
 export const START_SUCCESS = 'startSucces'
 
-const dipperinManager = new DipperinManager()
+export const dipperinManager = new DipperinManager()
 
 const initIPC = (mainWindow: BrowserWindow) => {
   // Check dipperin version and update
@@ -160,6 +160,10 @@ const handleUpdateNodeType = async (event, netEnv, mainWindow) => {
   // await runDipperin(netEnv, mainWindow)
   dipperinManager.runDipperin(netEnv, mainWindow)
   event.sender.send(NODE_RESTART_SUCCESS, SET_NET)
+}
+
+export const removeDipperin = () => {
+  dipperinManager.removeAllListeners()
 }
 
 export default initIPC

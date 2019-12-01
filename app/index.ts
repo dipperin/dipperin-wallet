@@ -9,7 +9,7 @@ import path from 'path'
 
 import setEnv from './helpers/setEnv'
 import createWindow from './helpers/window'
-import initIPC from './ipc'
+import initIPC, { dipperinManager } from './ipc'
 import { macTemplate } from './menu/dev_menu_template'
 import { cancelDipperinDownload } from './operations/fetchDipperin'
 import handleError from './operations/handleError'
@@ -32,6 +32,7 @@ let mainWindow: BrowserWindow
 if (!gotTheLock) {
   // If the lock is not obtained, exit the program
   app.quit()
+  dipperinManager.removeAllListeners()
 } else {
   app.on('second-instance', () => {
     // Someone tried to run a second instance, we should focus our window.
@@ -52,7 +53,7 @@ if (!gotTheLock) {
     } else {
       Menu.setApplicationMenu(null)
     }
-    
+
     createMainWindow()
     // init IPC
     initIPC(mainWindow)
@@ -67,7 +68,7 @@ const createMainWindow = () => {
     show: false,
     // useContentSize: true,
     width: 1080,
-    webPreferences: {webSecurity: false},
+    webPreferences: { webSecurity: false },
     icon: path.join(__dirname, 'icons/512.png')
     // transparent: true,
     // titleBarStyle: 'customButtonsOnHover'
@@ -87,7 +88,7 @@ const createMainWindow = () => {
       frame: false,
       useContentSize: true,
       modal: true,
-      webPreferences: {webSecurity: false},
+      webPreferences: { webSecurity: false },
       icon: path.join(__dirname, 'icons/512.png')
     })
 
@@ -139,6 +140,7 @@ app.on('window-all-closed', () => {
   }
   if (process.platform !== 'darwin') {
     app.quit()
+    dipperinManager.removeAllListeners()
   }
 })
 
