@@ -459,6 +459,24 @@ export default class WalletStore {
       return [false, 'sendStartMineByIpc error']
     }
   }
+  /**
+   * @returns [true, ''] | [false, Error]
+   */
+  private sendStopMineByIpc = async (): Promise<stdResponse> => {
+    try {
+      const wrappedRpc = {
+        id: 3,
+        jsonrpc: '2.0',
+        method: 'dipperin_stopMine',
+        params: []
+      }
+      await dipperinIpc(JSON.stringify(wrappedRpc))
+      return [true, '']
+    } catch (e) {
+      console.log(`sendStopMineFromIpc:`, e.message)
+      return [false, 'sendStopMineFromIpc error']
+    }
+  }
 
   // private startMineFromInit = async (): Promise<stdResponse> => {
   //   try {
@@ -534,25 +552,6 @@ export default class WalletStore {
     } catch (e) {
       console.log(`startMine error:`, e.message)
       return [false, 'startMine error']
-    }
-  }
-
-  /**
-   * @returns [true, ''] | [false, Error]
-   */
-  private sendStopMineByIpc = async (): Promise<stdResponse> => {
-    try {
-      const wrappedRpc = {
-        id: 3,
-        jsonrpc: '2.0',
-        method: 'dipperin_stopMine',
-        params: []
-      }
-      await dipperinIpc(JSON.stringify(wrappedRpc))
-      return [true, '']
-    } catch (e) {
-      console.log(`sendStopMineFromIpc:`, e.message)
-      return [false, 'sendStopMineFromIpc error']
     }
   }
 
