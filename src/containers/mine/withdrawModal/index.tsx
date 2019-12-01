@@ -98,6 +98,9 @@ export class WithdrawModal extends React.Component<IProps> {
     } catch (e) {
       let text: string
       switch (e.message) {
+        case `no Balance`:
+          text = this.props.labels.noBalance
+          break
         case `Returned error: "this transaction already in tx pool"`:
           text = this.props.labels.inPoolError
           break
@@ -109,6 +112,15 @@ export class WithdrawModal extends React.Component<IProps> {
           break
         case `noEnoughBalance`:
           text = this.props.labels.noEnoughBalance
+          break
+        case `ResponseError: Returned error: "this transaction already in tx pool"`:
+          text = this.props.labels.alreadyInTxPool
+          break
+        case `ResponseError: Returned error: "tx nonce is invalid"`:
+          text = this.props.labels.invalidNonce
+          break
+        case `ResponseError: Returned error: "new fee is too low to replace the old one"`:
+          text = this.props.labels.tooLowfee
           break
         default:
           text = e.message

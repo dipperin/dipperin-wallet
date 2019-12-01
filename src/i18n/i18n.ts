@@ -502,7 +502,11 @@ export const zhCN = {
       inPoolError: '交易已经发出，请等待',
       invalidAddress: '地址格式不正确!',
       noEnoughBalance: '矿工账户余额不足！',
-      newFeeTooLow: '请等待上一笔交易完成！'
+      newFeeTooLow: '请等待上一笔交易完成！',
+      noBalance: '无可提现金额',
+      alreadyInTxPool: '此交易已经进入交易池，请等待！',
+      invalidNonce: '请等待账号nonce值同步后发送交易!',
+      tooLowfee: '请等待上笔交易上链后发送!'
     }
   }
 }
@@ -1029,7 +1033,11 @@ export const enUS: I18nCollection = {
       inPoolError: 'The transaction has already in pool, please wait a moment.',
       invalidAddress: 'Recipient address is invalid',
       noEnoughBalance: 'Insufficient balance',
-      newFeeTooLow: 'Please wait util the last transaction finish.'
+      newFeeTooLow: 'Please wait util the last transaction finish.',
+      noBalance: 'No withdrawable amount',
+      alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+      invalidNonce: 'Please wait for the account synchronize the nonce number!',
+      tooLowfee: 'Please wait until the last transaction finishes!'
     }
   }
 }

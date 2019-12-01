@@ -200,7 +200,11 @@ export class Mine extends React.Component<RouteComponentProps<{}> & IProps> {
   }
 
   withdrawBalance = async (address: string, value: string) => {
-    if (new BN(value).gt(new BN(this.mineBalanceUnit)) || value === '0') {
+    if (value === '0') {
+      throw new Error('no Balance')
+    }
+
+    if (new BN(value).gt(new BN(this.mineBalanceUnit))) {
       throw new Error('noEnoughBalance')
     }
     const result = await this.props.wallet.withdrawAmount(address, value)
