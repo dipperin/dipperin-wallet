@@ -214,11 +214,11 @@ export default class DipperinManager extends EventEmitter {
           this._removeDipperin()
         })
 
-        this.dipperin.on('exit', (exitCode: number | null, signal: string | null) => {
-          log.info('dipperin exit', exitCode, signal)
-          // * remove dipperin from memory
-          this._removeDipperin()
-        })
+        // this.dipperin.on('exit', (exitCode: number | null, signal: string | null) => {
+        //   log.info('dipperin exit', exitCode, signal)
+        //   // * remove dipperin from memory
+        //   this._removeDipperin()
+        // })
 
         this.dipperin.on('disconnect', () => {
           log.info('dipperin disconnect')
