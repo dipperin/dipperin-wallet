@@ -98,8 +98,10 @@ export class Send extends React.Component<IProps> {
 
   handleGetEstimateGas = async () => {
     runInAction(() => {
-      this.amount = formatAmount(this.amount)
-      console.log(this.amount)
+      if (this.amount) {
+        this.amount = formatAmount(this.amount)
+      }
+      // console.log(this.amount)
     })
     const hexAddress = `0x${this.address.replace('0x', '')}`
     try {

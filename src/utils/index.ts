@@ -150,8 +150,11 @@ export const formatAmount = (amount: string) => {
   if (amount === '') {
     return '0'
   }
-  // add 0 before . if . is first
   let formattedAmount = amount
+  if (/^0+[1-9]+/.test(formattedAmount)) {
+    formattedAmount = formattedAmount.replace(/^0+/, '')
+  }
+  // add 0 before . if . is first
   if (formattedAmount.slice(0, 1) === '.') {
     formattedAmount = '0' + formattedAmount
   }
