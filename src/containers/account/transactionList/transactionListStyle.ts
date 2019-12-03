@@ -78,6 +78,7 @@ export const styles = createStyles({
     cursor: 'pointer'
   },
   detail: {
+    color: '#3ec9fd',
     '&:hover': {
       color: '#3ec9fd'
     }

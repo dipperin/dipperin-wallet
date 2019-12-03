@@ -141,7 +141,7 @@ export class Call extends React.Component<IProps> {
           this.name,
           this.gas,
           this.gasPrice,
-          this.params.split(',').map(param => param.trim())
+          this.params ? this.params.split(',').map(param => param.trim()) : []
         )
         return callRes as CallRes
       }
@@ -163,7 +163,7 @@ export class Call extends React.Component<IProps> {
         this.amount,
         this.gas,
         this.gasPrice,
-        this.params.split(',').map(param => param.trim())
+        this.params ? this.params.split(',').map(param => param.trim()) : []
       )
       if (callRes.success) {
         await swal.fire({
