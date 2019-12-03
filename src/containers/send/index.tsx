@@ -160,8 +160,8 @@ export class Send extends React.Component<IProps> {
       this.validateExtraData(this.memo)
       this.validateBalance()
       this.handleShowDialog()
-    } catch (e) {
-      swal.fire(e.message, '', 'error')
+    } catch (err) {
+      swal.fire(err.message, '', 'error')
     }
     // if (!isValidAmount(this.amount)) {
     //   await swal.fire(labels.swal.invalidAmount, '', 'error')
@@ -223,6 +223,7 @@ export class Send extends React.Component<IProps> {
   }
 
   send = async () => {
+    this.handleCloseDialog()
     const { labels } = this.props
     const hexAddress = `0x${this.address.replace('0x', '')}`
     let gas
@@ -245,7 +246,6 @@ export class Send extends React.Component<IProps> {
         })
         this.props.transaction!.updateTransactionType()
       } else {
-        this.handleCloseDialog()
         let errorText: string = res.info || ''
         if (res.info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
           errorText = labels.swal.alreadyInTxPool
