@@ -31,7 +31,9 @@ export class DialogConfirm extends React.Component<Props> {
 
   @action
   handleChangePassword = (e: React.ChangeEvent<{ value: string }>) => {
-    this.value = e.target.value
+    if (/^(0x)?[0-9a-fA-F]{0,64}$/.test(e.target.value)) {
+      this.value = e.target.value.toLowerCase()
+    }
   }
 
   handleConfirm = async (e: React.FormEvent) => {

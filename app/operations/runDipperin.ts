@@ -10,7 +10,7 @@ import util from 'util'
 import lnet from 'net'
 
 import dipperinPath from '../utils/dipperinPath'
-import handleError from './handleError'
+// import handleError from './handleError'
 import { START_MINER_NODE_FAILURE, START_NODE_FAILURE, START_MINER_NODE_SUCCESS, START_SUCCESS } from '../ipc'
 import { getOs } from '../utils/dipperinPath'
 
@@ -35,15 +35,18 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
   if (opt) {
     chainDataDir = path.join(opt.chainDataDir, `${getNodeEnv(net)}`, `wallet`)
   } else {
-    chainDataDir =
-      path.join(settings.get(CHAIN_DATA_DIR) as string, `${getNodeEnv(net)}`, `wallet`) ||
-      path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+    const appDir = settings.get(CHAIN_DATA_DIR) as string|undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+    chainDataDir =path.join(appDir, `${getNodeEnv(net)}`, `wallet`) 
   }
   log.info('running net:', getNodeEnv(net))
   // Create a logStream to save logs
   // chainDataDir = path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
   const chainLogPath = path.join(chainDataDir, `dipperin.log`)
   const chainIpcPath = path.join(chainDataDir, `dipperin.ipc`)
+
+  if(fs.existsSync(chainIpcPath)) {
+    fs.unlinkSync(chainIpcPath)
+  }
 
   if (dipperin) {
     return
@@ -94,7 +97,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
       })
 
       dipperin.on('close', exitCode => {
-        log.info('close', exitCode)
+        log.info('dipperinclose', exitCode)
         // null || 0
         if (!exitCode) {
           return
@@ -119,7 +122,7 @@ export const runDipperin = (net: string, mainWindow: BrowserWindow, opt?: Dipper
       dipperin.stderr.pipe(logStream)
     })
     .catch(err => {
-      handleError(err, 'An error occured while running Dipperin.')
+      // handleError(err, 'An error occured while running Dipperin.')
       mainWindow.webContents.send(START_NODE_FAILURE)
     })
 }
@@ -201,6 +204,7 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
         } else {
           // comment the following code to avoid user quit mainWindow unexportedly
           // handleError({message: 'dipperin node closed'}, 'An error occured while running Dipperin.')
+          log.info('dipperin close')
           // The following line is history code
           // mainWindow.close()
         }
@@ -217,7 +221,7 @@ export const runDipperinMiner = (net: string, mainWindow: BrowserWindow) => {
       dipperin.stderr.pipe(logStream)
     })
     .catch(err => {
-      handleError(err, 'An error occured while running Dipperin Miner.')
+      // handleError(err, 'An error occured while running Dipperin Miner.')
       mainWindow.webContents.send(START_MINER_NODE_FAILURE)
     })
 }
@@ -227,18 +231,28 @@ export const getChainIpcPath = () => {
 }
 
 export const dipperinIpcRequest = (rpcString: string): Promise<string> => {
+  log.info('dipperinIpcRequest receive', rpcString)
   return new Promise((resolve, reject) => {
     try {
       const dipperinIpcSocket = new lnet.Socket()
+
+      dipperinIpcSocket.on('error', (err: Error) => {
+        reject(err)
+      })
+      dipperinIpcSocket.on('lookup', (e: Error) => {
+        reject(e)
+      })
+      dipperinIpcSocket.on('close', ()=>{
+        reject(new Error(''))
+      })
+
       const wrapPath = getOs() === 'windows' ? `\\\\.\\pipe\\` + dipperinIpcPath : dipperinIpcPath
       dipperinIpcSocket.connect({ path: wrapPath }, () => {
         dipperinIpcSocket.once('data', data => {
           const result = data.toString()
+          log.info(result)
           dipperinIpcSocket.end()
           resolve(result)
-        })
-        dipperinIpcSocket.on('error', (err: Error) => {
-          reject(err)
         })
         setTimeout(() => {
           dipperinIpcSocket.end()
@@ -247,6 +261,7 @@ export const dipperinIpcRequest = (rpcString: string): Promise<string> => {
         dipperinIpcSocket.write(rpcString)
       })
     } catch (e) {
+      log.info('dipperinIpcRequest error', e.message)
       reject(e)
     }
   })

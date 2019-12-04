@@ -15,9 +15,8 @@ const noop = () => null
 
 export const openTmp = () => {
   const net: string = settings.get('netEnv') as string
-  const chainDataDir =
-    path.join(settings.get(CHAIN_DATA_DIR) as string, `${getNodeEnv(net)}`, `wallet`) ||
-    path.join(os.homedir(), `tmp`, `dipperin_apps`, `${getNodeEnv(net)}`, `wallet`)
+  const appDir = settings.get(CHAIN_DATA_DIR) as string|undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+  const chainDataDir =path.join(appDir, `${getNodeEnv(net)}`, `wallet`) 
   const chainLogPath = path.join(`${chainDataDir}`, `dipperin.log`)
 
   shell.showItemInFolder(chainLogPath)
@@ -56,3 +55,5 @@ export const moveFiles = (oldPath: string, newPath: string) => {
     log.info('move files success!')
   })
 }
+
+

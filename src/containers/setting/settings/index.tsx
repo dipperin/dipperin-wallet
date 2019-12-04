@@ -25,9 +25,9 @@ import {
   openTmp,
   setNodeNet,
   updateNode,
-  sendStopNode,
-  sendStartNode,
-  onStartNodeSuccess,
+  // sendStopNode,
+  // sendStartNode,
+  // onStartNodeSuccess,
   cancelDipperinDownload
 } from '@/ipc'
 import WalletStore from '@/stores/wallet'
@@ -105,18 +105,18 @@ export class Setting extends React.Component<Props> {
       }
     })
 
-    onStartNodeSuccess(this.nodeStartSuccess)
+    // onStartNodeSuccess(this.nodeStartSuccess)
 
     this.setChainDataDir(
       (settings.get(CHAIN_DATA_DIR) as string) || pathModule.join(os.homedir(), 'tmp', 'dipperin_apps')
     )
   }
 
-  nodeStartSuccess = () => {
-    setTimeout(() => {
-      this.props.root!.reconnect()
-    }, 1000)
-  }
+  // nodeStartSuccess = () => {
+  //   setTimeout(() => {
+  //     this.props.root!.reconnect()
+  //   }, 1000)
+  // }
 
   @action
   changeAccount = () => {
@@ -229,7 +229,8 @@ export class Setting extends React.Component<Props> {
     root.toggleIsRemoteNode()
     if (root.isRemoteNode) {
       // stop local node
-      sendStopNode()
+      // sendStopNode()
+      this.props.root.stopNode()
       // default select REMOTE_MECURY
       if (this.netEnv in NET_HOST_OBJ) {
         this.selectRemote(this.netEnv)
@@ -270,7 +271,7 @@ export class Setting extends React.Component<Props> {
     // this.netEnv = VENUS
     // update net in settings
     setCurrentNet(this.netEnv)
-    sendStartNode()
+    this.props.root.startNode()
     this.props.root.reconnect()
   }
 
@@ -386,10 +387,12 @@ export class Setting extends React.Component<Props> {
       this.setChainDataDir(e.target.files[0].path)
       settings.set(CHAIN_DATA_DIR, e.target.files[0].path)
       if (!settings.get(IS_REMOTE)) {
-        sendStopNode()
-        this.props.root!.stopConnectNode()
+        this.props.root.stopNode()
+        // sendStopNode()
+        // this.props.root!.stopConnectNode()
         await sleep(1000)
-        sendStartNode()
+        // sendStartNode()
+        this.props.root.startNode()
       }
     }
   }
@@ -506,10 +509,10 @@ export class Setting extends React.Component<Props> {
                 </span>
               </div>
             )}
-            <p className={classes.title} style={{ position: 'absolute', top: '150px' }}>
+            <p className={classes.title} style={{ position: 'absolute', top: '170px' }}>
               {labels.walletManagement}
             </p>
-            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '190px' }}>
+            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '210px' }}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>

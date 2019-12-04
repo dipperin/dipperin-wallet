@@ -24,7 +24,7 @@ import SelectedFile from '@/images/select-file-ed.png'
 import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
 import { helper } from '@dipperin/dipperin.js'
-import { isVmContractAddress } from '@/utils'
+import { isVmContractAddress, validateEnteringAmount, formatAmount } from '@/utils'
 
 interface WrapProps extends RouteComponentProps<{}> {
   account?: AccountStore
@@ -97,6 +97,7 @@ export class CreateContract extends React.Component<IProps> {
     this.setStringField('inputWasmPlaceholder', '')
     this.setStringField('abi', '')
     this.setStringField('inputABIPlaceholder', '')
+    this.setStringField('amount', '0')
     this.setStringField('gas', '')
     this.setStringField('gasPrice', '1')
     this.setStringField('params', '')
@@ -188,8 +189,19 @@ export class CreateContract extends React.Component<IProps> {
     }
   }
 
+  handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (validateEnteringAmount(e.target.value)) {
+      this.setStringField('amount', e.target.value)
+    }
+  }
+
+  handleBlurAmount = () => {
+    const formattedAmount = formatAmount(this.getStringField('amount'))
+    this.setStringField('amount', formattedAmount)
+  }
+
   handleChangeGasPrice = (e: React.ChangeEvent<{ value: string }>) => {
-    if (isInt(e.target.value) || e.target.value === '') {
+    if (e.target.value || e.target.value === '') {
       this.setStringField('gasPrice', e.target.value)
     }
   }
@@ -281,7 +293,7 @@ export class CreateContract extends React.Component<IProps> {
       const abi = this.getStringField('abi')
       const gas = this.getStringField('gas')
       const gasPrice = this.getStringField('gasPrice')
-      const amount = '0'
+      const amount = this.getStringField('amount')
       const params = this.getStringField('params')
         .split(',')
         .map(param => param.trim())
@@ -296,9 +308,10 @@ export class CreateContract extends React.Component<IProps> {
         this.handleCloseDialog()
       } else {
         this.handleCloseDialog()
+        const errorText = this.transformErrorInfo(contractRes.info as string)
         swal.fire({
           title: labels.createSwal.createErr,
-          text: contractRes.info,
+          text: errorText,
           type: 'error'
         })
       }
@@ -308,6 +321,30 @@ export class CreateContract extends React.Component<IProps> {
         title: labels.createSwal.incorrectPassword
       })
     }
+  }
+
+  transformErrorInfo = (info: string): string => {
+    const labels = this.props.labels
+    if (info === 'Error: Network Error' || info.includes('InvalidConnectionError')) {
+      return labels.createSwal.networkError
+    }
+    if (info === 'insufficient balance') {
+      return labels.createSwal.noEnoughBalance
+    }
+
+    if (info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
+      return labels.swal.alreadyInTxPool
+    }
+    if (info === `ResponseError: Returned error: "tx nonce is invalid"`) {
+      return labels.swal.invalidNonce
+    }
+    if (info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
+      return labels.swal.tooLowfee
+    }
+    if (info.includes('NoEnoughBalance') || info.includes('insufficient balance')) {
+      return labels.swal.insufficientFunds
+    }
+    return info
   }
 
   handleDialogConfirm = debounce(this.dialogConfirm, 1000)
@@ -546,6 +583,15 @@ export class CreateContract extends React.Component<IProps> {
                     )}
                   </Fragment>
                 </div>
+              </div>
+              <div className={classes.inputRow}>
+                <span>{labels.value}</span>
+                <input
+                  type="text"
+                  value={this.stringField.get('amount') || ''}
+                  onChange={this.handleChangeAmount}
+                  onBlur={this.handleBlurAmount}
+                />
               </div>
               <div className={classes.inputRow}>
                 <span>{labels.gas}</span>

@@ -51,7 +51,9 @@ export class VmContractList extends React.Component<Props> {
     reaction(
       () => this.props.wallet!.activeAccountId,
       () => {
-        this.redirect()
+        if (window.location.pathname.split('/')[2] === 'vm_contract') {
+          this.redirect()
+        }
       }
     )
     const path = this.props.vmContract!.path

@@ -116,6 +116,7 @@ describe('VmContract store', () => {
       '0x001487e42fbc7234714213a4dd3947cd1378cd28fa8c',
       mockAbi,
       'transfer',
+      '0',
       '1000000',
       '1',
       ['0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37', '100']

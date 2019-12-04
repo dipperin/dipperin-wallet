@@ -90,8 +90,10 @@ export class Import extends React.Component<IImportProps> {
   }
 
   @action
-  passwordInput = e => {
-    this.password = e.target.value
+  passwordInput = (e: React.ChangeEvent<{ value: string }>) => {
+    if (/^[a-zA-Z0-9`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]{0,24}$/.test(e.target.value)) {
+      this.password = e.target.value
+    }
   }
 
   @computed
@@ -113,13 +115,20 @@ export class Import extends React.Component<IImportProps> {
   }
 
   @action
-  repeatPasswordInput = e => {
-    this.repeatPassword = e.target.value
+  repeatPasswordInput = (e: React.ChangeEvent<{ value: string }>) => {
+    if (/^[a-zA-Z0-9`~!@#$%^&*()_+<>?:"{},.\\/;'[\]]{0,24}$/.test(e.target.value)) {
+      this.repeatPassword = e.target.value
+    }
   }
 
   @action
   mnemonicInput = e => {
     this.mnemonic = e.target.value
+  }
+
+  @action
+  handleBlurMnemonic = () => {
+    this.mnemonic = this.mnemonic.replace(/^\s*|\s*$/g, '')
   }
 
   @action
@@ -140,6 +149,9 @@ export class Import extends React.Component<IImportProps> {
 
   @computed
   get validatePassword(): string {
+    if (this.password === '') {
+      return this.props.labels.swal.emptyPassword
+    }
     if (!this.password || this.password.length < 8) {
       return this.props.labels.swal.passwordLength
     }
@@ -168,6 +180,9 @@ export class Import extends React.Component<IImportProps> {
     }
     if (!BIP39.validateMnemonic(mnemonic)) {
       return labels.swal.invalidMnemonic
+    }
+    if (password === '') {
+      return labels.swal.emptyPassword
     }
     if (!password || password.length < 8) {
       return labels.swal.passwordLength
@@ -291,12 +306,15 @@ export class Import extends React.Component<IImportProps> {
                 className={classNames([classes.textInput, classes.mnemonicInput])}
                 value={this.mnemonic}
                 onChange={this.mnemonicInput}
+                onBlur={this.handleBlurMnemonic}
               />
             </FormControl>
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.setPassword}</span>
-                {this.password && <Tip type={!this.validatePassword} msg={this.validatePassword} />}
+                {(this.password || this.repeatPassword) && (
+                  <Tip type={!this.validatePassword} msg={this.validatePassword} />
+                )}
               </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
@@ -309,15 +327,39 @@ export class Import extends React.Component<IImportProps> {
               <div className={classes.pswStr}>
                 <div className={classes.rankbar}>
                   <div className={classes.weakPswActive} />
-                  <div className={this.passwordStrength > 1 ? classes.mediumPswActive : classes.mediumPsw} />
-                  <div className={this.passwordStrength > 3 ? classes.strongPswActive : classes.strongPsw} />
+                  <div
+                    className={
+                      this.passwordStrength > 1 && this.password.length >= 8
+                        ? classes.mediumPswActive
+                        : classes.mediumPsw
+                    }
+                  />
+                  <div
+                    className={
+                      this.passwordStrength > 3 && this.password.length >= 8
+                        ? classes.strongPswActive
+                        : classes.strongPsw
+                    }
+                  />
                 </div>
                 <div className={classes.rankbar}>
                   <span className={classes.weakText}>{labels.weak}</span>
-                  <span className={this.passwordStrength > 1 ? classes.mediumText : classes.strengthTextDefault}>
+                  <span
+                    className={
+                      this.passwordStrength > 1 && this.password.length >= 8
+                        ? classes.mediumText
+                        : classes.strengthTextDefault
+                    }
+                  >
                     {labels.medium}
                   </span>
-                  <span className={this.passwordStrength > 3 ? classes.strongText : classes.strengthTextDefault}>
+                  <span
+                    className={
+                      this.passwordStrength > 3 && this.password.length >= 8
+                        ? classes.strongText
+                        : classes.strengthTextDefault
+                    }
+                  >
                     {labels.strong}
                   </span>
                 </div>
@@ -346,8 +388,14 @@ export class Import extends React.Component<IImportProps> {
             </Button>
             <div className={classes.note}>{labels.note}</div>
           </div>
-          <div className={classes.create} data-tour={'second'}>
-            <Button className={classes.addBtn} variant="contained" color="primary" onClick={this.ToCreate}>
+          <div className={classes.create}>
+            <Button
+              className={classes.addBtn}
+              variant="contained"
+              color="primary"
+              onClick={this.ToCreate}
+              data-tour={'second'}
+            >
               <p className={classNames({ ['cn']: isChinese })}>
                 <span className={classes.addIcon}>+</span>
                 {labels.create}

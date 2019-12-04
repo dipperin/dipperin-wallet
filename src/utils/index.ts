@@ -1,4 +1,5 @@
 import format from 'date-fns/format'
+import { Utils } from '@dipperin/dipperin.js'
 import crypto from 'crypto'
 
 export const stringMapToPlainObject = (map: Map<string, any>): object => {
@@ -43,6 +44,14 @@ export const isValidAmount = (amount: string): boolean => {
   return true
 }
 
+export const validateEnteringAmount = (amount: string) => {
+  if (amount === '') {
+    return true
+  }
+
+  return /^[0-9]*(\.[0-9]{0,18})?$/.test(amount)
+}
+
 export const formatUTCTime = (time: string) => {
   if (!time) {
     return ''
@@ -69,6 +78,12 @@ export const isVmContractAddress = (address: string): boolean => {
   //   default:
   //     return false
   // }
+}
+
+export const validateAddress = (address: string) => {
+  if (!Utils.isAddress(address)) {
+    throw new Error('invalid address')
+  }
 }
 
 export const isAlpha = version => version.includes('alpha')
@@ -131,8 +146,15 @@ export const getNowTimestamp = (): number => {
 }
 
 export const formatAmount = (amount: string) => {
-  // add 0 before . if . is first
+  // when '' return '0'
+  if (amount === '') {
+    return '0'
+  }
   let formattedAmount = amount
+  if (/^0+[1-9]+/.test(formattedAmount)) {
+    formattedAmount = formattedAmount.replace(/^0+/, '')
+  }
+  // add 0 before . if . is first
   if (formattedAmount.slice(0, 1) === '.') {
     formattedAmount = '0' + formattedAmount
   }
