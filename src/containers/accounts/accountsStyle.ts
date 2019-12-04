@@ -106,6 +106,7 @@ const styles = createStyles({
   bigBalance: {
     marginBottom: 5,
     fontSize: 24,
+    lineHeight: '24px',
     fontWeight: 'bold',
     ...textOverflow
   },
@@ -125,7 +126,7 @@ const styles = createStyles({
     minHeight: 0,
     minWidth: 0,
     padding: 0,
-    margin: '5px auto 0',
+    margin: '0 auto 0',
     '& img': {
       width: 18,
       height: 18

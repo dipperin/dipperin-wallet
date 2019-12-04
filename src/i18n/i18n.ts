@@ -25,8 +25,7 @@ export const zhCN = {
         confirm: '确认',
         cancel: '取消',
         resetConfirm: '确定',
-        warnText:
-          '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
+        warnText: '重置钱包，钱包所有记录将被删除。',
         warn: '警告',
         backupMnemonic:
           '助记词是您钱包资产的重要凭证，任何人得到您的助记词都可以使用您的资产，请您采用多种方式保管好助记词，避免泄露。助记词顺序有唯一性，请务必不要打乱助记词的顺序。'
@@ -46,10 +45,12 @@ export const zhCN = {
         success: '导入成功!',
         mnemonicLength: '请提供至少12位助记词',
         invalidMnemonic: '助记词不合法',
+        emptyMnemonic: '助记词不能为空',
         passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致',
-        confirm: '确认'
+        confirm: '确认',
+        emptyPassword: '密码不能为空'
       },
       tour: {
         create: '如果您还没有钱包，点击这里去创建钱包！',
@@ -65,6 +66,7 @@ export const zhCN = {
       wallet: '钱包',
       contract: '智能合约',
       vmContract: '智能合约',
+      mine: '挖矿',
       setting: '设置',
       title: 'Dipperin 钱包',
       walletVersion: '钱包版本',
@@ -75,7 +77,8 @@ export const zhCN = {
     setting: {
       left: {
         title: '设置',
-        info: '设置您的钱包账户信息'
+        info: '设置您的钱包账户信息',
+        dataDir: '数据储存路径'
       },
       net: {
         title: '选择本地节点',
@@ -96,7 +99,7 @@ export const zhCN = {
         title: '关于钱包',
         label: {
           developer: '开发商',
-          version: '版本',
+          version: '钱包版本',
           copyright: '版权所属',
           function: '版本功能'
         },
@@ -127,8 +130,7 @@ export const zhCN = {
         updateSuccess: '更新成功!',
         cancel: '取消',
         confirm: '确定',
-        warnText:
-          '如果您重置钱包，所有记录会被删除。在您以后再导入钱包的时候，会一开始显示第一个账户。您可以点击“添加账户”按钮显示更多已存在的账户。',
+        warnText: '重置钱包，钱包所有记录将被删除。',
         warn: '警告',
         startUpdate: '开始更新?',
         documentTitle: 'Dipperin 钱包',
@@ -145,10 +147,11 @@ export const zhCN = {
       repeatPassword: '确认密码',
       confirm: '确定',
       swal: {
-        passwordLength: '请输入至少８位密码！',
+        passwordLength: '密码长度为8~24个字符',
         invalidPassword: '无效密码',
         diffPassword: '两次密码不一致！',
-        confirm: '确定'
+        confirm: '确定',
+        emptyPassword: '密码不能为空'
       },
       weak: '弱',
       medium: '中',
@@ -197,15 +200,20 @@ export const zhCN = {
       gasPrice: 'gas费用',
       estimateGas: '预估Gas',
       swal: {
-        invalidAddress: '无效地址',
-        insufficientFunds: '余额不足',
+        invalidAddress: '地址格式不正确',
+        insufficientFunds: '账户余额不足',
         invalidAmount: '无效数量',
         invalidFee: '无效交易费',
         timeout: '远程节点响应时间过长',
         success: '发送成功!',
         fail: '发送失败!',
         incorrectPassword: '密码错误!',
-        confirm: '确认'
+        confirm: '确认',
+        alreadyInTxPool: '此交易已经进入交易池，请等待！',
+        invalidNonce: '请等待账号nonce值同步后发送交易!',
+        tooLowfee: '请等待上笔交易上链后发送!',
+        tooMuchExtraData: '备注内容过多，请优化备注内容!',
+        networkError: '当前网络不可用，请检查网络'
       }
     },
     txList: {
@@ -346,8 +354,14 @@ export const zhCN = {
         decimalLength: '精度不能超过18',
         paramsLengthErr: '输入参数数量错误',
         contractAddressErr: '合约地址错误',
+        noAbi: '未导入合约ABI文件',
+        noWASM: '未导入合约WASM文件',
+        noGas: '未输入Gas上限',
+        noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
-        feeMax: '手续费不足'
+        feeMax: '手续费不足',
+        networkError: '当前网络不可用，请检查网络！',
+        noEnoughBalance: '账户余额不足'
       },
       labs: {
         transfer: '合约转账',
@@ -355,7 +369,13 @@ export const zhCN = {
         transferFrom: '任意转账'
       },
       swal: {
-        somethingWrong: '系统错误!'
+        somethingWrong: '系统错误!',
+        alreadyInTxPool: '此交易已经进入交易池，请等待！',
+        invalidNonce: '请等待账号nonce值同步后发送交易!',
+        tooLowfee: '请等待上笔交易上链后发送!',
+        tooMuchExtraData: '备注内容过多，请优化备注内容!',
+        networkError: '当前网络不可用，请检查网络',
+        insufficientFunds: '账户余额不足'
       }
     },
 
@@ -395,7 +415,7 @@ export const zhCN = {
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
         insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
+        invalidAddress: '地址格式不正确!',
         confirm: '确认'
       }
     },
@@ -417,7 +437,7 @@ export const zhCN = {
         incorrectPassword: '密码错误!',
         somethingWrong: '系统错误!',
         insufficientFunds: '余额不足!',
-        invalidAddress: '无效地址!',
+        invalidAddress: '地址格式不正确!',
         addressAleadyExist: '账户已经存在',
         addSuccess: '添加成功',
         confirm: '确定'
@@ -453,6 +473,41 @@ export const zhCN = {
       cancel: '取消',
       confirm: '确认'
     }
+  },
+  mine: {
+    main: {
+      easyMine: '一键挖矿',
+      loading: '启动中',
+      stopMining: '停止挖矿',
+      mineReward: '挖矿奖励',
+      withdrawBalance: '提取余额',
+      startFailure: '启动失败',
+      remoteNodeError: '请开启本地节点后启动.',
+      unstartNodeError: '请启动节点后开启挖矿',
+      waitService: '请等待节点开启服务'
+    },
+    tips: {
+      title: '注意事项',
+      tipContent: '当启动钱包挖矿功能时，钱包网络节点会切换至本地节点，等待本地节点同步至最新区块高度后即开始挖矿。',
+      done: '确认'
+    },
+    withdraw: {
+      withdraw: '提现',
+      receipt: '收款地址',
+      withdrawAmount: '提款金额',
+      availableAmount: '可提现金额：',
+      cancel: '取消',
+      confirm: '提款',
+      success: '提现成功',
+      inPoolError: '交易已经发出，请等待',
+      invalidAddress: '地址格式不正确!',
+      noEnoughBalance: '矿工账户余额不足！',
+      newFeeTooLow: '请等待上一笔交易完成！',
+      noBalance: '无可提现金额',
+      alreadyInTxPool: '此交易已经进入交易池，请等待！',
+      invalidNonce: '请等待账号nonce值同步后发送交易!',
+      tooLowfee: '请等待上笔交易上链后发送!'
+    }
   }
 }
 
@@ -469,6 +524,8 @@ export type I18nCollectionDialog = typeof zhCN.dialog
 export type I18nCollectionWallet = typeof zhCN.wallet
 
 export type I18nCollectionCreate = typeof zhCN.create
+
+export type I18nCollectionMine = typeof zhCN.mine
 
 export const enUS: I18nCollection = {
   wallet: {
@@ -494,8 +551,7 @@ export const enUS: I18nCollection = {
         confirm: 'Ok',
         cancel: 'Cancel',
         resetConfirm: 'Confirm',
-        warnText:
-          'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
+        warnText: 'Reseting wallet will DELETE your entire wallet account, transaction records and profile.',
         warn: 'Warning',
         backupMnemonic:
           'Mnemonic phrase are the voucher to recover your wallet assets. Obtaining Mnemonic equals owning all assets. Please do backup and preserve it properly! Please be sure not to disturb the order of the mnemonic phrase.'
@@ -513,12 +569,14 @@ export const enUS: I18nCollection = {
       lang: 'English',
       swal: {
         success: 'Success!',
-        mnemonicLength: 'You should provide 12 words of mnemonics',
+        mnemonicLength: 'You should provide 12 words of mnemonics.',
         invalidMnemonic: 'Invalid mnemonics',
-        passwordLength: 'Password must be 8~24 characters in length',
+        emptyMnemonic: 'Please enter your mnemonics.',
+        passwordLength: 'Password must be 8~24 characters in length.',
         invalidPassword: 'Invalid password',
-        diffPassword: `Passwords don't match`,
-        confirm: 'Ok'
+        diffPassword: `Passwords don't match.`,
+        confirm: 'Ok',
+        emptyPassword: 'The passwork should not be empty.'
       },
       tour: {
         create: `If you don't already have a wallet, click here to create one!`,
@@ -534,6 +592,7 @@ export const enUS: I18nCollection = {
       wallet: 'Wallet',
       contract: 'Contract',
       vmContract: 'Contract',
+      mine: 'Mining',
       setting: 'Setting',
       title: 'Dipperin Wallet',
       walletVersion: 'Wallet Version',
@@ -544,7 +603,8 @@ export const enUS: I18nCollection = {
     setting: {
       left: {
         title: 'Setting',
-        info: 'Set up your wallet infomation'
+        info: 'Set up your wallet infomation',
+        dataDir: 'Chain Data Dictionary'
       },
       net: {
         title: 'Select Local Node',
@@ -599,8 +659,7 @@ export const enUS: I18nCollection = {
         updateSuccess: 'update success',
         cancel: 'Cancel',
         confirm: 'Confirm',
-        warnText:
-          'If you reset your wallet, all transaction records will be deleted. When you import this wallet somewhere later, it will initially only display the first account. You may display more existing accounts by simply clicking the "Add Account" button.',
+        warnText: 'Reseting wallet will DELETE your entire wallet account, transaction records and profile.',
         warn: 'Warning',
         startUpdate: 'Start update',
         documentTitle: 'Dipperin Wallet',
@@ -621,7 +680,8 @@ export const enUS: I18nCollection = {
         passwordLength: 'Please fill in a password greater than or equal to 8 digits in length!',
         invalidPassword: 'Invalid password',
         diffPassword: 'The first password is not equal to the second password!',
-        confirm: 'OK'
+        confirm: 'OK',
+        emptyPassword: 'The passwork should not be empty.'
       },
       weak: 'week',
       medium: 'medium',
@@ -670,15 +730,20 @@ export const enUS: I18nCollection = {
       gasPrice: 'Gas Price',
       estimateGas: 'Estimate Gas',
       swal: {
-        invalidAddress: 'Provided address is invalid',
-        insufficientFunds: 'Insufficient funds',
+        invalidAddress: 'Recipient address is invalid',
+        insufficientFunds: ' Insufficient balance',
         invalidAmount: 'Invalid amount',
         invalidFee: 'Invalid poundage',
         timeout: 'Remote node react too late',
         success: 'Send transaction successful!',
         fail: 'Send transaction fail!',
         incorrectPassword: 'Incorrect password!',
-        confirm: 'Ok'
+        confirm: 'Ok',
+        alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+        invalidNonce: 'Please wait for the account synchronize the nonce number!',
+        tooLowfee: 'Please wait until the last transaction finishes!',
+        tooMuchExtraData: 'The entered text is too long, please optimize your content.',
+        networkError: 'The network connection is abnormal, please check your network！'
       }
     },
     txList: {
@@ -815,12 +880,18 @@ export const enUS: I18nCollection = {
       createSwal: {
         createSuccess: 'Create contract success',
         createErr: 'Create contract error',
+        noAbi: 'Please import the ABI file of your contract',
+        noWASM: 'Please import the WASM file of your contract',
+        noGas: 'Please input the gas limit',
+        noGasPrice: 'Please input the gas price',
         incorrectPassword: 'Incorrect password',
         decimalLength: 'Decimal should not exceed 18',
         paramsLengthErr: 'Number of input parameter is wrong',
         contractAddressErr: 'The contract address is wrong',
         getAbi: 'Get ABI error',
-        feeMax: 'Fee is less than the minimum fee'
+        feeMax: 'Fee is less than the minimum fee',
+        networkError: 'Current network is unreachable, please check your network connection.',
+        noEnoughBalance: 'Insufficient balance'
       },
       labs: {
         transfer: 'Transfer',
@@ -828,7 +899,13 @@ export const enUS: I18nCollection = {
         transferFrom: 'Transfer From'
       },
       swal: {
-        somethingWrong: 'Something wrong!'
+        somethingWrong: 'Something wrong!',
+        alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+        invalidNonce: 'Please wait for the account synchronize the nonce number!',
+        tooLowfee: 'Please wait until the last transaction finishes!',
+        tooMuchExtraData: 'The entered text is too long, please optimize your content.',
+        networkError: 'The network connection is abnormal, please check your network！',
+        insufficientFunds: ' Insufficient balance'
       }
     },
     transfer: {
@@ -867,7 +944,7 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
+        invalidAddress: 'Recipient address is invalid',
         confirm: 'OK'
       }
     },
@@ -889,7 +966,7 @@ export const enUS: I18nCollection = {
         incorrectPassword: 'Incorrect password!',
         somethingWrong: 'Something wrong!',
         insufficientFunds: 'Incufficient funds!',
-        invalidAddress: 'Invalid address!',
+        invalidAddress: 'Recipient address is invalid',
         addressAleadyExist: 'Address aleady exist',
         addSuccess: 'Add success',
         confirm: 'OK'
@@ -924,6 +1001,43 @@ export const enUS: I18nCollection = {
       password: 'Password',
       cancel: 'Cancel',
       confirm: 'Confirm'
+    }
+  },
+
+  mine: {
+    main: {
+      easyMine: 'Start Mining',
+      loading: 'Loading',
+      stopMining: 'Stop Mining',
+      mineReward: 'Mining Reward',
+      withdrawBalance: 'Withdraw Balance',
+      startFailure: 'Start Failure',
+      remoteNodeError: 'please restart after switching to local node.',
+      unstartNodeError: 'please restart after booting booting node',
+      waitService: 'please wait a moment, the node is start service soon'
+    },
+    tips: {
+      title: 'Attentions',
+      tipContent:
+        'When the wallet starts mining, it will automatically switch to the local node and wait for the local node to synchronize to the latest block height before mining.',
+      done: 'Done'
+    },
+    withdraw: {
+      withdraw: 'Withdraw Balance',
+      receipt: 'Receipt Address',
+      withdrawAmount: 'Withdraw Amount',
+      availableAmount: 'Available Amount: ',
+      cancel: 'Cancel',
+      confirm: 'Withdraw',
+      success: 'Withdraw Success',
+      inPoolError: 'The transaction has already in pool, please wait a moment.',
+      invalidAddress: 'Recipient address is invalid',
+      noEnoughBalance: 'Insufficient balance',
+      newFeeTooLow: 'Please wait util the last transaction finish.',
+      noBalance: 'No withdrawable amount',
+      alreadyInTxPool: 'This transaction has already come into transaction pool, please wait for a moment!',
+      invalidNonce: 'Please wait for the account synchronize the nonce number!',
+      tooLowfee: 'Please wait until the last transaction finishes!'
     }
   }
 }

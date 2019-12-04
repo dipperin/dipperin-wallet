@@ -150,6 +150,7 @@ const sidebarStyle = theme =>
       display: 'block',
       textDecoration: 'none',
       width: drawerWidth,
+      userSelect: 'none',
       '&:hover,&:focus,&:visited,&': {
         color: '#FFFFFF'
       }
@@ -168,6 +169,7 @@ const sidebarStyle = theme =>
       display: 'block',
       padding: '10px 15px',
       backgroundColor: 'transparent',
+      userSelect: 'none',
       '&:focus': {
         backgroundColor: primaryColor
       },
@@ -183,7 +185,8 @@ const sidebarStyle = theme =>
       position: 'absolute',
       left: '50%',
       top: '50%',
-      transform: 'translate(-50%,-50%)'
+      transform: 'translate(-50%,-50%)',
+      userSelect: 'none'
     },
     itemText: {
       ...defaultFont,

@@ -4,6 +4,8 @@ import walletActive from '../images/menu-wallet-active.png'
 import wallet from '../images/menu-wallet.png'
 import contract from '@/images/menu-contract.png'
 import contractActive from '@/images/menu-contract-active.png'
+import mine from '@/images/menu-mine.png'
+import mineActive from '@/images/menu-mine-active.png'
 
 export interface NormalDashboardRoutes {
   path: string
@@ -43,6 +45,13 @@ const dashboardRoutes: DashboardRoutes[] = [
     navbarName: 'VM Contract',
     icon: contract,
     iconActive: contractActive
+  },
+  {
+    path: '/main/mine',
+    sidebarName: 'mine',
+    navbarName: 'Mining',
+    icon: mine,
+    iconActive: mineActive
   },
   {
     path: '/main/setting',

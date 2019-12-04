@@ -18,6 +18,7 @@ import WalletStore from '@/stores/wallet'
 // components
 import PasswordConfirm from '@/components/passwordConfirm'
 import FunctionCaller from './functionCaller'
+import { validateEnteringAmount, formatAmount } from '@/utils'
 
 import { I18nCollectionContract } from '@/i18n/i18n'
 import { helper } from '@dipperin/dipperin.js'
@@ -48,6 +49,8 @@ export class Call extends React.Component<IProps> {
   @observable
   showDialog: boolean = false
   @observable
+  amount: string = '0'
+  @observable
   gas: string = '1000000'
   @observable
   gasPrice: string = '1'
@@ -72,6 +75,19 @@ export class Call extends React.Component<IProps> {
         }
       }
     )
+  }
+
+  @action
+  handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (validateEnteringAmount(e.target.value)) {
+      this.amount = e.target.value
+    }
+  }
+
+  @action
+  handleBlurAmount = () => {
+    const formattedAmount = formatAmount(this.amount)
+    this.amount = formattedAmount
   }
 
   @action
@@ -125,7 +141,7 @@ export class Call extends React.Component<IProps> {
           this.name,
           this.gas,
           this.gasPrice,
-          this.params.split(',').map(param => param.trim())
+          this.params ? this.params.split(',').map(param => param.trim()) : []
         )
         return callRes as CallRes
       }
@@ -144,9 +160,10 @@ export class Call extends React.Component<IProps> {
         callContract.contractAddress,
         callContract.contractAbi,
         this.name,
+        this.amount,
         this.gas,
         this.gasPrice,
-        this.params.split(',').map(param => param.trim())
+        this.params ? this.params.split(',').map(param => param.trim()) : []
       )
       if (callRes.success) {
         await swal.fire({
@@ -155,13 +172,27 @@ export class Call extends React.Component<IProps> {
           timer: 1000
         })
         this.handleCloseDialog()
-        console.log('after swal fire', callRes)
+        // console.log('after swal fire', callRes)
         return callRes as CallRes
       } else {
         this.handleCloseDialog()
+        let errorText: string = callRes.info || ''
+        if (callRes.info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
+          errorText = labels.swal.alreadyInTxPool
+        }
+        if (callRes.info === `ResponseError: Returned error: "tx nonce is invalid"`) {
+          errorText = labels.swal.invalidNonce
+        }
+        if (callRes.info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
+          errorText = labels.swal.tooLowfee
+        }
+        if (errorText.includes('NoEnoughBalance') || errorText.includes('insufficient balance')) {
+          errorText = labels.swal.insufficientFunds
+        }
+
         await swal.fire({
           title: labels.callDialog.callFail,
-          text: String(callRes.info),
+          text: errorText,
           type: 'error'
         })
       }
@@ -201,6 +232,16 @@ export class Call extends React.Component<IProps> {
       <Fragment>
         <div className={classes.title}>
           <span>{labels.contractCall}</span>
+        </div>
+        <div className={classes.inputRow}>
+          <span>{labels.value}</span>
+          <input
+            type="text"
+            value={this.amount}
+            // required={true}
+            onChange={this.handleChangeAmount}
+            onBlur={this.handleBlurAmount}
+          />
         </div>
         <div className={classes.inputRow}>
           <span>{labels.gas}</span>

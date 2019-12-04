@@ -115,6 +115,12 @@ class TransactionStore {
     return transaction
   }
 
+  getChainId = (): string => {
+    const net = getCurrentNet()
+    const chainId: string = net in CHAIN_ID_DIC ? CHAIN_ID_DIC[net] : DEFAULT_CHAIN_ID
+    return chainId
+  }
+
   async confirmTransaction(
     address: string,
     amount: string,
@@ -122,8 +128,8 @@ class TransactionStore {
     gas?: string,
     gasPrice?: string
   ): Promise<TxResponse> {
-    const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
     try {
+      const transaction = this.getSignedTransactionData(address, amount, memo, gas, gasPrice)
       // const privateKey = this._store.wallet.getPrivateKeyByPath(this._store.account.activeAccount.path)
       // const transaction = this.createNewTransaction(address, amount, memo, gas, gasPrice)
       // transaction.signTranaction(privateKey, DEFAULT_CHAIN_ID)
@@ -153,7 +159,7 @@ class TransactionStore {
         }
       }
     } catch (err) {
-      // console.error(String(err))
+      console.error(String(err))
       if (err instanceof Errors.NoEnoughBalanceError) {
         return {
           success: false,
@@ -254,7 +260,7 @@ class TransactionStore {
     const amountUnit = Utils.toUnit(amount)
 
     // TODO: confirm default with yc
-    const gasUnit = gas ? gas : '120000'
+    const gasUnit = gas ? gas : '21000'
     const gasPriceUnit = gasPrice ? gasPrice : '1'
 
     const accountAmount = Utils.toUnit(fromAccount.balance)
@@ -271,6 +277,28 @@ class TransactionStore {
       to: address,
       gas: gasUnit,
       gasPrice: gasPriceUnit
+    })
+  }
+
+  createTransaction(
+    fromAddress: string,
+    toAddress: string,
+    valueUnit: string,
+    extraData: string,
+    gas: string,
+    gasPrice: string,
+    nonce: string,
+    hashLock: string
+  ) {
+    return new TransactionModel({
+      nonce,
+      extraData,
+      from: fromAddress,
+      to: toAddress,
+      value: valueUnit,
+      gas,
+      gasPrice,
+      hashLock
     })
   }
 

@@ -817,10 +817,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@dipperin/dipperin.js@^0.4.45":
-  version "0.4.45"
-  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.45.tgz#bd0d96d17fabce1f0548af1e91347ef3c767f001"
-  integrity sha512-E+1kH2CM8lxEw1bqbV5TLILBslCFo/yW3uD9gNwuoPbWQSGQizaj2YCO2GUSKc4Pa/Z2Mo+Q5PBPd32gBBJAsw==
+"@dipperin/dipperin.js@^0.4.46":
+  version "0.4.46"
+  resolved "https://registry.yarnpkg.com/@dipperin/dipperin.js/-/dipperin.js-0.4.46.tgz#952d9b480007c336e96bbd16a24ba21de4a455d3"
+  integrity sha512-Wtm6G+b9HPU3PP3O/4NwzhE8xRB1vqkDIG474/jZhlBm+P0xWmmF2LoqP+eJFD89ggQII0TUgPoLoYeeAt8gdw==
   dependencies:
     axios "^0.18.0"
     bignumber.js "^7.2.1"
@@ -4433,6 +4433,11 @@ eventemitter3@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
   integrity sha512-ivIvhpq/Y0uSjcHDcOIccjmYjGLcP09MFGE7ysAwkAvkXfpZlC985pH2/ui64DKazbTW/4kN3yqozUxlXzI6cA==
+
+eventemitter3@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
+  integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
 
 events@^3.0.0:
   version "3.0.0"

@@ -52,6 +52,13 @@ export const VM_CONTRACT_DB = 'vmContrat'
 export const FAVORITE_CONTRACT = 'favoriteContract'
 export const OWNER_DB = 'owner'
 export const RECEIPT_DB = 'receipt'
+export const MINE_DB = 'mine'
+export const CONFIG_DB = 'config'
+
+export enum CONFIG_TYPE {
+  CHAIN_DATA_DIR,
+  MINER_MNEMONIC
+}
 
 /**
  * Worker
@@ -79,6 +86,19 @@ export const OPEN_DIPPERIN = 'openDipperin'
 export const START_NODE = 'startNode'
 export const STOP_NODE = 'stopNode'
 export const START_SUCCESS = 'startSucces'
+export const START_NODE_FAILURE = 'startNodeFailure'
+export const START_MINER_NODE = 'startMinerNode'
+export const START_MINER_NODE_FAILURE = 'startMinerNodeFailure'
+export const START_MINER_NODE_SUCCESS = 'startMinerNodeSuccess'
+export const DELETE_CSWALLET = 'deleteCSWallet'
+export const DELETE_CSWALLET_SUCCESS = 'deleteCSWalletSuccess'
+export const DIPPERIN_IPC = 'dipperinIpc'
+export const DIPPERIN_IPC_RESPONSE = 'dipperinIpcResponse'
+export const CHAIN_IPC_PATH = 'chainIpcPath'
+export const CHAIN_DATA_DIR = 'chainDataDir'
+export const MOVE_CHAIN_DATA_DIR = 'moveChainDataDir'
+export const CANCEL_DIPPERIN_DOWNLOAD = 'cancelDipperinDownload'
+
 /**
  * node net
  */

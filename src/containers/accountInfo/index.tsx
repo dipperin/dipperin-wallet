@@ -16,7 +16,11 @@ import RootStore from '@/stores/root'
 import { Button, Fab } from '@material-ui/core'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 
-import { sendStartNode, sendStopNode, onStartNodeSuccess } from '@/ipc'
+// import {
+// sendStartNode,
+// sendStopNode,
+// onStartNodeSuccess
+// } from '@/ipc'
 
 import Start from '@/images/reset.png'
 import Stop from '@/images/reset.png'
@@ -60,7 +64,7 @@ export class AccountInfo extends React.Component<Props> {
       }
     )
 
-    onStartNodeSuccess(this.nodeStartSuccess)
+    // onStartNodeSuccess(this.nodeStartSuccess)
   }
 
   componentDidMount() {
@@ -71,13 +75,13 @@ export class AccountInfo extends React.Component<Props> {
     window.removeEventListener('click', this.closeInfo)
   }
 
-  nodeStartSuccess = () => {
-    this.timer = setTimeout(() => {
-      // this.changeLoading(false)
-      // this.changeNodeRunning(true)
-      this.props.root!.reconnect()
-    }, 1000)
-  }
+  // nodeStartSuccess = () => {
+  //   this.timer = setTimeout(() => {
+  //     // this.changeLoading(false)
+  //     // this.changeNodeRunning(true)
+  //     this.props.root!.reconnect()
+  //   }, 1000)
+  // }
 
   @action
   changeNodeRunning = (flag: boolean) => {
@@ -118,12 +122,14 @@ export class AccountInfo extends React.Component<Props> {
     if (this.nodeRuning) {
       // stop node
       this.changeLoading(true)
-      sendStopNode()
-      this.props.root!.stopConnectNode()
+      // sendStopNode()
+      this.props.root!.stopNode()
+      // this.props.root!.stopConnectNode()
     } else {
       // start node
       this.changeLoading(true)
-      sendStartNode()
+      // sendStartNode()
+      this.props.root!.startNode()
     }
   }
 

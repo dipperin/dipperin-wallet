@@ -49,7 +49,7 @@ export class Backup extends React.Component<IBackupProps> {
           <div className={classes.back} onClick={this.goBack}>
             {labels.return}
           </div>
-          <ProcessBar pathname={pathname} />
+          <ProcessBar pathname={pathname} turnFunc={[true, this.goBack, false, () => null]} />
           <p className={classes.title}>{labels.title}</p>
           <p className={classes.hint}>{labels.hint}</p>
         </div>

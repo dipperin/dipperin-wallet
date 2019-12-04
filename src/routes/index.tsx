@@ -22,7 +22,7 @@ import Login from '../containers/login'
 // route config
 import routes from './menuRouteConfig'
 
-import { onUpdateVersion, sendUpdateVersion, onDownloadProgress } from '@/ipc'
+import { onUpdateVersion, sendUpdateVersion, onDownloadProgress, cancelDipperinDownload } from '@/ipc'
 
 // images
 import Logo from '../images/logo.png'
@@ -48,6 +48,8 @@ class Routes extends React.Component<Props> {
   updateStatus: string = ''
   @observable
   progress: number = 0.005
+  @observable
+  cancelDownload: string = ''
 
   @action
   componentDidMount() {
@@ -70,6 +72,8 @@ class Routes extends React.Component<Props> {
     // update dipperin version
     sendUpdateVersion()
     onDownloadProgress(this.updateProgress)
+
+    this.cancelDownload = isChinese ? '取消' : 'Cancel'
   }
 
   @action
@@ -82,6 +86,11 @@ class Routes extends React.Component<Props> {
     if (progress > this.progress) {
       this.progress = progress
     }
+  }
+
+  handleCancelDipperinDownload = () => {
+    cancelDipperinDownload()
+    this.props.loading.downloading = false
   }
 
   render() {
@@ -103,7 +112,14 @@ class Routes extends React.Component<Props> {
             <Route path="/main" component={Main} />
           </Switch>
         </div>
-        {downloading && <Loading title={this.updateStatus} progress={this.progress} />}
+        {downloading && (
+          <Loading
+            title={this.updateStatus}
+            progress={this.progress}
+            onCancel={this.handleCancelDipperinDownload}
+            cancelText={this.cancelDownload}
+          />
+        )}
       </Fragment>
     )
   }

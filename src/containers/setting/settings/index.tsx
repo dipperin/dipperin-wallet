@@ -6,6 +6,8 @@ import { withTranslation, WithTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 import swal from 'sweetalert2'
 import _ from 'lodash'
+import os from 'os'
+import pathModule from 'path'
 
 import PackageJson from '@/../package.json'
 import Loading from '@/components/loading'
@@ -23,21 +25,22 @@ import {
   openTmp,
   setNodeNet,
   updateNode,
-  sendStopNode,
-  sendStartNode,
-  onStartNodeSuccess
+  // sendStopNode,
+  // sendStartNode,
+  // onStartNodeSuccess,
+  cancelDipperinDownload
 } from '@/ipc'
 import WalletStore from '@/stores/wallet'
 // import RootStore from '@/stores/root'
 import AccountStore from '@/stores/account'
-import { isAlpha } from '@/utils'
+import { isAlpha, sleep } from '@/utils'
 import { getCurrentNet, setCurrentNet, setIsRemoteNode } from '@/utils/node'
 import settings from '@/utils/settings'
 import { Button, Fab, WithStyles, withStyles, Tooltip } from '@material-ui/core'
 
 import { I18nCollectionWallet } from '@/i18n/i18n'
 import RootStore from '@/stores/root'
-import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ } from '@/utils/constants'
+import { DEFAULT_NET, VENUS, TEST, LOCAL, NET_HOST_OBJ, CHAIN_DATA_DIR, IS_REMOTE } from '@/utils/constants'
 import SwitchButton from '@/components/switchButton'
 
 import styles from './settingStyle'
@@ -71,6 +74,10 @@ export class Setting extends React.Component<Props> {
   privateKey: string = ''
   @observable
   showTip: boolean = true
+  @observable
+  chainDataDir: string = ''
+
+  chainDataDirInput: HTMLInputElement
 
   constructor(props: Props) {
     super(props)
@@ -98,14 +105,18 @@ export class Setting extends React.Component<Props> {
       }
     })
 
-    onStartNodeSuccess(this.nodeStartSuccess)
+    // onStartNodeSuccess(this.nodeStartSuccess)
+
+    this.setChainDataDir(
+      (settings.get(CHAIN_DATA_DIR) as string) || pathModule.join(os.homedir(), 'tmp', 'dipperin_apps')
+    )
   }
 
-  nodeStartSuccess = () => {
-    setTimeout(() => {
-      this.props.root!.reconnect()
-    }, 1000)
-  }
+  // nodeStartSuccess = () => {
+  //   setTimeout(() => {
+  //     this.props.root!.reconnect()
+  //   }, 1000)
+  // }
 
   @action
   changeAccount = () => {
@@ -120,6 +131,20 @@ export class Setting extends React.Component<Props> {
   @action
   setShowDialog = (flag: boolean) => {
     this.showDialog = flag
+  }
+
+  @action
+  setChainDataDir = (path: string) => {
+    this.chainDataDir = path
+  }
+
+  chainDataDirRef = (instance: HTMLInputElement) => {
+    if (instance) {
+      instance.setAttribute('webkitdirectory', '')
+      instance.setAttribute('directory', '')
+      instance.setAttribute('multiple', '')
+    }
+    this.chainDataDirInput = instance
   }
 
   handleCloseDialog = () => {
@@ -204,7 +229,8 @@ export class Setting extends React.Component<Props> {
     root.toggleIsRemoteNode()
     if (root.isRemoteNode) {
       // stop local node
-      sendStopNode()
+      // sendStopNode()
+      this.props.root.stopNode()
       // default select REMOTE_MECURY
       if (this.netEnv in NET_HOST_OBJ) {
         this.selectRemote(this.netEnv)
@@ -245,7 +271,7 @@ export class Setting extends React.Component<Props> {
     // this.netEnv = VENUS
     // update net in settings
     setCurrentNet(this.netEnv)
-    sendStartNode()
+    this.props.root.startNode()
     this.props.root.reconnect()
   }
 
@@ -355,6 +381,34 @@ export class Setting extends React.Component<Props> {
     this.showTip = false
   }
 
+  handleChangeDir = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files)
+    if (e.target.files && e.target.files.length > 0) {
+      this.setChainDataDir(e.target.files[0].path)
+      settings.set(CHAIN_DATA_DIR, e.target.files[0].path)
+      if (!settings.get(IS_REMOTE)) {
+        this.props.root.stopNode()
+        // sendStopNode()
+        // this.props.root!.stopConnectNode()
+        await sleep(1000)
+        // sendStartNode()
+        this.props.root.startNode()
+      }
+    }
+  }
+
+  handleSelectChangeDir = () => {
+    if (this.chainDataDirInput) {
+      this.chainDataDirInput.click()
+    }
+  }
+
+  @action
+  handleCancelDownload = () => {
+    cancelDipperinDownload()
+    this.loading = false
+  }
+
   render() {
     const {
       labels,
@@ -388,6 +442,19 @@ export class Setting extends React.Component<Props> {
               <p>
                 {labels.about.label.version} : {PackageJson.version}
               </p>
+            </div>
+            <div className={classes.dirSelectorBox}>
+              <p>{labels.left.dataDir}</p>
+              <input
+                type="file"
+                onChange={this.handleChangeDir}
+                ref={this.chainDataDirRef}
+                style={{ opacity: 0, zIndex: -1, width: 1, height: 1, position: 'absolute', left: 100 }}
+              />
+              <div className={classes.dirSelector} onClick={this.handleSelectChangeDir}>
+                {this.chainDataDir}
+                <div className={classes.selectorIcon} />
+              </div>
             </div>
           </div>
           <div className={classes.right}>
@@ -442,10 +509,10 @@ export class Setting extends React.Component<Props> {
                 </span>
               </div>
             )}
-            <p className={classes.title} style={{ position: 'absolute', top: '150px' }}>
+            <p className={classes.title} style={{ position: 'absolute', top: '170px' }}>
               {labels.walletManagement}
             </p>
-            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '190px' }}>
+            <div className={classes.aboutInfo} style={{ position: 'absolute', top: '210px' }}>
               {/* <div>
                 <p>{t('about.label.developer')}:</p>
                 <p>{t('about.value.developer')}</p>
@@ -505,7 +572,14 @@ export class Setting extends React.Component<Props> {
           )}
         </div>
         {this.showAccounts && <Accounts handleClose={this.handleClose} history={this.props.history} />}
-        {this.loading && <Loading title={labels.loading} progress={this.progress} />}
+        {this.loading && (
+          <Loading
+            title={labels.loading}
+            progress={this.progress}
+            onCancel={this.handleCancelDownload}
+            cancelText={this.props.labels.swal.cancel}
+          />
+        )}
         {this.showDialog && <PasswordConfirm onClose={this.handleCloseDialog} onConfirm={this.handleDialogConfirm} />}
         {this.showPrivateKey && (
           <DialogConfirm
@@ -533,3 +607,13 @@ const SettingWrap = (props: WrapProps & WithTranslation) => {
 export default withTranslation()(SettingWrap)
 
 // export default withStyles(styles)(withNamespaces('setting')(Setting))
+
+// export const mockFile = {
+//   lastModified: 1564729958000,
+//   lastModifiedDate: 'Fri Aug 02 2019 15:12:38 GMT+0800 (CST)',
+//   name: 'build',
+//   path: '/home/liuboheng/Desktop/chrome-extension/build',
+//   size: 4096,
+//   type: '',
+//   webkitRelativePath: 'chrome-extension/build'
+// }
