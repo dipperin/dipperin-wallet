@@ -78,7 +78,8 @@ export const zhCN = {
       left: {
         title: '设置',
         info: '设置您的钱包账户信息',
-        dataDir: '数据储存路径'
+        dataDir: '数据储存路径',
+        moving: '数据迁移中'
       },
       net: {
         title: '选择本地节点',
@@ -136,6 +137,14 @@ export const zhCN = {
         documentTitle: 'Dipperin 钱包',
         copySuccess: '复制成功',
         incorrectPassword: '密码错误'
+      },
+      dataDirPop: {
+        title: '确认存储路径',
+        info: '您的主链数据存储路径将变更，有以下两种数据存储路径变更方式，请选择：',
+        option1: '只变更数据存储路径，不迁移数据，需要重新同步区块高度；',
+        option2: '变更数据存储路径的同时迁移数据，数据迁移的过程中，请勿关闭电脑、钱包软件，避免数据丢失影响钱包使用。',
+        cancel: 'Cancel',
+        confirm: 'Confirm'
       }
     }
   },
@@ -604,7 +613,8 @@ export const enUS: I18nCollection = {
       left: {
         title: 'Setting',
         info: 'Set up your wallet infomation',
-        dataDir: 'Chain Data Dictionary'
+        dataDir: 'Chain Data Dictionary',
+        moving: 'Data moving'
       },
       net: {
         title: 'Select Local Node',
@@ -665,6 +675,15 @@ export const enUS: I18nCollection = {
         documentTitle: 'Dipperin Wallet',
         copySuccess: 'Copy Success',
         incorrectPassword: 'Incorrect password'
+      },
+      dataDirPop: {
+        // TODO
+        title: '确认存储路径',
+        info: '您的主链数据存储路径将变更，有以下两种数据存储路径变更方式，请选择：',
+        option1: '只变更数据存储路径，不迁移数据，需要重新同步区块高度；',
+        option2: '变更数据存储路径的同时迁移数据，数据迁移的过程中，请勿关闭电脑、钱包软件，避免数据丢失影响钱包使用。',
+        cancel: 'Cancel',
+        confirm: 'Confirm'
       }
     }
   },

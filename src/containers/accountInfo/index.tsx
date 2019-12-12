@@ -145,7 +145,7 @@ export class AccountInfo extends React.Component<Props> {
     const { classes, labels, changeAccount, account, root } = this.props
     // const { blockInfo } = wallet!
     const { activeAccount } = account!
-    const { isRemoteNode } = root!
+    const { isRemoteNode, isMovingData } = root!
     if (!activeAccount) {
       return null
     }
@@ -179,7 +179,7 @@ export class AccountInfo extends React.Component<Props> {
           <p>{activeAccount.address}</p>
         </div>
         <div className={classes.btnWrap}>
-          {!isRemoteNode && (
+          {!isRemoteNode && !isMovingData && (
             <div className={classNames(classes.btnItem, classes.nodeSwitch)}>
               <Fab
                 className={classNames(classes.btn, { [classes.running]: this.nodeRuning })}

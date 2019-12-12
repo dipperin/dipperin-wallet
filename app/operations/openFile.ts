@@ -1,4 +1,4 @@
-import { shell } from 'electron'
+import { shell, Event } from 'electron'
 import settings from 'electron-settings'
 import log from 'electron-log'
 import os from 'os'
@@ -6,17 +6,19 @@ import path from 'path'
 import fs from 'fs'
 import fsExtra from 'fs-extra'
 import util from 'util'
+import rimraf from 'rimraf'
 
 import dipperinPath from '../utils/dipperinPath'
 import { getNodeEnv, CHAIN_DATA_DIR } from './runDipperin'
+import { MOVE_DATA_STATUS } from '../ipc'
 
 const fsExists = util.promisify(fs.stat)
 const noop = () => null
 
 export const openTmp = () => {
   const net: string = settings.get('netEnv') as string
-  const appDir = settings.get(CHAIN_DATA_DIR) as string|undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
-  const chainDataDir =path.join(appDir, `${getNodeEnv(net)}`, `wallet`) 
+  const appDir = settings.get(CHAIN_DATA_DIR) as string | undefined || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+  const chainDataDir = path.join(appDir, `${getNodeEnv(net)}`, `wallet`)
   const chainLogPath = path.join(`${chainDataDir}`, `dipperin.log`)
 
   shell.showItemInFolder(chainLogPath)
@@ -47,13 +49,37 @@ export const getChainDataDir = () => {
  * @param oldPath
  * @param newPath
  */
-export const moveFiles = (oldPath: string, newPath: string) => {
-  fsExtra.move(oldPath, newPath, err => {
+export const moveFiles = (newPath: string, event: Event) => {
+  const oldChainDataDir = settings.get(CHAIN_DATA_DIR) as string || path.join(os.homedir(), `tmp`, `dipperin_apps`)
+  const oldPath = path.join(oldChainDataDir)
+  log.info('start mv chain data')
+  if(fs.existsSync(newPath)) {
+    // remove exist dir
+    rimraf(newPath, () => {
+      log.info('remove exist dir')
+      moveToEmptyDir(oldPath, newPath, event)
+    })
+  } else {
+    moveToEmptyDir(oldPath, newPath, event)
+  }
+}
+
+/**
+ * move dir to en empty dir
+ * @param oldPath 
+ * @param newPath 
+ */
+const moveToEmptyDir = (oldPath: string, newPath: string, event: Event) => {
+  fs.rename(oldPath, newPath, (err) => {
     if (err) {
+      log.info('move failure')
       log.error(err)
+      event.sender.send(MOVE_DATA_STATUS, false) 
+      return
     }
-    log.info('move files success!')
-  })
+    log.info('move success')
+    event.sender.send(MOVE_DATA_STATUS, true) 
+  })  
 }
 
 
