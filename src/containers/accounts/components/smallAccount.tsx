@@ -29,9 +29,7 @@ export class SmallAccount extends React.Component<SmalllAccountPropss> {
         className={classNames(classes.item, account.id === selectedId ? classes.selected : '')}
         onClick={this.changeAccount}
       >
-        <p className={classes.smallAccountName}>
-          {labels.account} {account.id}
-        </p>
+        <p className={classes.smallAccountName}>{account.name ? account.name : `${labels.account} ${account.id}`}</p>
         <div className={classes.smallId}>{account.id}</div>
         <p className={classes.smallBalance}>{account.balance}</p>
         <p className={classes.smallDip}>DIP</p>

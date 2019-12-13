@@ -163,9 +163,7 @@ export class AccountInfo extends React.Component<Props> {
           </div>
         </Button>
         <div className={classes.right} id="selector1">
-          <p>
-            {labels.account} {activeAccount.id}
-          </p>
+          <p>{activeAccount.name ? activeAccount.name : `${labels.account} ${activeAccount.id}`}</p>
           <p>
             {this.formatNumber(Number(activeAccount.balance), 6)}
             <span>&nbsp;&nbsp;DIP</span>

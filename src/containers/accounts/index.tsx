@@ -6,6 +6,7 @@ import { WithTranslation, withTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router'
 // import _ from 'lodash'
 import throttle from 'lodash/throttle'
+import swal from 'sweetalert2'
 
 import AccountStore from '@/stores/account'
 import { Button } from '@material-ui/core'
@@ -18,6 +19,7 @@ import SmallAccountList from './components/smallAccountList'
 import BigAccountList from './components/bigAccountList'
 import PrivateConfirm from '@/components/privateKeyImport'
 import { TxResponseCode, TxResponseInfo } from '@/utils/errors'
+import DialogConfirm from '@/components/dialogConfirm'
 
 import Close from '@/images/close.png'
 import Left from '@/images/left.png'
@@ -50,6 +52,9 @@ export class Accounts extends React.Component<Props> {
   smallListPage: number = 1
   @observable
   showPrivateKeyModal = false
+  @observable
+  isShowDialogConfirm: boolean = false
+  @observable accountToUpdate: AccountModel | null = null
 
   constructor(props: Props) {
     super(props)
@@ -65,6 +70,32 @@ export class Accounts extends React.Component<Props> {
         this.changeAccount(id)
       }
     )
+  }
+
+  @action
+  showDialogConfirm = (account: AccountModel): void => {
+    this.accountToUpdate = account
+    this.isShowDialogConfirm = true
+  }
+  @action
+  hideDialogConfirm = (): void => {
+    this.isShowDialogConfirm = false
+  }
+  @action
+  handleUpdateNameConfirm = async (value: string) => {
+    const val = value.trim().replace(/\s+/g, ' ') // 去掉前后空格 把联系空格替换为一个
+    const { updateAccount } = this.props.account!
+    this.accountToUpdate!.updateAccountName(val)
+    await updateAccount(this.accountToUpdate!)
+    this.hideDialogConfirm()
+    this.showAccounts(this.selectedId)
+
+    swal.fire({
+      showCloseButton: false,
+      type: 'success',
+      timer: 1500,
+      title: this.props.labels.changeSuccess
+    })
   }
 
   @action
@@ -94,6 +125,7 @@ export class Accounts extends React.Component<Props> {
   /**
    * get current big accounts
    */
+  @action
   getBigAccounts = (id: string, accounts: AccountModel[]) => {
     const accountLength = accounts.length
     return accounts.filter(item => {
@@ -251,6 +283,7 @@ export class Accounts extends React.Component<Props> {
       activeAccount: { id }
     } = account!
     const smallListWidth = this.getSmallListWidth(accounts.length)
+    const defaultName = this.accountToUpdate && this.accountToUpdate.name ? this.accountToUpdate.name : ''
     return (
       <div className={classes.changeAccount}>
         <div className={classes.shadow}>
@@ -276,6 +309,7 @@ export class Accounts extends React.Component<Props> {
             activeId={id}
             handleChangeActiveAccount={this.handleChangeActiveAccount}
             accounts={this.bigAccounts}
+            showDialogConfirm={this.showDialogConfirm}
           />
 
           <div className={classes.accountsList}>
@@ -312,6 +346,17 @@ export class Accounts extends React.Component<Props> {
             title={labels.title}
             label={labels.label}
             tips={this.props.labels}
+          />
+        )}
+        {/* 修改账户名字弹窗 */}
+        {this.isShowDialogConfirm && (
+          <DialogConfirm
+            onClose={this.hideDialogConfirm}
+            onConfirm={this.handleUpdateNameConfirm}
+            title={this.props.labels.accountName}
+            label={this.props.labels.accountName}
+            btnText={this.props.labels.confirm}
+            defaultVal={defaultName}
           />
         )}
       </div>

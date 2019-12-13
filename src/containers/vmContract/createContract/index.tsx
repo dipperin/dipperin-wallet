@@ -447,7 +447,6 @@ export class CreateContract extends React.Component<IProps> {
       const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
-        console.log(`getAbi`, abi)
         this.setStringField(`abi:${contractAddress.toLocaleLowerCase()}`, abi)
       }
     }

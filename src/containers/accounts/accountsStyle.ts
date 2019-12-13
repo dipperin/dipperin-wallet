@@ -119,6 +119,21 @@ const styles = createStyles({
     lineHeight: '20px',
     wordBreak: 'break-all'
   },
+  edit: {
+    verticalAlign: 'middle',
+    display: 'inline-block',
+    width: 18,
+    height: 18,
+    minHeight: 0,
+    minWidth: 0,
+    padding: 0,
+    marginLeft: 10,
+    '& img': {
+      width: 14,
+      height: 14,
+      marginBottom: 2
+    }
+  },
   copy: {
     display: 'block',
     width: 18,

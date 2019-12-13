@@ -7,26 +7,25 @@ import { I18nCollectionAccount } from '@/i18n/i18n'
 import styles from '../accountsStyle'
 
 import Copy from '@/images/copy.png'
+import Edit from '@/images/edit.png'
 
 interface BigAccountProps extends WithStyles<typeof styles> {
   account: AccountModel
   activeId: string
   handleChangeActiveAccount: (id: string) => void
   labels: I18nCollectionAccount['accounts']
+  showDialogConfirm: (account: AccountModel) => void
 }
-
 export class BigAccount extends React.Component<BigAccountProps> {
   handleChangeActiveAccount = () => {
     this.props.handleChangeActiveAccount(this.props.account.id)
   }
-
   copyAddress = (address: string, e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation()
     const input = document.createElement('input')
     document.body.appendChild(input)
     input.setAttribute('value', address)
     input.select()
-    console.log(input)
     if (document.execCommand('copy')) {
       document.execCommand('copy')
       swal.fire({
@@ -37,6 +36,11 @@ export class BigAccount extends React.Component<BigAccountProps> {
       })
     }
     document.body.removeChild(input)
+  }
+  editAccountName = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    const { showDialogConfirm, account } = this.props
+    e.stopPropagation()
+    showDialogConfirm(account)
   }
 
   formatNumber = (num: number, w: number) => {
@@ -49,10 +53,14 @@ export class BigAccount extends React.Component<BigAccountProps> {
 
   render() {
     const { classes, account, activeId, labels } = this.props
+    const defaultName = account.name ? account.name : `${labels.account}${account.id}`
     return (
       <div className={classNames(classes.bigItem, 'tour-account')} onClick={this.handleChangeActiveAccount}>
         <p className={classes.bigAccountName}>
-          {labels.account} {account.id}
+          <span>{defaultName}</span>
+          <Button className={classes.edit} onClick={this.editAccountName}>
+            <img src={Edit} alt="edit" title="edit" />
+          </Button>
         </p>
         <div className={classNames(classes.bigId, { ['small-font']: String(account.id).length > 2 })}>{account.id}</div>
         <p className={classes.bigBalance} title={account.balance}>

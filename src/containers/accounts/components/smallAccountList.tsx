@@ -1,5 +1,6 @@
 import React from 'react'
 import { I18nCollectionAccount } from '@/i18n/i18n'
+import { observer } from 'mobx-react'
 
 import AccountModel from '@/models/account'
 import SmallAccount from './smallAccount'
@@ -12,6 +13,7 @@ interface Props {
   changeAccount: (id: string) => void
 }
 
+@observer
 export class SmallAccountList extends React.Component<Props> {
   render() {
     const { labels, changeAccount, selectedId, activeId, accounts } = this.props

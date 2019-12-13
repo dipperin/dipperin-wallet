@@ -17,7 +17,8 @@ describe('smallAccount', () => {
   const mockAccount = new AccountModel(
     'sqEVSm4jZaNAegxA',
     "m/44'/709394'/0'/0/1",
-    '0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37'
+    '0x0000b4293d60F051936beDecfaE1B85d5A46d377aF37',
+    ''
   )
   const labels = i18n['zh-CN'].account.accounts
   const classes = mockStyleClasses(styles)
