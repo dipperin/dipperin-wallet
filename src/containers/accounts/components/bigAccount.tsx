@@ -2,12 +2,13 @@ import React from 'react'
 import classNames from 'classnames'
 import AccountModel from '@/models/account'
 import { withStyles, WithStyles, Button } from '@material-ui/core'
+import DropButtons from '@/components/dropButtons'
 import swal from 'sweetalert2'
 import { I18nCollectionAccount } from '@/i18n/i18n'
 import styles from '../accountsStyle'
 
 import Copy from '@/images/copy.png'
-import Edit from '@/images/edit.png'
+// import Edit from '@/images/edit.png'
 
 interface BigAccountProps extends WithStyles<typeof styles> {
   account: AccountModel
@@ -38,17 +39,15 @@ export class BigAccount extends React.Component<BigAccountProps> {
     }
     document.body.removeChild(input)
   }
-  editAccountName = (e: React.MouseEvent<HTMLButtonElement>): void => {
+  editAccountName = (): void => {
     const { showDialogConfirm, account } = this.props
-    e.stopPropagation()
     showDialogConfirm(account)
   }
-  removeAccount = (e: React.MouseEvent<HTMLButtonElement>) => {
+  removeAccount = () => {
     const {
       account: { id },
       deleteAccount
     } = this.props
-    e.stopPropagation()
     deleteAccount(id)
   }
 
@@ -59,21 +58,31 @@ export class BigAccount extends React.Component<BigAccountProps> {
       maximumFractionDigits: w
     })
   }
+  handleFunc = () => {
+    console.log('....')
+  }
 
   render() {
     const { classes, account, activeId, labels } = this.props
     const defaultName = account.name ? account.name : `${labels.account}${account.id}`
+    const btnArr = [
+      {
+        label: labels.modifyName,
+        handleFunc: this.editAccountName
+      },
+      {
+        label: labels.deleteAccount,
+        handleFunc: this.removeAccount
+      }
+    ]
     return (
       <div className={classNames(classes.bigItem, 'tour-account')} onClick={this.handleChangeActiveAccount}>
-        <p className={classes.bigAccountName}>
+        <div className={classes.moreWrap}>
+          <DropButtons btnArray={btnArr} />
+        </div>
+        <div className={classes.bigAccountName}>
           <span>{defaultName}</span>
-          <Button className={classes.edit} onClick={this.editAccountName}>
-            <img src={Edit} alt="edit" title="edit" />
-          </Button>
-          <Button className={classes.edit} onClick={this.removeAccount}>
-            <img src={Edit} alt="edit" title="edit" />
-          </Button>
-        </p>
+        </div>
         <div className={classNames(classes.bigId, { ['small-font']: String(account.id).length > 2 })}>{account.id}</div>
         <p className={classes.bigBalance} title={account.balance}>
           {this.formatNumber(Number(account.balance), 6)}

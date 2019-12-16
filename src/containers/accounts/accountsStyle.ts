@@ -82,6 +82,12 @@ const styles = createStyles({
     textAlign: 'center',
     cursor: 'pointer'
   },
+  moreWrap: {
+    position: 'absolute',
+    width: 20,
+    right: 10,
+    top: 10
+  },
   bigAccountName: {
     fontSize: 16,
     fontWeight: 'bold',
