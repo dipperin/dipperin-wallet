@@ -27,7 +27,8 @@ describe('SmallAccountList', () => {
     labels,
     classes,
     changeAccount,
-    selectedId: '0x',
+    index: 10,
+    selectedIndex: 10,
     activeId: '0x0000000001',
     accounts: mockAccounts,
     ...routerProps
