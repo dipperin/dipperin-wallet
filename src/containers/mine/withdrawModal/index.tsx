@@ -90,7 +90,7 @@ export class WithdrawModal extends React.Component<IProps> {
       }
       swal.fire({
         text: this.props.labels.success,
-        type: 'success',
+        icon: 'success',
         // confirmButtonText: labels.swal.confirm,
         timer: 3000
       })
@@ -126,7 +126,7 @@ export class WithdrawModal extends React.Component<IProps> {
           text = e.message
       }
       swal.fire({
-        type: 'error',
+        icon: 'error',
         timer: 3000,
         text
       })

@@ -15,6 +15,7 @@ interface BigAccountProps extends WithStyles<typeof styles> {
   handleChangeActiveAccount: (id: string) => void
   labels: I18nCollectionAccount['accounts']
   showDialogConfirm: (account: AccountModel) => void
+  deleteAccount: (id: string) => void
 }
 export class BigAccount extends React.Component<BigAccountProps> {
   handleChangeActiveAccount = () => {
@@ -30,7 +31,7 @@ export class BigAccount extends React.Component<BigAccountProps> {
       document.execCommand('copy')
       swal.fire({
         showCloseButton: false,
-        type: 'success',
+        icon: 'success',
         timer: 1500,
         title: this.props.labels.copySuccess
       })
@@ -41,6 +42,14 @@ export class BigAccount extends React.Component<BigAccountProps> {
     const { showDialogConfirm, account } = this.props
     e.stopPropagation()
     showDialogConfirm(account)
+  }
+  removeAccount = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const {
+      account: { id },
+      deleteAccount
+    } = this.props
+    e.stopPropagation()
+    deleteAccount(id)
   }
 
   formatNumber = (num: number, w: number) => {
@@ -59,6 +68,9 @@ export class BigAccount extends React.Component<BigAccountProps> {
         <p className={classes.bigAccountName}>
           <span>{defaultName}</span>
           <Button className={classes.edit} onClick={this.editAccountName}>
+            <img src={Edit} alt="edit" title="edit" />
+          </Button>
+          <Button className={classes.edit} onClick={this.removeAccount}>
             <img src={Edit} alt="edit" title="edit" />
           </Button>
         </p>

@@ -89,7 +89,7 @@ export class Setting extends React.Component<Props> {
       () => {
         this.closeLoading()
         swal.fire({
-          type: 'success',
+          icon: 'success',
           title: labels.swal.updateSuccess,
           timer: 1000
         })
@@ -162,7 +162,7 @@ export class Setting extends React.Component<Props> {
       showConfirmButton: true,
       cancelButtonText: labels.swal.cancel,
       confirmButtonText: labels.swal.confirm,
-      type: 'warning',
+      icon: 'warning',
       text: labels.swal.warnText,
       title: labels.swal.warn,
       reverseButtons: true
@@ -180,7 +180,7 @@ export class Setting extends React.Component<Props> {
     const { labels, root } = this.props
     const res = await swal.fire({
       text: labels.swal.startUpdate,
-      type: 'warning',
+      icon: 'warning',
       showConfirmButton: true,
       showCancelButton: true,
       cancelButtonText: labels.swal.cancel,
@@ -353,7 +353,7 @@ export class Setting extends React.Component<Props> {
       this.handleShowPrivateKey()
     } else {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: this.props.labels.swal.incorrectPassword,
         timer: 1000
       })

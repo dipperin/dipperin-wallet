@@ -80,8 +80,8 @@ export default class AccountStore {
       console.error(err)
     }
   }
-
-  async removeAccountAsync(id: string): Promise<Error | void> {
+  @action
+  removeAccountAsync = async (id: string): Promise<Error | void> => {
     try {
       this._accountMap.delete(id)
       await removeAccount(Number(id))

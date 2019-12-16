@@ -266,7 +266,10 @@ export const zhCN = {
       importErrorTitle: '导入失败',
       importError: '请输入正确私钥!',
       addressReimportError: '导入账户已存在!',
-      changeSuccess: '修改成功'
+      changeSuccess: '修改成功',
+      deleteAccountTitle: '确认删除账户',
+      deleteAccountText: '删除的账户将无法找回，请确保当前账户内的资产已全部转移。',
+      deleteSuccess: '账户已删除'
     },
     account: {
       transfer: '转账',
@@ -798,7 +801,10 @@ export const enUS: I18nCollection = {
       importErrorTitle: 'Import Failure',
       importError: 'Please enter correct private key!',
       addressReimportError: 'The account has already existed.',
-      changeSuccess: 'Update Success'
+      changeSuccess: 'Update Success',
+      deleteAccountTitle: '确认删除账户',
+      deleteAccountText: '删除的账户将无法找回，请确保当前账户内的资产已全部转移。',
+      deleteSuccess: '账户已删除'
     },
     account: {
       transfer: 'Transfer',

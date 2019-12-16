@@ -30,6 +30,7 @@ describe('BigAccountList', () => {
     activeId: '0x0000000001',
     accounts: mockAccounts,
     showDialogConfirm: jest.fn(),
+    deleteAccount: jest.fn(),
     ...routerProps
   }
 

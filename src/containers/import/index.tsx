@@ -72,7 +72,7 @@ export class Import extends React.Component<IImportProps> {
         if (this.props.wallet.isHaveWallet) {
           if (this.props.wallet.isUnlock) {
             await swal.fire({
-              type: 'success',
+              icon: 'success',
               title: labels.swal.success,
               confirmButtonText: labels.swal.confirm,
               timer: 1000
@@ -215,7 +215,7 @@ export class Import extends React.Component<IImportProps> {
     const errInfo = this.verifyInputs(this.mnemonic, this.password, this.repeatPassword, labels)
     if (errInfo) {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: errInfo,
         confirmButtonText: labels.swal.confirm
       })
@@ -227,7 +227,7 @@ export class Import extends React.Component<IImportProps> {
     // this.props.account.changeActiveAccount("1")
     if (err) {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: err.message
       })
       return

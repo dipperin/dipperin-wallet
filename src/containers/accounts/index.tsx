@@ -42,7 +42,7 @@ const CONTAINER_WIDTH = S_AMOUNT * S_WIDTH + (S_AMOUNT - 1) * S_MARGIN // 816
 @observer
 export class Accounts extends React.Component<Props> {
   @observable
-  selectedId: string = '1'
+  selectedIndex: number = 0
   // show big accounts
   @observable
   bigAccounts: AccountModel[] = []
@@ -63,11 +63,12 @@ export class Accounts extends React.Component<Props> {
 
   @action
   init = () => {
-    this.changeAccount(this.props.account!.activeAccount.id)
+    const index = this.props.account!.accounts.findIndex(item => item.id === this.props.account!.activeAccount.id)
+    this.changeAccount(index)
     reaction(
-      () => this.props.account!.activeAccount.id,
-      id => {
-        this.changeAccount(id)
+      () => this.props.account!.accounts.findIndex(item => item.id === this.props.account!.activeAccount.id),
+      idx => {
+        this.changeAccount(idx)
       }
     )
   }
@@ -81,6 +82,7 @@ export class Accounts extends React.Component<Props> {
   hideDialogConfirm = (): void => {
     this.isShowDialogConfirm = false
   }
+
   @action
   handleUpdateNameConfirm = async (value: string) => {
     const val = value.trim().replace(/\s+/g, ' ') // 去掉前后空格 把联系空格替换为一个
@@ -88,14 +90,39 @@ export class Accounts extends React.Component<Props> {
     this.accountToUpdate!.updateAccountName(val)
     await updateAccount(this.accountToUpdate!)
     this.hideDialogConfirm()
-    this.showAccounts(this.selectedId)
+    this.showAccounts(this.selectedIndex)
 
     swal.fire({
       showCloseButton: false,
-      type: 'success',
+      icon: 'success',
       timer: 1500,
       title: this.props.labels.changeSuccess
     })
+  }
+
+  @action
+  deleteAccount = async (id: string) => {
+    const { removeAccountAsync } = this.props.account!
+
+    const result = await swal.fire({
+      icon: 'warning',
+      title: this.props.labels.deleteAccountTitle,
+      text: this.props.labels.deleteAccountText,
+      showCancelButton: true,
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    })
+
+    if (result.value) {
+      await removeAccountAsync(id)
+      this.showAccounts(this.selectedIndex)
+      swal.fire({
+        icon: 'success',
+        text: this.props.labels.deleteSuccess,
+        timer: 1500
+      })
+    }
   }
 
   @action
@@ -115,25 +142,25 @@ export class Accounts extends React.Component<Props> {
    * show big accounts & small accounts
    */
   @action
-  showAccounts = (id: string) => {
+  showAccounts = (index: number) => {
     const { account } = this.props
     const { accounts } = account!
-    this.selectAccount(id)
-    this.bigAccounts = this.getBigAccounts(id, accounts)
+    this.selectAccount(index)
+    this.bigAccounts = this.getBigAccounts(index, accounts)
   }
 
   /**
    * get current big accounts
    */
   @action
-  getBigAccounts = (id: string, accounts: AccountModel[]) => {
+  getBigAccounts = (index: number, accounts: AccountModel[]) => {
     const accountLength = accounts.length
-    return accounts.filter(item => {
+    return accounts.filter((_, idx) => {
       // active id is the last/first one
-      if ((Number(id) === accountLength || Number(id) === 1) && Math.abs(Number(item.id) - Number(id)) < 3) {
+      if ((index === accountLength - 1 || index === 0) && Math.abs(idx - index) < 3) {
         return true
       }
-      if (Math.abs(Number(item.id) - Number(id)) < 2) {
+      if (Math.abs(idx - index) < 2) {
         return true
       }
 
@@ -175,9 +202,9 @@ export class Accounts extends React.Component<Props> {
   }
 
   @action
-  changeAccount = (id: string) => {
-    this.selectedId = id
-    this.showAccounts(id)
+  changeAccount = (index: number) => {
+    this.selectedIndex = index
+    this.showAccounts(index)
   }
 
   computeMiddleAccount = (accountLength: number, samllListLeft: number): number | undefined => {
@@ -196,7 +223,8 @@ export class Accounts extends React.Component<Props> {
     const { accounts } = this.props.account!
     const middleAccount = this.computeMiddleAccount(accounts.length, this.smallListLeft)
     if (middleAccount) {
-      this.selectedId = String(middleAccount)
+      this.selectedIndex = middleAccount
+      this.showAccounts(this.selectedIndex)
     }
   }
 
@@ -251,26 +279,27 @@ export class Accounts extends React.Component<Props> {
    * show small accounts by id
    */
   @action
-  selectAccount = (id: string) => {
+  selectAccount = (index: number) => {
     const { accounts } = this.props.account!
-    const computedLeft = this.computeLeftBySelectId(accounts.length, Number(id))
+    const computedLeft = this.computeLeftBySelectId(accounts.length, index)
     this.smallListLeft = computedLeft
   }
 
-  computeLeftBySelectId = (accountLength: number, id: number): number => {
+  computeLeftBySelectId = (accountLength: number, index: number): number => {
     const smallListWidth = this.getSmallListWidth(accountLength)
+    // const index = this.props.account!.accounts.findIndex(item=>Number(item.id)===id)
 
     const halfAmount = Math.floor(S_AMOUNT / 2)
     const totalAmount = accountLength
     if (totalAmount < S_AMOUNT) {
       return 0
     } else {
-      if (id - 1 <= halfAmount) {
+      if (index - 1 <= halfAmount) {
         return 0
-      } else if (totalAmount - id <= halfAmount) {
+      } else if (totalAmount - index <= halfAmount) {
         return CONTAINER_WIDTH - smallListWidth
       } else {
-        return -(id - 1 - halfAmount) * ITEM_WIDTH
+        return -(index - 1 - halfAmount) * ITEM_WIDTH
       }
     }
   }
@@ -310,6 +339,7 @@ export class Accounts extends React.Component<Props> {
             handleChangeActiveAccount={this.handleChangeActiveAccount}
             accounts={this.bigAccounts}
             showDialogConfirm={this.showDialogConfirm}
+            deleteAccount={this.deleteAccount}
           />
 
           <div className={classes.accountsList}>
@@ -331,7 +361,7 @@ export class Accounts extends React.Component<Props> {
                 <SmallAccountList
                   accounts={accounts}
                   labels={labels}
-                  selectedId={this.selectedId}
+                  selectedIndex={this.selectedIndex}
                   activeId={id}
                   changeAccount={this.changeAccount}
                 />

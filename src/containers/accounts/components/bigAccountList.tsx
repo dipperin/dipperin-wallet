@@ -14,12 +14,21 @@ interface Props extends WithStyles {
   activeId: string
   handleChangeActiveAccount: (id: string) => void
   showDialogConfirm: (account: AccountModel) => void
+  deleteAccount: (id: string) => void
 }
 
 @observer
 export class BigAccountList extends React.Component<Props> {
   render() {
-    const { classes, labels, handleChangeActiveAccount, activeId, accounts, showDialogConfirm } = this.props
+    const {
+      classes,
+      labels,
+      handleChangeActiveAccount,
+      activeId,
+      accounts,
+      showDialogConfirm,
+      deleteAccount
+    } = this.props
     return (
       <div className={classes.bigList}>
         {accounts.map((account, index) => {
@@ -31,6 +40,7 @@ export class BigAccountList extends React.Component<Props> {
               activeId={activeId}
               handleChangeActiveAccount={handleChangeActiveAccount}
               showDialogConfirm={showDialogConfirm}
+              deleteAccount={deleteAccount}
             />
           )
         })}
