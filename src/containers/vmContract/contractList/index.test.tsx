@@ -51,7 +51,7 @@ describe('contractList', () => {
     const mockHistoryPush = jest.fn()
     mockRouterProps.history.push = mockHistoryPush
     instance.jumpToCall('0x01')
-    expect(mockHistoryPush).toHaveBeenCalled()
+    expect(mockProps.vmContract.setPath).toHaveBeenCalled()
   })
 
   it('jumpToCreate', () => {

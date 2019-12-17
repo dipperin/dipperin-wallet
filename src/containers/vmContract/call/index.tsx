@@ -168,7 +168,7 @@ export class Call extends React.Component<IProps> {
       if (callRes.success) {
         await swal.fire({
           title: labels.callDialog.callSuccess,
-          type: 'success',
+          icon: 'success',
           timer: 1000
         })
         this.handleCloseDialog()
@@ -193,12 +193,12 @@ export class Call extends React.Component<IProps> {
         await swal.fire({
           title: labels.callDialog.callFail,
           text: errorText,
-          type: 'error'
+          icon: 'error'
         })
       }
     } else {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: labels.callDialog.incorrectPassword
       })
     }

@@ -41,6 +41,7 @@ const sidebarStyle = theme =>
     logo: {
       position: 'relative',
       padding: '24px 0 28px',
+      cursor: 'pointer',
       '& .blockInfo': {
         position: 'absolute',
         opacity: 0,
@@ -48,6 +49,9 @@ const sidebarStyle = theme =>
         top: 40,
         width: 0,
         height: 0,
+        // opacity: 1,
+        // width: 248,
+        // height: 240,
         background: '#fff',
         transition: 'all 1s cubic-bezier(0.07, 0.7, 0.2, 1)',
         borderRadius: '10px',
@@ -55,13 +59,18 @@ const sidebarStyle = theme =>
         overflow: 'hidden',
         boxShadow: '0 0 5px 5px rgba(0,0,0,0.05)'
       },
-      '&:hover': {
-        '& .blockInfo': {
-          opacity: 1,
-          width: 248,
-          height: 240
-        }
+      '& .activeInfo': {
+        opacity: 1,
+        width: 248,
+        height: 240
       }
+      // '&:hover': {
+      //   '& .blockInfo': {
+      //     opacity: 1,
+      //     width: 248,
+      //     height: 240
+      //   }
+      // }
     },
     infoDetail: {
       width: 248,

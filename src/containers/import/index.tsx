@@ -49,6 +49,12 @@ export class Import extends React.Component<IImportProps> {
   mnemonic = ''
   @observable
   showTour: boolean = false
+  @observable
+  validatePassword: string = '' // password tip
+  @observable
+  isPasswordRight: boolean = false // is password right ?
+  @observable
+  isShowValidatePassword: boolean = false // is show password tip ?
 
   @action
   componentDidMount() {
@@ -66,7 +72,7 @@ export class Import extends React.Component<IImportProps> {
         if (this.props.wallet.isHaveWallet) {
           if (this.props.wallet.isUnlock) {
             await swal.fire({
-              type: 'success',
+              icon: 'success',
               title: labels.swal.success,
               confirmButtonText: labels.swal.confirm,
               timer: 1000
@@ -147,18 +153,26 @@ export class Import extends React.Component<IImportProps> {
     return BIP39.validateMnemonic(this.mnemonic)
   }
 
-  @computed
-  get validatePassword(): string {
+  @action
+  vertifyPassword = () => {
+    this.isShowValidatePassword = true
     if (this.password === '') {
-      return this.props.labels.swal.emptyPassword
+      this.isPasswordRight = false
+      this.validatePassword = this.props.labels.swal.emptyPassword
+      return
     }
     if (!this.password || this.password.length < 8) {
-      return this.props.labels.swal.passwordLength
+      this.isPasswordRight = false
+      this.validatePassword = this.props.labels.swal.passwordLength
+      return
     }
     if (!isValidPassword(this.password)) {
-      return this.props.labels.swal.invalidPassword
+      this.isPasswordRight = false
+      this.validatePassword = this.props.labels.swal.invalidPassword
+      return
     }
-    return ''
+    this.validatePassword = ''
+    this.isPasswordRight = true
   }
 
   @computed
@@ -201,7 +215,7 @@ export class Import extends React.Component<IImportProps> {
     const errInfo = this.verifyInputs(this.mnemonic, this.password, this.repeatPassword, labels)
     if (errInfo) {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: errInfo,
         confirmButtonText: labels.swal.confirm
       })
@@ -213,7 +227,7 @@ export class Import extends React.Component<IImportProps> {
     // this.props.account.changeActiveAccount("1")
     if (err) {
       swal.fire({
-        type: 'error',
+        icon: 'error',
         title: err.message
       })
       return
@@ -312,15 +326,14 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.setPassword}</span>
-                {(this.password || this.repeatPassword) && (
-                  <Tip type={!this.validatePassword} msg={this.validatePassword} />
-                )}
+                {this.isShowValidatePassword && <Tip type={this.isPasswordRight} msg={this.validatePassword} />}
               </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
                 type="password"
                 value={this.password}
                 onChange={this.passwordInput}
+                onBlur={this.vertifyPassword}
               />
             </FormControl>
             {this.password && (

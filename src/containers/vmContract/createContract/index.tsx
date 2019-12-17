@@ -120,7 +120,7 @@ export class CreateContract extends React.Component<IProps> {
     if (e.target.files && e.target.files.length > 0) {
       if (e.target.files[0].name.split('.').reverse()[0] !== 'wasm') {
         await swal.fire({
-          type: 'error',
+          icon: 'error',
           title: this.props.labels.errorWasmFile
         })
         return
@@ -150,7 +150,7 @@ export class CreateContract extends React.Component<IProps> {
       // console.log(e.target.files[0].name.split('.').reverse())
       if (e.target.files[0].name.split('.').reverse()[0] !== 'json') {
         await swal.fire({
-          type: 'error',
+          icon: 'error',
           title: this.props.labels.errorAbiFile
         })
         return
@@ -166,7 +166,7 @@ export class CreateContract extends React.Component<IProps> {
           this.inputABI!.value = ''
           this.setStringField('inputABIPlaceholder', '')
           swal.fire({
-            type: 'error',
+            icon: 'error',
             title: this.props.labels.errorAbiFile
           })
         }
@@ -302,7 +302,7 @@ export class CreateContract extends React.Component<IProps> {
       if (contractRes.success) {
         await swal.fire({
           title: labels.createSwal.createSuccess,
-          type: 'success',
+          icon: 'success',
           timer: 1000
         })
         this.handleCloseDialog()
@@ -312,12 +312,12 @@ export class CreateContract extends React.Component<IProps> {
         swal.fire({
           title: labels.createSwal.createErr,
           text: errorText,
-          type: 'error'
+          icon: 'error'
         })
       }
     } else {
       await swal.fire({
-        type: 'error',
+        icon: 'error',
         title: labels.createSwal.incorrectPassword
       })
     }
@@ -374,7 +374,7 @@ export class CreateContract extends React.Component<IProps> {
           swal.fire({
             title: labels.createSwal.createErr,
             text: labels.createSwal.getAbi,
-            type: 'error'
+            icon: 'error'
           })
           return
         }
@@ -391,21 +391,21 @@ export class CreateContract extends React.Component<IProps> {
       if (contractRes.success) {
         await swal.fire({
           title: labels.createSwal.createSuccess,
-          type: 'success',
+          icon: 'success',
           timer: 1000
         })
       } else {
         swal.fire({
           title: labels.createSwal.createErr,
           text: contractRes.info,
-          type: 'error'
+          icon: 'error'
         })
       }
     } catch (e) {
       swal.fire({
         title: labels.createSwal.createErr,
         text: e.message,
-        type: 'error'
+        icon: 'error'
       })
     }
   }
@@ -447,7 +447,6 @@ export class CreateContract extends React.Component<IProps> {
       const res = await this.props.vmContract!.getABI(contractAddress)
       if ('abiArr' in res) {
         const abi = helper.Bytes.fromString(JSON.stringify(res!.abiArr))
-        console.log(`getAbi`, abi)
         this.setStringField(`abi:${contractAddress.toLocaleLowerCase()}`, abi)
       }
     }

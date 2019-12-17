@@ -1,5 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
+import { observable, action } from 'mobx'
 import classNames from 'classnames'
 import { withTranslation, WithTranslation } from 'react-i18next'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
@@ -25,6 +26,10 @@ interface Props extends WithStyles<typeof style>, WrapProps {
 
 @observer
 export class Sidebar extends React.Component<Props> {
+  @observable isShowWalletInfo: boolean = false
+  @action ChangeShowWalletInfo = () => {
+    this.isShowWalletInfo = !this.isShowWalletInfo
+  }
   backToHome = () => {
     this.props.history.push('/')
   }
@@ -105,13 +110,13 @@ export class Sidebar extends React.Component<Props> {
       </List>
     )
     const brand = (
-      <div className={classes.logo}>
+      <div className={classes.logo} onClick={this.ChangeShowWalletInfo}>
         <a onClick={this.backToHome} className={classes.logoLink}>
           <div className={classes.logoImage}>
             <img src={logo} alt="logo" className={classes.img} />
           </div>
         </a>
-        <div className="blockInfo">
+        <div className={classNames('blockInfo', this.isShowWalletInfo && 'activeInfo')}>
           <div className={classes.infoDetail}>
             <div className={classes.infoTitle}>{labels.title}</div>
             <div className={classes.infoItem}>

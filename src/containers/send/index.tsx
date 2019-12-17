@@ -240,7 +240,7 @@ export class Send extends React.Component<IProps> {
         this.initState()
         await swal.fire({
           text: labels.swal.success,
-          type: 'success',
+          icon: 'success',
           confirmButtonText: labels.swal.confirm,
           timer: 1000
         })
@@ -263,7 +263,7 @@ export class Send extends React.Component<IProps> {
         await swal.fire({
           title: labels.swal.fail,
           text: errorText,
-          type: 'error',
+          icon: 'error',
           confirmButtonText: labels.swal.confirm
         })
       }
@@ -276,7 +276,7 @@ export class Send extends React.Component<IProps> {
       await swal.fire({
         title: labels.swal.fail,
         text: errorText,
-        type: 'error',
+        icon: 'error',
         confirmButtonText: labels.swal.confirm
       })
     }
@@ -289,7 +289,7 @@ export class Send extends React.Component<IProps> {
       this.send()
     } else {
       await swal.fire({
-        type: 'error',
+        icon: 'error',
         title: labels.swal.incorrectPassword
       })
     }

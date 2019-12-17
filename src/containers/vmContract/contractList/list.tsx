@@ -44,7 +44,7 @@ export class ContractItem extends React.Component<ItemProps> {
       document.execCommand('copy')
       swal.fire({
         showCloseButton: false,
-        type: 'success',
+        icon: 'success',
         timer: 1500,
         title: this.props.labels.copySuccess
       })

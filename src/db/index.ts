@@ -42,6 +42,14 @@ export const getAccount = async (): Promise<AccountObj[]> => {
   })) as AccountObj[]
   return account
 }
+export const updateSingleAccount = async (account: AccountObj) => {
+  const db = getDB(ACCOUNT_DB)
+  await new Promise(resolve => {
+    db.update({ id: account.id }, { $set: account }, {}, (err, _) => {
+      resolve(true)
+    })
+  })
+}
 
 export const insertAccount = async (account: AccountObj[] | AccountObj) => {
   const db = getDB(ACCOUNT_DB)
