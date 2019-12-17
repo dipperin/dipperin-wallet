@@ -1,6 +1,6 @@
 import { createStyles } from '@material-ui/core/styles'
 
-import { drawerWidth, transition, boxShadow, defaultFont, primaryColor, primaryBoxShadow } from '../../styles/appStyle'
+import { drawerWidth, transition, boxShadow, defaultFont, primaryBoxShadow } from '../../styles/appStyle'
 
 const sidebarStyle = theme =>
   createStyles({
@@ -67,7 +67,7 @@ const sidebarStyle = theme =>
       width: 248,
       padding: '0 16px',
       boxSizing: 'border-box',
-      color: primaryColor
+      color: '#0a174c'
     },
     infoTitle: {
       padding: '20px 0',
@@ -84,7 +84,7 @@ const sidebarStyle = theme =>
       width: 12,
       height: 12,
       marginRight: 8,
-      border: `2px solid ${primaryColor}`,
+      border: `2px solid '#0a174c'`,
       borderRadius: '100%'
     },
     itemLabel: {
@@ -171,7 +171,7 @@ const sidebarStyle = theme =>
       backgroundColor: 'transparent',
       userSelect: 'none',
       '&:focus': {
-        backgroundColor: primaryColor
+        backgroundColor: '#0a174c'
       },
       ...defaultFont
     },
@@ -194,24 +194,24 @@ const sidebarStyle = theme =>
       lineHeight: '30px',
       fontSize: 12,
       fontWeight: 'bold',
-      color: primaryColor,
+      color: '#0a174c',
       textAlign: 'center'
     },
     whiteFont: {
       color: '#FFF'
     },
     purple: {
-      backgroundColor: primaryColor,
+      backgroundColor: '#0a174c',
       ...primaryBoxShadow,
       '&:hover': {
-        backgroundColor: primaryColor,
+        backgroundColor: '#0a174c',
         ...primaryBoxShadow
       }
     },
     active: {
-      backgroundColor: primaryColor,
+      backgroundColor: '#0a174c',
       '&:hover': {
-        backgroundColor: primaryColor
+        backgroundColor: '#0a174c'
       }
     },
     sidebarWrapper: {

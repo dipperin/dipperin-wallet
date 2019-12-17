@@ -143,3 +143,8 @@ export enum TIMET_NAME {
 }
 
 export const VM_CONTRACT_ADDRESS = '0x00120000000000000000000000000000000000000000'
+
+/**
+ * move data event status
+ */
+export const MOVE_DATA_STATUS = 'moveDataStatus'
