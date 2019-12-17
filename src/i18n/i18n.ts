@@ -60,7 +60,16 @@ export const zhCN = {
       medium: '中',
       strong: '强',
       note:
-        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。'
+        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。',
+      select: {
+        selectNet: '选择网络节点',
+        remoteVenus: '远程节点-金星',
+        remoteTest: '远程节点-测试网',
+        localVenus: '本地节点-金星',
+        localTest: '本地节点-测试网',
+        localLocal: '本地节点-本地',
+        storage: '数据存储:'
+      }
     },
     sidebar: {
       wallet: '钱包',
@@ -78,7 +87,8 @@ export const zhCN = {
       left: {
         title: '设置',
         info: '设置您的钱包账户信息',
-        dataDir: '数据储存路径'
+        dataDir: '数据储存路径',
+        moving: '数据迁移中'
       },
       net: {
         title: '选择本地节点',
@@ -136,6 +146,14 @@ export const zhCN = {
         documentTitle: 'Dipperin 钱包',
         copySuccess: '复制成功',
         incorrectPassword: '密码错误'
+      },
+      dataDirPop: {
+        title: '确认存储路径',
+        info: '您的主链数据存储路径将变更，有以下两种数据存储路径变更方式，请选择：',
+        option1: '只变更数据存储路径，不迁移数据，需要重新同步区块高度；',
+        option2: '变更数据存储路径的同时迁移数据，数据迁移的过程中，请勿关闭电脑、钱包软件，避免数据丢失影响钱包使用。',
+        cancel: 'Cancel',
+        confirm: 'Confirm'
       }
     }
   },
@@ -593,7 +611,16 @@ export const enUS: I18nCollection = {
       medium: 'medium',
       strong: 'strong',
       note:
-        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
+        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".',
+      select: {
+        selectNet: 'Select node net',
+        remoteVenus: 'Remote-Venus',
+        remoteTest: 'Remote-Mercury',
+        localVenus: 'Local-Venus',
+        localTest: 'Local-Test',
+        localLocal: 'Local-Local',
+        storage: 'Data Dictionary:'
+      }
     },
     sidebar: {
       wallet: 'Wallet',
@@ -611,7 +638,8 @@ export const enUS: I18nCollection = {
       left: {
         title: 'Setting',
         info: 'Set up your wallet infomation',
-        dataDir: 'Chain Data Dictionary'
+        dataDir: 'Chain Data Dictionary',
+        moving: 'Data moving'
       },
       net: {
         title: 'Select Local Node',
@@ -672,6 +700,15 @@ export const enUS: I18nCollection = {
         documentTitle: 'Dipperin Wallet',
         copySuccess: 'Copy Success',
         incorrectPassword: 'Incorrect password'
+      },
+      dataDirPop: {
+        // TODO
+        title: '确认存储路径',
+        info: '您的主链数据存储路径将变更，有以下两种数据存储路径变更方式，请选择：',
+        option1: '只变更数据存储路径，不迁移数据，需要重新同步区块高度；',
+        option2: '变更数据存储路径的同时迁移数据，数据迁移的过程中，请勿关闭电脑、钱包软件，避免数据丢失影响钱包使用。',
+        cancel: 'Cancel',
+        confirm: 'Confirm'
       }
     }
   },
