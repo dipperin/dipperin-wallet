@@ -52,8 +52,8 @@ export const getChainDataDir = () => {
 export const moveFiles = (newPath: string, event: Event) => {
   const oldChainDataDir = settings.get(CHAIN_DATA_DIR) as string || path.join(os.homedir(), `tmp`, `dipperin_apps`)
   const oldPath = path.join(oldChainDataDir)
-  log.info('start mv chain data')
-  if(fs.existsSync(newPath)) {
+ 
+  if (fs.existsSync(newPath)) {
     // remove exist dir
     rimraf(newPath, () => {
       log.info('remove exist dir')
@@ -70,16 +70,55 @@ export const moveFiles = (newPath: string, event: Event) => {
  * @param newPath 
  */
 const moveToEmptyDir = (oldPath: string, newPath: string, event: Event) => {
-  fs.rename(oldPath, newPath, (err) => {
-    if (err) {
-      log.info('move failure')
-      log.error(err)
-      event.sender.send(MOVE_DATA_STATUS, false) 
-      return
-    }
+  log.info('start mv chain data')
+  // try {
+  //   fs.renameSync(oldPath, newPath)
+  //   log.info('move success 1111')
+  //   event.sender.send(MOVE_DATA_STATUS, true) 
+  // } catch (_) {
+  //   log.error('errr1111111:', _)
+  //   try {
+  //     fs.renameSync(oldPath, newPath)
+  //     log.info('move success 22222')
+  //     event.sender.send(MOVE_DATA_STATUS, true)
+  //   } catch (__) {
+  //     log.error('errr222222:', __)
+  //     event.sender.send(MOVE_DATA_STATUS, false)
+  //   }
+  // }
+  // fsExtra.move(oldPath, newPath, (err) => {
+  //   if(err) {
+  //     log.info('move failure')
+  //     log.error(err)
+  //     event.sender.send(MOVE_DATA_STATUS, false)
+  //     return
+  //   }
+  //   log.info('move success')
+  //   event.sender.send(MOVE_DATA_STATUS, true)
+  // })
+
+  try {
+    fsExtra.copySync(oldPath, newPath)
     log.info('move success')
-    event.sender.send(MOVE_DATA_STATUS, true) 
-  })  
+    event.sender.send(MOVE_DATA_STATUS, true)
+  } catch(err) {
+    log.info('move failure')
+    log.error(err)
+    event.sender.send(MOVE_DATA_STATUS, false)
+  }
+  
 }
+
+
+// fs.rename(oldPath, newPath, (err) => {
+//   if (err) {
+//     log.info('move failure')
+//     log.error(err)
+//     event.sender.send(MOVE_DATA_STATUS, false) 
+//     return
+//   }
+//   log.info('move success')
+//   event.sender.send(MOVE_DATA_STATUS, true) 
+// }) 
 
 

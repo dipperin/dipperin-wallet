@@ -401,7 +401,7 @@ export class Setting extends React.Component<Props> {
       return
     }
     if (e.target.files && e.target.files.length > 0) {
-      const path = pathModule.join(e.target.files[0].path, 'dipperin_apps')
+      const path = e.target.files[0].path
       if (path === this.chainDataDir) {
         return
       }
@@ -436,7 +436,6 @@ export class Setting extends React.Component<Props> {
    * move chain data callback
    */
   moveChainDataCb = (success: boolean) => {
-    console.log(success, 'cbbbbbbbbbbbbbb')
     this.props.root.setIsMovingData(false)
     if (success) {
       // set chain data dir in settings

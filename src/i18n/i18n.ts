@@ -60,7 +60,16 @@ export const zhCN = {
       medium: '中',
       strong: '强',
       note:
-        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。'
+        '当您导入钱包时，仅显示您钱包账户前15个有资产的账户，从16个账户开始，需要您点击“添加账户”自行创建出来，里面的资产不会消失。',
+      select: {
+        selectNet: '选择网络节点',
+        remoteVenus: '远程节点-金星',
+        remoteTest: '远程节点-测试网',
+        localVenus: '本地节点-金星',
+        localTest: '本地节点-测试网',
+        localLocal: '本地节点-本地',
+        storage: '数据存储:'
+      }
     },
     sidebar: {
       wallet: '钱包',
@@ -595,7 +604,16 @@ export const enUS: I18nCollection = {
       medium: 'medium',
       strong: 'strong',
       note:
-        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".'
+        'When you import a wallet, the first 15 non-empty account will be imported. From the 16th account on, you may need to import  manually by "Add Account".',
+      select: {
+        selectNet: 'Select node net',
+        remoteVenus: 'Remote-Venus',
+        remoteTest: 'Remote-Mercury',
+        localVenus: 'Local-Venus',
+        localTest: 'Local-Test',
+        localLocal: 'Local-Local',
+        storage: 'Data Dictionary:'
+      }
     },
     sidebar: {
       wallet: 'Wallet',
