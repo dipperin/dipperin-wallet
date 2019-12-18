@@ -87,15 +87,6 @@ export class Sidebar extends React.Component<Props> {
             >
               <ListItem button={false} className={classNames(classes.itemLink, listItemClasses)}>
                 <div className={classes.iconWrap}>
-                  {/* <div
-                    className={classes.icon}
-                    style={{
-                      width: 35,
-                      height: 32,
-                      background: `url(${isActive ? prop.iconActive : prop.icon}) no-repeat`,
-                      backgroundPosition: 'center center',
-                    }}
-                  /> */}
                   <img className={classes.icon} draggable={false} src={isActive ? prop.iconActive : prop.icon} />
                 </div>
                 <ListItemText

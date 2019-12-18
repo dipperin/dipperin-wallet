@@ -85,7 +85,7 @@ const styles = createStyles({
   moreWrap: {
     position: 'absolute',
     width: 20,
-    right: 10,
+    right: 6,
     top: 10
   },
   bigAccountName: {

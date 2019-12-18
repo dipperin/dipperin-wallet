@@ -7,7 +7,7 @@ const styles = createStyles({
     display: 'inline-block'
   },
   more: {
-    width: 20,
+    width: 24,
     height: 20,
     backgroundImage: `url(${More}) `,
     backgroundRepeat: 'no-repeat',
@@ -15,22 +15,20 @@ const styles = createStyles({
     cursor: 'pointer'
   },
   btnBox: {
-    position: 'absolute',
-    top: 20,
-    left: -41,
     width: 102,
     height: 68,
     transition: 'all 0.3s linear',
     backgroundImage: `url(${OptionBg})`,
     backgroundRepeat: 'no-repeat',
-    backgroundSize: `102 68`,
     paddingTop: 15
   },
   item: {
+    fontSize: 14,
     color: '#fff',
     height: 24,
     lineHeight: `24px`,
     textAlign: 'center',
+    cursor: 'pointer',
     '&:hover': {
       backgroundColor: '#242646'
     }

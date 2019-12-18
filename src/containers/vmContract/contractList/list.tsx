@@ -5,12 +5,14 @@ import VmContractModel from '@/models/vmContract'
 import { observer } from 'mobx-react'
 import { withStyles, WithStyles, Button } from '@material-ui/core'
 import { I18nCollectionContract } from '@/i18n/i18n'
+import DropButtons from '@/components/dropButtons'
 
 import styles from './styles'
 
 import { TRANSACTION_STATUS_SUCCESS } from '@/utils/constants'
 import format from 'date-fns/format'
-import Copy from '@/images/copy.png'
+// import Copy from '@/images/copy.png'
+import Edit from '@/images/edit.png'
 
 interface ItemProps extends WithStyles {
   labels: I18nCollectionContract['contract']
@@ -18,6 +20,8 @@ interface ItemProps extends WithStyles {
   ifCurrent?: boolean
   jumpToCall: (contractAddress: string, contractTxHash: string) => void
   jumpToDetail: (contractAddress: string) => void
+  showChangeNamePop: (contract: VmContractModel) => void
+  deleteContract: (address: string) => void
 }
 
 @observer
@@ -34,8 +38,9 @@ export class ContractItem extends React.Component<ItemProps> {
     }
   }
 
-  copyAddress = (address: string, e: React.MouseEvent<HTMLButtonElement>): void => {
+  copyAddress = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation()
+    const address = this.props.contract.contractAddress
     const input = document.createElement('input')
     document.body.appendChild(input)
     input.setAttribute('value', address)
@@ -51,9 +56,30 @@ export class ContractItem extends React.Component<ItemProps> {
     }
     document.body.removeChild(input)
   }
+  openChangeNamePop = () => {
+    const { showChangeNamePop, contract } = this.props
+    showChangeNamePop(contract)
+  }
+  removeContract = () => {
+    const {
+      deleteContract,
+      contract: { contractAddress }
+    } = this.props
+    deleteContract(contractAddress)
+  }
 
   render() {
     const { contract, classes, labels } = this.props
+    const btnArr = [
+      {
+        label: labels.ViewHistory,
+        handleFunc: this.jumpToDetail
+      },
+      {
+        label: labels.deleteContract,
+        handleFunc: this.removeContract
+      }
+    ]
     return (
       <div
         className={classNames(classes.row, {
@@ -65,11 +91,14 @@ export class ContractItem extends React.Component<ItemProps> {
           {/* TODO: if no jumpToCall cursor is default */}
           <div className={classes.address} onClick={this.jumpToCall}>
             {!(contract.status === TRANSACTION_STATUS_SUCCESS) && <span>{labels[contract.status]}</span>}
-            {contract.contractAddress}
+            {contract.contractName ? contract.contractName : contract.contractAddress}
             {contract.status === TRANSACTION_STATUS_SUCCESS && (
-              <Button className={classes.copy} onClick={this.copyAddress.bind(this, contract.contractAddress)}>
-                <img src={Copy} alt="" title="copy" />
+              <Button className={classes.copy} onClick={this.openChangeNamePop}>
+                <img src={Edit} alt="" title="edit" />
               </Button>
+              // <Button className={classes.copy} onClick={this.copyAddress.bind(this, contract.contractAddress)}>
+              //   <img src={Copy} alt="" title="copy" />
+              // </Button>
             )}
           </div>
           <div className={classes.date}>{format(new Date(contract.timestamp), 'YYYY/MM/DD HH:mm')}</div>
@@ -77,7 +106,8 @@ export class ContractItem extends React.Component<ItemProps> {
 
         <div className={classes.rowRight}>
           {/* TODO: if no jumpToDetail cursor is default */}
-          <div className={classes.detail} onClick={this.jumpToDetail} />
+          {/* <div className={classes.detail} onClick={this.jumpToDetail} /> */}
+          <DropButtons btnArray={btnArr} />
         </div>
       </div>
     )

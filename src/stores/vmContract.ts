@@ -1,7 +1,15 @@
 import { computed, observable, reaction, runInAction, action } from 'mobx'
 import { isString } from 'lodash'
 
-import { insertVmContract, getVmContract, updateVmContractStatus, getReceipt, insertReceipt } from '@/db'
+import {
+  insertVmContract,
+  getVmContract,
+  deleteVmContract,
+  updateVmContractStatus,
+  updateVmContract,
+  getReceipt,
+  insertReceipt
+} from '@/db'
 import {
   // DEFAULT_CHAIN_ID,
   TRANSACTION_STATUS_FAIL,
@@ -75,9 +83,11 @@ class VmContractStore {
     if (!this._store.account.activeAccount) {
       return contracts
     }
+    console.log('dddsss111ddd', this._contract.get('0x00140374d7fda4114534315edd18d86db69c5e61efe9'))
 
     const accountAddress = this._store.account.activeAccount.address
     this._contract.forEach((contract: VmContractModel) => {
+      console.log('dddddd', contract)
       const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
@@ -332,6 +342,7 @@ class VmContractStore {
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
+    console.log('contractDb', contractDb)
     runInAction(() => {
       this.getContractsFromObj(contractDb).forEach(contract => {
         if (contract.contractAddress) {
@@ -358,6 +369,15 @@ class VmContractStore {
   clear() {
     this._contract.clear()
     this._pendingContract.clear()
+  }
+  @action
+  deleteContract = async (contractAddress: string) => {
+    this._contract.delete(contractAddress)
+    await deleteVmContract(contractAddress)
+  }
+  @action
+  updateContract = async (contract: VmContractModel) => {
+    await updateVmContract(contract.toJS())
   }
 
   reload() {
@@ -477,6 +497,7 @@ class VmContractStore {
 
   private getContractsFromObj(contractObj: VmContractObj[] = []) {
     return contractObj.map(item => {
+      console.log('hahahahahaha', item, VmContractModel.fromObj(item))
       return VmContractModel.fromObj(item)
     })
   }
