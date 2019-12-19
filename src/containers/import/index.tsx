@@ -55,6 +55,10 @@ export class Import extends React.Component<IImportProps> {
   isPasswordRight: boolean = false // is password right ?
   @observable
   isShowValidatePassword: boolean = false // is show password tip ?
+  @observable
+  isShowDiffTip: boolean = false
+  @observable
+  isRepeatPwdRight: boolean = false
 
   @action
   componentDidMount() {
@@ -158,26 +162,30 @@ export class Import extends React.Component<IImportProps> {
     this.isShowValidatePassword = true
     if (this.password === '') {
       this.isPasswordRight = false
-      this.validatePassword = this.props.labels.swal.emptyPassword
+      // this.validatePassword = this.props.labels.swal.emptyPassword
+      this.validatePassword = 'emptyPassword'
       return
     }
     if (!this.password || this.password.length < 8) {
       this.isPasswordRight = false
-      this.validatePassword = this.props.labels.swal.passwordLength
+      // this.validatePassword = this.props.labels.swal.passwordLength
+      this.validatePassword = 'passwordLength'
       return
     }
     if (!isValidPassword(this.password)) {
       this.isPasswordRight = false
-      this.validatePassword = this.props.labels.swal.invalidPassword
+      // this.validatePassword = this.props.labels.swal.invalidPassword
+      this.validatePassword = 'invalidPassword'
       return
     }
     this.validatePassword = ''
     this.isPasswordRight = true
   }
 
-  @computed
-  get validateRptPassword(): boolean {
-    return this.password === this.repeatPassword
+  @action
+  validateRptPassword = () => {
+    this.isShowDiffTip = true
+    this.isRepeatPwdRight = this.password === this.repeatPassword
   }
 
   verifyInputs = (
@@ -326,7 +334,9 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.setPassword}</span>
-                {this.isShowValidatePassword && <Tip type={this.isPasswordRight} msg={this.validatePassword} />}
+                {this.isShowValidatePassword && (
+                  <Tip type={this.isPasswordRight} msg={labels.swal[this.validatePassword]} />
+                )}
               </label>
               <input
                 className={classNames([classes.textInput, classes.pswInput])}
@@ -382,11 +392,8 @@ export class Import extends React.Component<IImportProps> {
             <FormControl fullWidth={true} className={classes.item}>
               <label className={classes.inputLabel}>
                 <span>{labels.repeatPassword}</span>
-                {this.repeatPassword && (
-                  <Tip
-                    type={this.validateRptPassword}
-                    msg={!this.validateRptPassword ? labels.swal.diffPassword : ''}
-                  />
+                {this.isShowDiffTip && (
+                  <Tip type={this.isRepeatPwdRight} msg={!this.isRepeatPwdRight ? labels.swal.diffPassword : ''} />
                 )}
               </label>
               <input
@@ -394,6 +401,7 @@ export class Import extends React.Component<IImportProps> {
                 type="password"
                 value={this.repeatPassword}
                 onChange={this.repeatPasswordInput}
+                onBlur={this.validateRptPassword}
               />
             </FormControl>
             <Button variant="contained" color="primary" className={classes.button} type="submit">
