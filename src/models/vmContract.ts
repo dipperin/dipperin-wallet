@@ -23,6 +23,7 @@ class ContractModel {
   private _owner: string[]
   @observable
   private _isDRC20: boolean
+  private _contractName: string = ''
 
   @observable
   private _contractData: string
@@ -40,19 +41,14 @@ class ContractModel {
     } else {
       this._owner = [options.owner]
     }
-
     this._status = options.status || TRANSACTION_STATUS_PENDING
-
     this._contractAddress = options.contractAddress || ''
-
+    this._contractName = options.contractName || ''
     if (options.txHash) {
       this._txHash = options.txHash
     }
-
     this._timestamp = options.timestamp || getNowTimestamp()
-
     this._contractAbi = options.contractAbi
-
     if (options.contractCode) {
       this.createContract(options.contractCode, options.contractAbi, options.initParams || [])
     }
@@ -92,6 +88,9 @@ class ContractModel {
 
   get contractData() {
     return this._contractData
+  }
+  get contractName() {
+    return this._contractName
   }
 
   @computed
@@ -136,6 +135,10 @@ class ContractModel {
       this._owner = [this._owner, address]
     }
   }
+  @action
+  setName = (name: string) => {
+    this._contractName = name
+  }
 
   isOverTime(now: number): boolean {
     return now - this._timestamp > TRANSACTION_LIMIT_TIME
@@ -164,9 +167,10 @@ class ContractModel {
   }
 
   toJS(): VmContractObj {
-    const { owner, contractAddress, status, timestamp, txHash, contractAbi } = this
+    const { owner, contractAddress, status, timestamp, txHash, contractAbi, contractName } = this
 
     return {
+      contractName,
       owner,
       contractAddress,
       contractAbi,
@@ -216,9 +220,11 @@ interface VmContractOptions {
   txHash?: string
   initParams?: string[]
   isDRC20?: boolean
+  contractName?: string
 }
 
 export interface VmContractObj {
+  contractName: string
   owner: string[]
   contractAddress: string
   contractAbi: string

@@ -1,6 +1,6 @@
 import React from 'react'
 import { withStyles, WithStyles } from '@material-ui/core/styles'
-import { ClickAwayListener } from '@material-ui/core'
+import { ClickAwayListener, Popper, Fade } from '@material-ui/core'
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 import styles from './styles'
@@ -14,13 +14,18 @@ interface Props extends WithStyles<typeof styles> {
 }
 @observer
 class DropButtons extends React.Component<Props> {
-  @observable isShowDrop: boolean = false
+  @observable
+  isShowDrop: boolean = false
+  @observable
+  anchorEl: any = null
   @action hideDrop = () => {
     this.isShowDrop = false
+    this.anchorEl = null
   }
   @action showDrop = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    this.anchorEl = e.currentTarget
     this.isShowDrop = true
   }
 
@@ -36,27 +41,34 @@ class DropButtons extends React.Component<Props> {
   }
 
   render() {
-    console.log(this.props)
     const { classes, btnArray } = this.props
-
     return (
       <div className={classes.wrap}>
         <div className={classes.more} onClick={this.showDrop} />
-        <ClickAwayListener onClickAway={this.handleClickAway}>
-          {this.isShowDrop ? (
-            <div className={classes.btnBox}>
-              {btnArray.map(item => {
-                return (
-                  <div onClick={this.wrapHandle(item.handleFunc)} key={item.label} className={classes.item}>
-                    {item.label}
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div />
+        <Popper
+          id={'dialog'}
+          open={this.isShowDrop}
+          anchorEl={this.anchorEl}
+          transition={true}
+          placement={'bottom'}
+          style={{ zIndex: 2 }}
+        >
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={350}>
+              <ClickAwayListener onClickAway={this.handleClickAway}>
+                <div className={classes.btnBox}>
+                  {btnArray.map(item => {
+                    return (
+                      <div onClick={this.wrapHandle(item.handleFunc)} key={item.label} className={classes.item}>
+                        {item.label}
+                      </div>
+                    )
+                  })}
+                </div>
+              </ClickAwayListener>
+            </Fade>
           )}
-        </ClickAwayListener>
+        </Popper>
       </div>
     )
   }

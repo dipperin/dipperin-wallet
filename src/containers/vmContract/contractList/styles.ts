@@ -121,7 +121,9 @@ const styles = createStyles({
     color: '#838899',
     fontWeight: 400
   },
-  rowRight: {},
+  rowRight: {
+    position: 'relative'
+  },
   detail: {
     width: '28px',
     height: '28px',
