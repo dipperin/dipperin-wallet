@@ -120,6 +120,7 @@ class VmContractStore {
   startUpdate() {
     this._store.timer.on('update_vmContracts', this.updateContractStatus.bind(this), 5000)
     this._store.timer.on('update_vmContracts_receipts', this.getContractReceipt.bind(this), 3000)
+    this._store.timer.on('update_vmContracts_DRC20_token', this.updataDRC20ContractsToken.bind(this), 3000)
   }
 
   async confirmTransaction(
@@ -473,6 +474,28 @@ class VmContractStore {
     //     console.log('after casting', this._contract.get(contract.contractAddress))
     //   }
     // })
+  }
+
+  /**
+   * update DRC20 contract token
+   */
+  updataDRC20ContractsToken() {
+    this._contract.forEach(async contract => {
+      const { isDRC20, contractAddress, contractAbi } = contract
+      console.log(isDRC20, 'ercccccccccccc')
+      if (isDRC20) {
+        console.log('eeeeeeeeeeeeeeee')
+        const res = await this.confirmConstantCallContractMethod(
+          contractAddress,
+          contractAbi,
+          'getBalance',
+          '100000',
+          '1',
+          [this.currentActiveAccount]
+        )
+        console.log(res, 'tokennnnnnnnnnnn')
+      }
+    })
   }
 
   private getContractsFromObj(contractObj: VmContractObj[] = []) {
