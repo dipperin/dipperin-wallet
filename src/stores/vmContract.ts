@@ -501,9 +501,7 @@ class VmContractStore {
   updataDRC20ContractsToken() {
     this._contract.forEach(async contract => {
       const { isDRC20, contractAddress, contractAbi } = contract
-      console.log(isDRC20, 'ercccccccccccc')
       if (isDRC20) {
-        console.log('eeeeeeeeeeeeeeee')
         const res = await this.confirmConstantCallContractMethod(
           contractAddress,
           contractAbi,
@@ -512,14 +510,15 @@ class VmContractStore {
           '1',
           [this.currentActiveAccount]
         )
-        console.log(res, 'tokennnnnnnnnnnn')
+        if (res.success && typeof res.info === 'string') {
+          contract.setDRC20Token(res.info)
+        }
       }
     })
   }
 
   private getContractsFromObj(contractObj: VmContractObj[] = []) {
     return contractObj.map(item => {
-      console.log('hahahahahaha', item, VmContractModel.fromObj(item))
       return VmContractModel.fromObj(item)
     })
   }

@@ -23,6 +23,7 @@ class ContractModel {
   private _owner: string[]
   @observable
   private _isDRC20: boolean
+  @observable
   private _contractName: string = ''
 
   @observable
