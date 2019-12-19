@@ -135,11 +135,9 @@ export class VmContractList extends React.Component<Props> {
     const { vmContract, classes, labels } = this.props
     const { contracts, pendingContracts } = vmContract!
     const haveContract = (contracts && contracts.length > 0) || (pendingContracts && pendingContracts.length > 0)
-    const defaultName = this.contractToUpdate
-      ? this.contractToUpdate!.contractName
-        ? this.contractToUpdate!.contractName
-        : this.contractToUpdate!.contractAddress
-      : ''
+    const defaultName =
+      this.contractToUpdate && this.contractToUpdate!.contractName ? this.contractToUpdate!.contractName : ''
+
     return (
       <Fragment>
         <div className={classes.title}>
@@ -162,6 +160,7 @@ export class VmContractList extends React.Component<Props> {
                   labels={labels}
                   contract={contract}
                   key={index}
+                  index={index}
                   ifCurrent={this.currentContract !== '' && this.currentContract === contract.contractAddress}
                   showChangeNamePop={this.showChangeNamePop}
                   deleteContract={this.deleteContract}
