@@ -342,7 +342,6 @@ class VmContractStore {
   @action
   async load() {
     const contractDb = await getVmContract(getCurrentNet())
-    console.log('contractDb', contractDb)
     runInAction(() => {
       this.getContractsFromObj(contractDb).forEach(contract => {
         if (contract.contractAddress) {

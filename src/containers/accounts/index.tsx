@@ -91,7 +91,6 @@ export class Accounts extends React.Component<Props> {
     await updateAccount(this.accountToUpdate!)
     this.hideDialogConfirm()
     this.showAccounts(this.selectedIndex)
-
     swal.fire({
       showCloseButton: false,
       icon: 'success',
@@ -103,20 +102,20 @@ export class Accounts extends React.Component<Props> {
   @action
   deleteAccount = async (id: string) => {
     const { removeAccountAsync } = this.props.account!
-
     const result = await swal.fire({
-      icon: 'warning',
       title: this.props.labels.deleteAccountTitle,
       text: this.props.labels.deleteAccountText,
       showCancelButton: true,
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: this.props.labels.confirm,
+      cancelButtonText: this.props.labels.cancel,
       reverseButtons: true
     })
 
     if (result.value) {
       await removeAccountAsync(id)
-      this.showAccounts(this.selectedIndex)
+      const showIdx =
+        this.selectedIndex >= this.props.account!.accounts.length ? this.selectedIndex - 1 : this.selectedIndex
+      this.changeAccount(showIdx)
       swal.fire({
         icon: 'success',
         text: this.props.labels.deleteSuccess,
@@ -183,6 +182,7 @@ export class Accounts extends React.Component<Props> {
   importPrivateKey = async (privateKey: string) => {
     try {
       await this.props.account!.importPrivateKey(privateKey)
+      this.handleClosePrivateKey()
     } catch (err) {
       if (err.message === TxResponseInfo[TxResponseCode.addressReimportError]) {
         throw new Error(this.props.labels.addressReimportError)
@@ -198,7 +198,6 @@ export class Accounts extends React.Component<Props> {
   handleChangeActiveAccount = (id: string) => {
     this.props.account!.changeActiveAccount(id)
     this.props.handleClose()
-    // console.log('changeActiveAccount Id', id)
   }
 
   @action
@@ -312,7 +311,11 @@ export class Accounts extends React.Component<Props> {
       activeAccount: { id }
     } = account!
     const smallListWidth = this.getSmallListWidth(accounts.length)
-    const defaultName = this.accountToUpdate && this.accountToUpdate.name ? this.accountToUpdate.name : ''
+    const defaultName = this.accountToUpdate
+      ? this.accountToUpdate.name
+        ? this.accountToUpdate.name
+        : `${labels.account}${this.accountToUpdate!.id}`
+      : ''
     return (
       <div className={classes.changeAccount}>
         <div className={classes.shadow}>

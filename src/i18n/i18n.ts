@@ -288,7 +288,8 @@ export const zhCN = {
       changeSuccess: '修改成功',
       deleteAccount: '删除账户',
       deleteAccountTitle: '确认删除账户',
-      deleteAccountText: '删除的账户将无法找回，请确保当前账户内的资产已全部转移。',
+      deleteAccountWarning: '当前账户不可删除',
+      deleteAccountText: '删除后将无法找回，请确保当前账户内的资产已全部转移。',
       deleteSuccess: '账户已删除'
     },
     account: {
@@ -836,7 +837,7 @@ export const enUS: I18nCollection = {
     accounts: {
       add: 'Add account',
       account: 'Account',
-      modifyName: 'modify Name',
+      modifyName: 'Modify Name',
       accountName: 'Account Name',
       copySuccess: 'Replicating Success!',
       currentAccount: CurrentAccountUS,
@@ -852,6 +853,7 @@ export const enUS: I18nCollection = {
       changeSuccess: 'Update Success',
       deleteAccount: 'Delete Account',
       deleteAccountTitle: 'Confirm delete account',
+      deleteAccountWarning: `you can't delete current account`,
       deleteAccountText: 'Please ensure that all assets in the current account have been transferred.',
       deleteSuccess: 'Account deleted'
     },

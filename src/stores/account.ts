@@ -1,4 +1,4 @@
-import { computed, observable, action } from 'mobx'
+import { computed, observable, action, runInAction } from 'mobx'
 
 import AccountModel, { AccountType, Opt } from '../models/account'
 import RootStore from './root'
@@ -62,15 +62,18 @@ export default class AccountStore {
   /**
    * Load wallet from data store
    */
-  async load() {
+  @action
+  load = async () => {
     try {
       const accounts = await getAccount()
       if (accounts.length > 0) {
         accounts.forEach(account => {
-          this._accountMap.set(
-            String(account.id),
-            this.newAccount(String(account.id), account.path, account.address, account.name)
-          )
+          runInAction(() => {
+            this._accountMap.set(
+              String(account.id),
+              this.newAccount(String(account.id), account.path, account.address, account.name)
+            )
+          })
         })
       }
       if (this._accountMap.size > 0) {
