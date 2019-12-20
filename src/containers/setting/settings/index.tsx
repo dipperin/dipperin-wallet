@@ -417,6 +417,8 @@ export class Setting extends React.Component<Props> {
     if (moveData) {
       // set move statu in root store
       this.props.root.setIsMovingData(true)
+      this.props.root.stopNode()
+      await sleep(1000)
       // ipc send move data
       moveChainData(this.tempSelectedPath)
       return
