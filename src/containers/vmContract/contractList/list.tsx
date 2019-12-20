@@ -108,7 +108,9 @@ export class ContractItem extends React.Component<ItemProps> {
             {contract.DRC20Token !== undefined && (
               <div className={classes.tokenWrap}>
                 <span>{labels.token}:</span>
-                <span className={classes.token}>{getShowName(contract.DRC20Token)}</span>
+                <span className={classes.token} title={contract.DRC20Token}>
+                  {getShowName(contract.DRC20Token)}
+                </span>
               </div>
             )}
           </div>
