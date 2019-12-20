@@ -515,7 +515,7 @@ export class Setting extends React.Component<Props> {
             </div>
             <div className={classes.dirSelectorBox}>
               <p>
-                {labels.left.dataDir} {isMovingData && <span>{labels.left.moving}</span>}
+                {labels.left.dataDir}: {isMovingData && <span>{labels.left.moving}</span>}
               </p>
               <input
                 type="file"
