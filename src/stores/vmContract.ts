@@ -83,11 +83,8 @@ class VmContractStore {
     if (!this._store.account.activeAccount) {
       return contracts
     }
-    console.log('dddsss111ddd', this._contract.get('0x00140374d7fda4114534315edd18d86db69c5e61efe9'))
-
     const accountAddress = this._store.account.activeAccount.address
     this._contract.forEach((contract: VmContractModel) => {
-      console.log('dddddd', contract)
       const owners = contract.owner.map((item: string) => item.toLocaleLowerCase())
       if (owners.includes(accountAddress.toLocaleLowerCase())) {
         contracts.push(contract)
@@ -496,7 +493,6 @@ class VmContractStore {
 
   private getContractsFromObj(contractObj: VmContractObj[] = []) {
     return contractObj.map(item => {
-      console.log('hahahahahaha', item, VmContractModel.fromObj(item))
       return VmContractModel.fromObj(item)
     })
   }

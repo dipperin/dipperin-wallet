@@ -261,6 +261,7 @@ export class Setting extends React.Component<Props> {
   /**
    * select remote note
    */
+  @action
   selectRemote = (remoteNode: string) => {
     // update isRemote in settings
     setIsRemoteNode(true)

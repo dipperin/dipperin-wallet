@@ -25,6 +25,7 @@ import { I18nCollectionContract } from '@/i18n/i18n'
 import styles from './styles'
 import { helper } from '@dipperin/dipperin.js'
 import { isVmContractAddress, validateEnteringAmount, formatAmount } from '@/utils'
+import { ErrMsg } from '@/utils/constants'
 
 interface WrapProps extends RouteComponentProps<{}> {
   account?: AccountStore
@@ -268,6 +269,7 @@ export class CreateContract extends React.Component<IProps> {
           throw new Error(this.props.labels.createSwal.noWASM)
         }
         this.validateParams()
+        console.log('ahahahahahh')
         if (!this.stringField.get('gas')) {
           throw new Error(this.props.labels.createSwal.noGas)
         }
@@ -325,21 +327,27 @@ export class CreateContract extends React.Component<IProps> {
 
   transformErrorInfo = (info: string): string => {
     const labels = this.props.labels
-    if (info === 'Error: Network Error' || info.includes('InvalidConnectionError')) {
-      return labels.createSwal.networkError
-    }
-    if (info === 'insufficient balance') {
-      return labels.createSwal.noEnoughBalance
-    }
+    // if (info === 'Error: Network Error') {
+    //   return labels.createSwal.networkError
+    // }
+    // if (info === 'insufficient balance') {
+    //   return labels.createSwal.noEnoughBalance
+    // }
 
-    if (info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
-      return labels.swal.alreadyInTxPool
+    // if (info === `ResponseError: Returned error: "this transaction already in tx pool"`) {
+    //   return labels.swal.alreadyInTxPool
+    // }
+    // if (info === `ResponseError: Returned error: "tx nonce is invalid"`) {
+    //   return labels.swal.invalidNonce
+    // }
+    // if (info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
+    //   return labels.swal.tooLowfee
+    // }
+    if (ErrMsg.hasOwnProperty(info)) {
+      return labels.swal[ErrMsg[info]]
     }
-    if (info === `ResponseError: Returned error: "tx nonce is invalid"`) {
-      return labels.swal.invalidNonce
-    }
-    if (info === `ResponseError: Returned error: "new fee is too low to replace the old one"`) {
-      return labels.swal.tooLowfee
+    if (info.includes('InvalidConnectionError')) {
+      return labels.swal.networkError
     }
     if (info.includes('NoEnoughBalance') || info.includes('insufficient balance')) {
       return labels.swal.insufficientFunds
