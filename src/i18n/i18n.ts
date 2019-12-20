@@ -365,6 +365,7 @@ export const zhCN = {
       ViewHistory: '查看记录',
       deleteSuccess: '删除成功',
       cancel: '取消',
+      token: '余额',
       addDialog: {
         title: '添加合约',
         label: '合约地址',
@@ -930,6 +931,7 @@ export const enUS: I18nCollection = {
       deleteContract: 'Delete Contract',
       ViewHistory: 'View History',
       cancel: 'Cancel',
+      token: 'Token',
       addDialog: {
         title: 'Add Smart Contract',
         label: 'Smart Contract Address',

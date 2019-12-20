@@ -105,6 +105,14 @@ export class ContractItem extends React.Component<ItemProps> {
               //   <img src={Copy} alt="" title="copy" />
               // </Button>
             )}
+            {contract.DRC20Token !== undefined && (
+              <div className={classes.tokenWrap}>
+                <span>{labels.token}:</span>
+                <span className={classes.token} title={contract.DRC20Token}>
+                  {getShowName(contract.DRC20Token)}
+                </span>
+              </div>
+            )}
           </div>
           <div className={classes.date}>
             {contract.contractAddress} &nbsp;&nbsp;&nbsp; {format(new Date(contract.timestamp), 'YYYY/MM/DD HH:mm')}
