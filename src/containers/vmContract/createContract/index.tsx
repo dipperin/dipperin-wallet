@@ -269,7 +269,6 @@ export class CreateContract extends React.Component<IProps> {
           throw new Error(this.props.labels.createSwal.noWASM)
         }
         this.validateParams()
-        console.log('ahahahahahh')
         if (!this.stringField.get('gas')) {
           throw new Error(this.props.labels.createSwal.noGas)
         }

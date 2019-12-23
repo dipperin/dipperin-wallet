@@ -105,7 +105,7 @@ export class Sidebar extends React.Component<Props> {
     )
     const brand = (
       <div className={classes.logo} onClick={this.showWalletInfo}>
-        <a onClick={this.backToHome} className={classes.logoLink}>
+        <a className={classes.logoLink}>
           <div className={classes.logoImage}>
             <img src={logo} alt="logo" className={classes.img} />
           </div>

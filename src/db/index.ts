@@ -198,10 +198,10 @@ export const updateErrTimes = (walletId: number, unlockErrTimes: number = 0) => 
 /**
  * vm contract
  */
-export const deleteVmContract = async (contractAddress: string) => {
+export const deleteVmContract = async (txHash: string) => {
   const db = getDB(VM_CONTRACT_DB)
   await new Promise(resolve => {
-    db.remove({ contractAddress }, (_, res) => {
+    db.remove({ txHash }, (_, res) => {
       resolve(true)
     })
   })

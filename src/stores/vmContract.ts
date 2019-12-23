@@ -367,9 +367,13 @@ class VmContractStore {
     this._pendingContract.clear()
   }
   @action
-  deleteContract = async (contractAddress: string) => {
-    this._contract.delete(contractAddress)
-    await deleteVmContract(contractAddress)
+  deleteContract = async (contract: VmContractModel) => {
+    if (contract.status === TRANSACTION_STATUS_SUCCESS) {
+      this._contract.delete(contract.contractAddress)
+    } else {
+      this._pendingContract.delete(contract.txHash)
+    }
+    await deleteVmContract(contract.txHash)
   }
   @action
   updateContract = async (contract: VmContractModel) => {
