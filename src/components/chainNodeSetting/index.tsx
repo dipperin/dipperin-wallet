@@ -76,6 +76,8 @@ class NodeSetting extends React.Component<Props> {
     } else {
       // (ipc)restart local node with different net
       setNodeNet(net)
+      // reconnect node in ipc event listener
+      this.props.root!.reconnect()
     }
   }
 
