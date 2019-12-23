@@ -230,6 +230,7 @@ export class Setting extends React.Component<Props> {
       // (ipc)restart local node with different net
       setNodeNet(net)
       // reconnect node in ipc event listener
+      this.props.root.reconnect()
     } else {
       this.selectRemote(net)
     }
@@ -418,6 +419,8 @@ export class Setting extends React.Component<Props> {
     if (moveData) {
       // set move statu in root store
       this.props.root.setIsMovingData(true)
+      this.props.root.stopNode()
+      await sleep(1000)
       // ipc send move data
       moveChainData(this.tempSelectedPath)
       return
@@ -514,7 +517,7 @@ export class Setting extends React.Component<Props> {
             </div>
             <div className={classes.dirSelectorBox}>
               <p>
-                {labels.left.dataDir} {isMovingData && <span>{labels.left.moving}</span>}
+                {labels.left.dataDir}: {isMovingData && <span>{labels.left.moving}</span>}
               </p>
               <input
                 type="file"

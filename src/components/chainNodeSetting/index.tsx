@@ -66,7 +66,7 @@ class NodeSetting extends React.Component<Props> {
     // update settings netEnv
     setCurrentNet(net)
     // update isRemote in settings
-    setIsRemoteNode(true)
+    setIsRemoteNode(isRemote)
     // disconnect node
     this.props.root!.stopConnectNode()
 
@@ -76,6 +76,8 @@ class NodeSetting extends React.Component<Props> {
     } else {
       // (ipc)restart local node with different net
       setNodeNet(net)
+      // reconnect node in ipc event listener
+      this.props.root!.reconnect()
     }
   }
 

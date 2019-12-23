@@ -86,26 +86,26 @@ const moveToEmptyDir = (oldPath: string, newPath: string, event: Event) => {
   //     event.sender.send(MOVE_DATA_STATUS, false)
   //   }
   // }
-  // fsExtra.move(oldPath, newPath, (err) => {
-  //   if(err) {
-  //     log.info('move failure')
-  //     log.error(err)
-  //     event.sender.send(MOVE_DATA_STATUS, false)
-  //     return
-  //   }
-  //   log.info('move success')
-  //   event.sender.send(MOVE_DATA_STATUS, true)
-  // })
-
-  try {
-    fsExtra.copySync(oldPath, newPath)
+  fsExtra.move(oldPath, newPath, (err) => {
+    if(err) {
+      log.info('move failure')
+      log.error(err)
+      event.sender.send(MOVE_DATA_STATUS, false)
+      return
+    }
     log.info('move success')
     event.sender.send(MOVE_DATA_STATUS, true)
-  } catch(err) {
-    log.info('move failure')
-    log.error(err)
-    event.sender.send(MOVE_DATA_STATUS, false)
-  }
+  })
+
+  // try {
+  //   fsExtra.copySync(oldPath, newPath)
+  //   log.info('move success')
+  //   event.sender.send(MOVE_DATA_STATUS, true)
+  // } catch(err) {
+  //   log.info('move failure')
+  //   log.error(err)
+  //   event.sender.send(MOVE_DATA_STATUS, false)
+  // }
   
 }
 
