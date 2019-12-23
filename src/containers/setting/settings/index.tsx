@@ -230,6 +230,7 @@ export class Setting extends React.Component<Props> {
       // (ipc)restart local node with different net
       setNodeNet(net)
       // reconnect node in ipc event listener
+      this.props.root.reconnect()
     } else {
       this.selectRemote(net)
     }
