@@ -394,9 +394,9 @@ export const zhCN = {
         noGas: '未输入Gas上限',
         noGasPrice: '未输入Gas单价',
         getAbi: '获取ABI失败',
-        feeMax: '手续费不足',
-        networkError: '当前网络不可用，请检查网络！',
-        noEnoughBalance: '账户余额不足'
+        feeMax: '手续费不足'
+        // networkError: '当前网络不可用，请检查网络！',
+        // noEnoughBalance: '账户余额不足'
       },
       labs: {
         transfer: '合约转账',
@@ -410,7 +410,8 @@ export const zhCN = {
         tooLowfee: '请等待上笔交易上链后发送!',
         tooMuchExtraData: '备注内容过多，请优化备注内容!',
         networkError: '当前网络不可用，请检查网络',
-        insufficientFunds: '账户余额不足'
+        insufficientFunds: '账户余额不足',
+        noEnoughBalance: '账户余额不足'
       }
     },
 
@@ -960,9 +961,9 @@ export const enUS: I18nCollection = {
         paramsLengthErr: 'Number of input parameter is wrong',
         contractAddressErr: 'The contract address is wrong',
         getAbi: 'Get ABI error',
-        feeMax: 'Fee is less than the minimum fee',
-        networkError: 'Current network is unreachable, please check your network connection.',
-        noEnoughBalance: 'Insufficient balance'
+        feeMax: 'Fee is less than the minimum fee'
+        // networkError: 'Current network is unreachable, please check your network connection.',
+        // noEnoughBalance: 'Insufficient balance'
       },
       labs: {
         transfer: 'Transfer',
@@ -976,7 +977,8 @@ export const enUS: I18nCollection = {
         tooLowfee: 'Please wait until the last transaction finishes!',
         tooMuchExtraData: 'The entered text is too long, please optimize your content.',
         networkError: 'The network connection is abnormal, please check your network！',
-        insufficientFunds: ' Insufficient balance'
+        insufficientFunds: ' Insufficient balance',
+        noEnoughBalance: 'Insufficient balance'
       }
     },
     transfer: {

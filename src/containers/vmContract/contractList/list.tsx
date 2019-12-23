@@ -21,7 +21,7 @@ interface ItemProps extends WithStyles {
   jumpToCall: (contractAddress: string, contractTxHash: string) => void
   jumpToDetail: (contractAddress: string) => void
   showChangeNamePop: (contract: VmContractModel) => void
-  deleteContract: (address: string) => void
+  deleteContract: (contract: VmContractModel) => void
   index: number
 }
 
@@ -64,11 +64,8 @@ export class ContractItem extends React.Component<ItemProps> {
     showChangeNamePop(contract)
   }
   removeContract = () => {
-    const {
-      deleteContract,
-      contract: { contractAddress }
-    } = this.props
-    deleteContract(contractAddress)
+    const { deleteContract, contract } = this.props
+    deleteContract(contract)
   }
 
   render() {

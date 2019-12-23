@@ -110,7 +110,7 @@ export class VmContractList extends React.Component<Props> {
     this.isShowChangeNamePop = true
   }
   @action
-  deleteContract = async (address: string) => {
+  deleteContract = async (contract: VmContractModel) => {
     const { deleteContract } = this.props.vmContract!
     const result = await swal.fire({
       icon: 'warning',
@@ -122,7 +122,7 @@ export class VmContractList extends React.Component<Props> {
       reverseButtons: true
     })
     if (result.value) {
-      await deleteContract(address)
+      await deleteContract(contract)
       swal.fire({
         icon: 'success',
         text: this.props.labels.deleteSuccess,
@@ -137,7 +137,6 @@ export class VmContractList extends React.Component<Props> {
     const haveContract = (contracts && contracts.length > 0) || (pendingContracts && pendingContracts.length > 0)
     const defaultName =
       this.contractToUpdate && this.contractToUpdate!.contractName ? this.contractToUpdate!.contractName : ''
-
     return (
       <Fragment>
         <div className={classes.title}>
