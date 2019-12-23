@@ -66,7 +66,7 @@ class NodeSetting extends React.Component<Props> {
     // update settings netEnv
     setCurrentNet(net)
     // update isRemote in settings
-    setIsRemoteNode(true)
+    setIsRemoteNode(isRemote)
     // disconnect node
     this.props.root!.stopConnectNode()
 
