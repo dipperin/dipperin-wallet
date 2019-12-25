@@ -29,6 +29,7 @@ export class BigAccountList extends React.Component<Props> {
       showDialogConfirm,
       deleteAccount
     } = this.props
+    console.log('listacounts', accounts)
     return (
       <div className={classes.bigList}>
         {accounts.map((account, index) => {

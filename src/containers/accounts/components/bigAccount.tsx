@@ -7,6 +7,7 @@ import swal from 'sweetalert2'
 import { I18nCollectionAccount } from '@/i18n/i18n'
 import styles from '../accountsStyle'
 import { getShowName } from '@/utils'
+import { observer } from 'mobx-react'
 
 import Copy from '@/images/copy.png'
 // import Edit from '@/images/edit.png'
@@ -19,6 +20,7 @@ interface BigAccountProps extends WithStyles<typeof styles> {
   showDialogConfirm: (account: AccountModel) => void
   deleteAccount: (id: string) => void
 }
+@observer
 export class BigAccount extends React.Component<BigAccountProps> {
   handleChangeActiveAccount = () => {
     this.props.handleChangeActiveAccount(this.props.account.id)
