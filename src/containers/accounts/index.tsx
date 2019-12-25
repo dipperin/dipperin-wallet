@@ -316,6 +316,7 @@ export class Accounts extends React.Component<Props> {
         ? this.accountToUpdate.name
         : `${labels.account}${this.accountToUpdate!.id}`
       : ''
+
     return (
       <div className={classes.changeAccount}>
         <div className={classes.shadow}>
