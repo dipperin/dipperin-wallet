@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=branch::$(echo ${GITHUB_REF:11})
+
       - name: Check out Git repository
         uses: actions/checkout@v2
 
@@ -26,9 +30,10 @@ jobs:
       
       - name: push
         uses: github-actions-x/commit@v2.3
+        if: startsWith(github.event.ref, 'refs/heads/')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: 'master'
+          push-branch: ${{ steps.vars.outputs.branch }}
           commit-message: 'lint'
           force-add: 'false'
           name: Github Action
