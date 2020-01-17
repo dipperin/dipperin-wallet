@@ -306,10 +306,8 @@ class RootStore {
   }
 
   stopNode() {
-    if (this._isConnecting) {
-      sendStopNode()
-      this.stopConnectNode()
-    }
+    sendStopNode()
+    this.stopConnectNode()
     this.wallet.setMineState('init')
   }
 

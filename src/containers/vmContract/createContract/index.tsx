@@ -248,7 +248,8 @@ export class CreateContract extends React.Component<IProps> {
   validateParams = () => {
     const label = this.props.labels.createSwal
     // validates params' length
-    const params = (this.stringField.get('params') || '').split(',')
+    const paramsString = this.stringField.get('params')
+    const params = paramsString ? paramsString.split(',') : []
     const initFunc = (this.jsonAbi.find(
       abi => abi.name === 'init' && abi.type === 'function'
     ) as unknown) as VmcontractAbi

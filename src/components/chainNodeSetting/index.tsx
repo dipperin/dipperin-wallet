@@ -71,8 +71,8 @@ class NodeSetting extends React.Component<Props> {
     if (isRemote !== this.props.root!.isRemoteNode) {
       this.props.root!.toggleIsRemoteNode()
     }
-    // disconnect node
-    this.props.root!.stopConnectNode()
+    // stop node
+    this.props.root!.stopNode()
 
     if (isRemote) {
       // change provide
@@ -80,6 +80,7 @@ class NodeSetting extends React.Component<Props> {
     } else {
       // (ipc)restart local node with different net
       setNodeNet(net)
+      this.props.root!.startNode()
       // reconnect node in ipc event listener
       this.props.root!.reconnect()
     }
