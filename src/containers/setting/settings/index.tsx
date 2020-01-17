@@ -224,7 +224,7 @@ export class Setting extends React.Component<Props> {
       this.netEnv = net
     })
     // disconnect node
-    this.props.root.stopConnectNode()
+    this.props.root.stopNode()
 
     if (!this.props.root.isRemoteNode) {
       // (ipc)restart local node with different net
@@ -423,6 +423,8 @@ export class Setting extends React.Component<Props> {
       await sleep(1000)
       // ipc send move data
       moveChainData(this.tempSelectedPath)
+      // reconnect node in ipc event listener
+      this.props.root!.reconnect()
       return
     }
 
@@ -433,6 +435,8 @@ export class Setting extends React.Component<Props> {
       this.props.root.stopNode()
       await sleep(1000)
       this.props.root.startNode()
+      // reconnect node in ipc event listener
+      this.props.root!.reconnect()
     }
   }
 
