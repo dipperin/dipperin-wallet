@@ -1,8 +1,10 @@
 name: Lint
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: [master,dev]
+  pull_request:
+    branches: [master,dev]
 
 jobs:
   run-linters:
@@ -10,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=branch::$(echo ${GITHUB_REF:11})
-
       - name: Check out Git repository
         uses: actions/checkout@v2
 
@@ -27,14 +25,28 @@ jobs:
 
       - name: Run linters
         run: yarn fix
-      
+
+      - name: Add changes to Git tracking
+        id: git_commit
+        run: |
+          git config --global user.email "it@dipperin.io"
+          git config --global user.name "Github Action"
+          changes=$(git status -s | wc -l)
+          echo ::set-output name=changes::$changes
+          echo $changes
+          if [ "$changes" -gt "0" ] ; then
+            echo "commit"
+            git add -A .
+            git commit -am 'lint'
+          fi
+
       - name: push
+        if: steps.git_commit.outputs.changes > 0
         uses: github-actions-x/commit@v2.3
-        if: startsWith(github.event.ref, 'refs/heads/')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: ${{ steps.vars.outputs.branch }}
+          push-branch: 'master'
           commit-message: 'lint'
           force-add: 'false'
           name: Github Action
-          email: it@dipperin.io 
+          email: it@dipperin.io
