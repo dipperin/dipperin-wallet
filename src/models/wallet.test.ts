@@ -45,6 +45,12 @@ import BIP39 from 'bip39'
 // })
 
 describe('aa', () => {
-  const seed = BIP39.mnemonicToSeedHex('unusual drastic patrol mansion fuel more obey acquire disagree head trip chat')
-  expect(seed).toBe('aa')
+  it('seed', () => {
+    const seed = BIP39.mnemonicToSeedHex(
+      'unusual drastic patrol mansion fuel more obey acquire disagree head trip chat'
+    )
+    expect(seed).toBe(
+      '2da41ba5e1627fa7f1f5c2d293c0ea427f5372f14884a52065751271b8861b6d392b376f6e00420dd0d25b058a1292752b9f915db7e486af2e350b60276c8921'
+    )
+  })
 })
